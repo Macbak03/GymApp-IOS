@@ -9,7 +9,12 @@ import SwiftUI
 
 struct CreatePlanDialogView: View {
     @Binding var trainingPlans: [TrainingPlan]
-    @State private var planName = ""
+    let plansDatabaseHelper: PlansDataBaseHelper
+    let dialogTitle: String
+    let confirmButtonTitle: String
+    let state: DialogState
+    @State var planNameText: String
+    @Binding var planName: String?
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -22,12 +27,12 @@ struct CreatePlanDialogView: View {
                 
                 VStack {
                     // Title at the top, centered horizontally
-                    Text("Create Training Plan")
+                    Text(dialogTitle)
                         .font(.title)
                         .padding(.top)
                     
                     // TextField for entering plan name
-                    TextField("Enter training plan name", text: $planName)
+                    TextField("Enter training plan name", text: $planNameText)
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(10)
@@ -44,11 +49,15 @@ struct CreatePlanDialogView: View {
                         Spacer() // Pushes the buttons to the sides
                         
                         Button(action: {
-                            addPlan()
+                            if state == DialogState.add {
+                                addPlan()
+                            } else {
+                                editPlan()
+                            }
                         }) {
-                            Text("Add Plan")
+                            Text(confirmButtonTitle)
                         }
-                        .disabled(planName.isEmpty)
+                        .disabled(planNameText.isEmpty)
                         .padding()
                     }
                     .padding(.horizontal)
@@ -60,16 +69,15 @@ struct CreatePlanDialogView: View {
                 .padding(.horizontal)
                 .frame(maxWidth: .infinity) // Take the full width at the bottom
             }
-            //.background(Color.blur())
         }
     }
     
     func addPlan() {
-        if planName.isEmpty || planName == PlansView.defaultPlan.name {
+        if planNameText.isEmpty || planNameText == PlansView.defaultPlan.name {
             return
         }
         
-        if trainingPlans.contains(where: { $0.name == planName }) {
+        if trainingPlans.contains(where: { $0.name == planNameText }) {
             // Show error: plan with this name already exists
             return
         }
@@ -78,14 +86,38 @@ struct CreatePlanDialogView: View {
             trainingPlans.removeAll()
         }
         
-        trainingPlans.append(TrainingPlan(name: planName))
+        plansDatabaseHelper.addPlan(planName: planNameText)
+        trainingPlans.append(TrainingPlan(name: planNameText))
+        presentationMode.wrappedValue.dismiss()
+    }
+    
+    func editPlan(){
+        if planNameText.isEmpty || planNameText == PlansView.defaultPlan.name {
+            return
+        }
+        if trainingPlans.contains(where: { $0.name == planNameText }) {
+            // Show error: plan with this name already exists
+            return
+        }
+        guard let checkedPlanName = planName else {
+            print("Plan name is null, cannot retrieve plan ID.")
+            return
+        }
+        let planId = plansDatabaseHelper.getPlanId(planName: checkedPlanName)
+        guard let checkedPlanId = planId else {
+            print("Plan ID is null.")
+            return
+        }
+        plansDatabaseHelper.updatePlanName(planId: checkedPlanId, newName: planNameText)
         presentationMode.wrappedValue.dismiss()
     }
 }
 
 struct CreatePlanDialogView_Previews: PreviewProvider {
     @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
+    static var plansDatabaseHelper = PlansDataBaseHelper()
+    @State static var planName: String?
     static var previews: some View {
-        CreatePlanDialogView(trainingPlans: $trainingPlans)
+        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper,dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", planName: $planName)
     }
 }

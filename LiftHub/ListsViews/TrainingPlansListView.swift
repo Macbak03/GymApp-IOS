@@ -9,41 +9,47 @@ import SwiftUI
 
 struct TrainingPlansListView: View {
     @Binding var trainingPlans: [TrainingPlan]
+    let plansDatabaseHelper: PlansDataBaseHelper
     let geometry: GeometryProxy
     var body: some View {
         ScrollView {
             ForEach(trainingPlans) {
                 plan in 
-                TrainingPlansElementView(plan: plan)
+                TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, planName: plan.name)
             }
         }
     }
 }
 
 struct TrainingPlansElementView: View {
-    let plan: TrainingPlan
+    @Binding var trainingPlans: [TrainingPlan]
+    let plansDatabaseHelper: PlansDataBaseHelper
+    @State var planName: String
     @Environment(\.colorScheme) var colorScheme
-    //var onMoreButtonTap: () -> Void
+    @State private var showOptionsDialog = false
     var body: some View {
         HStack {
-            Text(plan.name)
+            Text(planName)
                 .font(.system(size: 25, weight: .medium))
                 .foregroundColor(Color.TextColorPrimary)
                 .padding(.leading, 5)
             
             Spacer()
             
-            Button(action: {
-                //onMoreButtonTap()
-            }) {
-                Image(systemName: "ellipsis")
-                    .resizable()
-                    .frame(width: 20, height: 5)
-                    .padding()
-                    .rotationEffect(.degrees(90))
+            
+            if planName != PlansView.defaultPlan.name {
+                Button(action: {
+                    showOptionsDialog = true
+                }) {
+                    Image(systemName: "ellipsis")
+                        .resizable()
+                        .frame(width: 20, height: 5)
+                        .padding()
+                        .rotationEffect(.degrees(90))
+                }
+                .frame(width: 30, height: 50)
+                .background(Color.clear) // You can modify this to fit the background style
             }
-            .frame(width: 30, height: 50)
-            .background(Color.clear) // You can modify this to fit the background style
         }
         .padding(5)
         .background(
@@ -52,14 +58,19 @@ struct TrainingPlansElementView: View {
                 .shadow(radius: 3)
         )
         .padding(.horizontal, 8) // Card marginHorizontal
+        .sheet(isPresented: $showOptionsDialog) {
+            PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, planName: $planName)
+        }
     }
 }
 
 struct TrainingPlansElementView_Previews: PreviewProvider {
     @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
+    static var plansDatabaseHelper = PlansDataBaseHelper()
+
     static var previews: some View {
         GeometryReader { geometry in
-            TrainingPlansListView(trainingPlans: $trainingPlans, geometry: geometry)
+            TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)
         }
     }
 }

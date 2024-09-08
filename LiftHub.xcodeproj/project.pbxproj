@@ -25,6 +25,9 @@
 		5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E652C8CF21100FB6400 /* TrainingPlan.swift */; };
 		5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */; };
 		5FE53E6C2C8DF58300FB6400 /* CreatePlanDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */; };
+		5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */; };
+		5FE53E752C8E223500FB6400 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 5FE53E742C8E223500FB6400 /* SQLite */; };
+		5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +70,8 @@
 		5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlansListView.swift; sourceTree = "<group>"; };
 		5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanDialogView.swift; sourceTree = "<group>"; };
 		5FE53E6F2C8E026600FB6400 /* .gitignore.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = .gitignore.md; sourceTree = "<group>"; };
+		5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansDatabaseHelper.swift; sourceTree = "<group>"; };
+		5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanOptionsDialog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE53E752C8E223500FB6400 /* SQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +124,7 @@
 		5FE53E252C8C727C00FB6400 /* LiftHub */ = {
 			isa = PBXGroup;
 			children = (
+				5FE53E712C8E214B00FB6400 /* Persistence */,
 				5FE53E6A2C8DF55400FB6400 /* DialogViews */,
 				5FE53E672C8DE7E800FB6400 /* ListsViews */,
 				5FE53E642C8CF1F800FB6400 /* Model */,
@@ -214,8 +221,17 @@
 			isa = PBXGroup;
 			children = (
 				5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */,
+				5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */,
 			);
 			path = DialogViews;
+			sourceTree = "<group>";
+		};
+		5FE53E712C8E214B00FB6400 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,6 +250,9 @@
 			dependencies = (
 			);
 			name = LiftHub;
+			packageProductDependencies = (
+				5FE53E742C8E223500FB6400 /* SQLite */,
+			);
 			productName = LiftHub;
 			productReference = 5FE53E232C8C727C00FB6400 /* LiftHub.app */;
 			productType = "com.apple.product-type.application";
@@ -306,6 +325,9 @@
 				Base,
 			);
 			mainGroup = 5FE53E1A2C8C727C00FB6400;
+			packageReferences = (
+				5FE53E702C8E213900FB6400 /* XCRemoteSwiftPackageReference "SQLite" */,
+			);
 			productRefGroup = 5FE53E242C8C727C00FB6400 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -349,10 +371,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */,
+				5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */,
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
 				5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */,
 				5FE53E612C8CC05800FB6400 /* SettingsView.swift in Sources */,
 				5FE53E6C2C8DF58300FB6400 /* CreatePlanDialogView.swift in Sources */,
+				5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */,
 				5FE53E272C8C727C00FB6400 /* LiftHubApp.swift in Sources */,
 				5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */,
 				5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */,
@@ -531,6 +555,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -559,6 +584,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -684,6 +710,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5FE53E702C8E213900FB6400 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5FE53E742C8E223500FB6400 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FE53E702C8E213900FB6400 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5FE53E1B2C8C727C00FB6400 /* Project object */;
 }

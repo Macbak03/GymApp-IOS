@@ -13,6 +13,7 @@ struct PlansView: View {
     @State private var showDeleteAlert = false
     @State private var selectedPlan: TrainingPlan?
     @State private var isPlanDefault = false
+    private let plansDatabaseHelper = PlansDataBaseHelper()
     
     static var defaultPlan = TrainingPlan(name: "Create training plan")
     
@@ -22,11 +23,14 @@ struct PlansView: View {
                 Backgroundimage(geometry: geometry)
                 VStack {
                     // RecyclerView equivalent (could be a ScrollView or List in SwiftUI)
-                    TrainingPlansListView(trainingPlans: $trainingPlans, geometry: geometry)
+                    TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)
+                        .onAppear() {
+                            loadPlans()
+                        }
                     
                     Spacer()
                     
-                    AddButton(geometry: geometry, trainingPlans: $trainingPlans, defaultPlan: PlansView.defaultPlan)
+                    AddButton(geometry: geometry, trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
                     
                     Spacer()
                 }
@@ -40,8 +44,10 @@ struct PlansView: View {
     }
     
     func loadPlans() {
-        // Load the plans from database (mock implementation for now)
-        trainingPlans = [PlansView.defaultPlan]
+        trainingPlans = plansDatabaseHelper.getPlans()
+        if trainingPlans.isEmpty {
+            trainingPlans.append(PlansView.defaultPlan)
+        }
     }
     
     func deletePlan(at offsets: IndexSet) {
@@ -61,7 +67,7 @@ struct PlansView: View {
 struct AddButton: View {
     let geometry: GeometryProxy
     @Binding var trainingPlans: [TrainingPlan]
-    let defaultPlan: TrainingPlan
+    let plansDatabaseHelper: PlansDataBaseHelper
     
     @State private var showCreatePlanDialog = false
     
@@ -82,7 +88,11 @@ struct AddButton: View {
             height: geometry.size.height * buttonScale
         )
         .sheet(isPresented: $showCreatePlanDialog) {
-            CreatePlanDialogView(trainingPlans: $trainingPlans)
+            @State var name = ""
+            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", planName: Binding<String?>(
+                get: { name },   // Getter: Returns the non-optional value
+                set: { name = $0 ?? "" })
+                                 )
         }
     }
 }
