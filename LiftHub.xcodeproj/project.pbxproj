@@ -66,6 +66,7 @@
 		5FE53E652C8CF21100FB6400 /* TrainingPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlan.swift; sourceTree = "<group>"; };
 		5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlansListView.swift; sourceTree = "<group>"; };
 		5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanDialogView.swift; sourceTree = "<group>"; };
+		5FE53E6F2C8E026600FB6400 /* .gitignore.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = .gitignore.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +97,7 @@
 		5FE53E1A2C8C727C00FB6400 = {
 			isa = PBXGroup;
 			children = (
+				5FE53E6F2C8E026600FB6400 /* .gitignore.md */,
 				5FE53E252C8C727C00FB6400 /* LiftHub */,
 				5FE53E362C8C727D00FB6400 /* LiftHubTests */,
 				5FE53E402C8C727D00FB6400 /* LiftHubUITests */,
