@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TrainingPlan: Identifiable {
+class TrainingPlan: Equatable {
     var id = UUID()
     var name: String
     
@@ -17,5 +17,9 @@ class TrainingPlan: Identifiable {
     
     var description: String {
         return name
+    }
+    
+    static func == (lhs: TrainingPlan, rhs: TrainingPlan) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
     }
 }

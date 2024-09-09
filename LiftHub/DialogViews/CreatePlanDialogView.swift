@@ -14,8 +14,10 @@ struct CreatePlanDialogView: View {
     let confirmButtonTitle: String
     let state: DialogState
     @State var planNameText: String
-    @Binding var planName: String?
+    let position: Int?
+    @State var planName: String = ""
     @Environment(\.presentationMode) var presentationMode
+    
     
     var body: some View {
         ZStack{
@@ -68,6 +70,11 @@ struct CreatePlanDialogView: View {
                 .shadow(radius: 10)
                 .padding(.horizontal)
                 .frame(maxWidth: .infinity) // Take the full width at the bottom
+                .onAppear() {
+                    if let position = position, position < trainingPlans.count {
+                        planName = trainingPlans[position].name
+                    }
+                }
             }
         }
     }
@@ -99,16 +106,17 @@ struct CreatePlanDialogView: View {
             // Show error: plan with this name already exists
             return
         }
-        guard let checkedPlanName = planName else {
-            print("Plan name is null, cannot retrieve plan ID.")
-            return
-        }
-        let planId = plansDatabaseHelper.getPlanId(planName: checkedPlanName)
+        let planId = plansDatabaseHelper.getPlanId(planName: planName)
         guard let checkedPlanId = planId else {
             print("Plan ID is null.")
             return
         }
+        guard let checkedPosition = position else {
+            print("Position is null.")
+            return
+        }
         plansDatabaseHelper.updatePlanName(planId: checkedPlanId, newName: planNameText)
+        trainingPlans[checkedPosition].name = planNameText
         presentationMode.wrappedValue.dismiss()
     }
 }
@@ -118,6 +126,6 @@ struct CreatePlanDialogView_Previews: PreviewProvider {
     static var plansDatabaseHelper = PlansDataBaseHelper()
     @State static var planName: String?
     static var previews: some View {
-        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper,dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", planName: $planName)
+        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper,dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", position: nil)
     }
 }

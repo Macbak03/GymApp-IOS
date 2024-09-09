@@ -13,9 +13,9 @@ struct TrainingPlansListView: View {
     let geometry: GeometryProxy
     var body: some View {
         ScrollView {
-            ForEach(trainingPlans) {
-                plan in 
-                TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, planName: plan.name)
+            ForEach(trainingPlans.indices, id: \.self) {
+                index in
+                TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: index)
             }
         }
     }
@@ -24,15 +24,22 @@ struct TrainingPlansListView: View {
 struct TrainingPlansElementView: View {
     @Binding var trainingPlans: [TrainingPlan]
     let plansDatabaseHelper: PlansDataBaseHelper
-    @State var planName: String
+    let position: Int
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
+    @State var planName: String = ""
     var body: some View {
         HStack {
             Text(planName)
                 .font(.system(size: 25, weight: .medium))
                 .foregroundColor(Color.TextColorPrimary)
                 .padding(.leading, 5)
+                .onAppear {
+                    // Set the initial value of planName
+                    if position < trainingPlans.count {
+                        planName = trainingPlans[position].name
+                    }
+                }
             
             Spacer()
             
@@ -51,6 +58,7 @@ struct TrainingPlansElementView: View {
                 .background(Color.clear) // You can modify this to fit the background style
             }
         }
+        .frame(maxWidth: .infinity, minHeight: 50)
         .padding(5)
         .background(
             RoundedRectangle(cornerRadius: 8)
@@ -58,16 +66,20 @@ struct TrainingPlansElementView: View {
                 .shadow(radius: 3)
         )
         .padding(.horizontal, 8) // Card marginHorizontal
-        .sheet(isPresented: $showOptionsDialog) {
-            PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, planName: $planName)
+        .sheet(isPresented: $showOptionsDialog, onDismiss: {
+            if position < trainingPlans.count {
+                planName = trainingPlans[position].name
+            }
+        }) {
+            PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: position)
         }
     }
 }
 
 struct TrainingPlansElementView_Previews: PreviewProvider {
-    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
+    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: PlansView.defaultPlan.name), TrainingPlan(name: "plan2")]
     static var plansDatabaseHelper = PlansDataBaseHelper()
-
+    
     static var previews: some View {
         GeometryReader { geometry in
             TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)

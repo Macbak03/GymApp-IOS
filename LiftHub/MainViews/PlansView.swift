@@ -49,19 +49,6 @@ struct PlansView: View {
             trainingPlans.append(PlansView.defaultPlan)
         }
     }
-    
-    func deletePlan(at offsets: IndexSet) {
-        if let index = offsets.first {
-            selectedPlan = trainingPlans[index]
-            showDeleteAlert = true
-        }
-    }
-    
-    func deleteConfirmed(plan: TrainingPlan) {
-        if let index = trainingPlans.firstIndex(where: { $0.id == plan.id }) {
-            trainingPlans.remove(at: index)
-        }
-    }
 }
 
 struct AddButton: View {
@@ -89,10 +76,7 @@ struct AddButton: View {
         )
         .sheet(isPresented: $showCreatePlanDialog) {
             @State var name = ""
-            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", planName: Binding<String?>(
-                get: { name },   // Getter: Returns the non-optional value
-                set: { name = $0 ?? "" })
-                                 )
+            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", position: nil)
         }
     }
 }

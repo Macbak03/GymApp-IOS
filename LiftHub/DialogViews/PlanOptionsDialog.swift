@@ -6,17 +6,17 @@
 //
 
 
-
-// TODO: Nazwa planu nie zmiania sie dynamicznie z edycją tylko po ponownym zaladowaniu widoku
 import SwiftUI
 
 struct PlanOptionsDialog: View {
     @Binding var trainingPlans: [TrainingPlan]
     let plansDatabaseHelper: PlansDataBaseHelper
-    @Binding var planName: String
+    let position: Int
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
     @State private var showEditPlanDialog = false
+    @State private var showAlertDialog = false
+    @State var planName: String = ""
     var body: some View {
         ZStack{
             Color.black.opacity(0.3)
@@ -40,6 +40,12 @@ struct PlanOptionsDialog: View {
                             .foregroundColor(Color.textColorPrimary)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
+                            .onAppear {
+                                // Set the initial value of planName
+                                if position < trainingPlans.count {
+                                    planName = trainingPlans[position].name
+                                }
+                            }
                     }
                     .padding(.top, 15)
                     .padding(.horizontal, 10)
@@ -61,16 +67,17 @@ struct PlanOptionsDialog: View {
                     }
                     .padding(.horizontal, 30)
                     .padding(.top, 10)
-                    .sheet(isPresented: $showEditPlanDialog) {
-                        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planName, planName: Binding<String?>(
-                            get: { self.planName },   // Getter: Returns the non-optional value
-                            set: { self.planName = $0 ?? "" })
-                                             )
+                    .sheet(isPresented: $showEditPlanDialog, onDismiss: {
+                        if position < trainingPlans.count {
+                            planName = trainingPlans[position].name
+                        }
+                    }) {
+                        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planName, position: position)
                     }
                     
                     // Delete Button
                     Button(action: {
-                        // Delete action here
+                        showAlertDialog = true
                     }) {
                         Text("Delete")
                             .font(.system(size: 18))
@@ -85,6 +92,17 @@ struct PlanOptionsDialog: View {
                     }
                     .padding(.horizontal, 30)
                     .padding(.top, 5)
+                    .alert(isPresented: $showAlertDialog) {
+                        Alert(
+                            title: Text("Warning"),
+                            message: Text("Are you sure you want to delete \(planName)?"),
+                            primaryButton: .destructive(Text("OK")) {
+                                deletePlan()
+                                presentationMode.wrappedValue.dismiss()
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    }
                     
                     // Cancel Button
                     Button(action: {
@@ -114,6 +132,11 @@ struct PlanOptionsDialog: View {
             }
         }
     }
+    
+    func deletePlan() {
+        plansDatabaseHelper.deletePlan(planName: planName)
+        trainingPlans.remove(at: position)
+    }
 }
 
 struct OptionsDialog_Previews: PreviewProvider {
@@ -121,6 +144,6 @@ struct OptionsDialog_Previews: PreviewProvider {
     static var plansDatabaseHelper = PlansDataBaseHelper()
     @State static var planName = "Plan"
     static var previews: some View {
-        PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, planName: $planName)
+        PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: 1)
     }
 }
