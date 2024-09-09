@@ -10,9 +10,6 @@ import Foundation
 
 struct PlansView: View {
     @State private var trainingPlans: [TrainingPlan] = []
-    @State private var showDeleteAlert = false
-    @State private var selectedPlan: TrainingPlan?
-    @State private var isPlanDefault = false
     private let plansDatabaseHelper = PlansDataBaseHelper()
     
     static var defaultPlan = TrainingPlan(name: "Create training plan")
@@ -51,7 +48,7 @@ struct PlansView: View {
     }
 }
 
-struct AddButton: View {
+private struct AddButton: View {
     let geometry: GeometryProxy
     @Binding var trainingPlans: [TrainingPlan]
     let plansDatabaseHelper: PlansDataBaseHelper
@@ -81,7 +78,7 @@ struct AddButton: View {
     }
 }
 
-struct Backgroundimage: View {
+private struct Backgroundimage: View {
     let geometry: GeometryProxy
     
     var body: some View {

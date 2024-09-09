@@ -28,6 +28,9 @@
 		5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */; };
 		5FE53E752C8E223500FB6400 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 5FE53E742C8E223500FB6400 /* SQLite */; };
 		5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */; };
+		5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E782C8F606D00FB6400 /* RoutinesView.swift */; };
+		5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */; };
+		5FE53E7E2C8F62AC00FB6400 /* RoutinesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E7D2C8F62AC00FB6400 /* RoutinesListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +75,9 @@
 		5FE53E6F2C8E026600FB6400 /* .gitignore.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = .gitignore.md; sourceTree = "<group>"; };
 		5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansDatabaseHelper.swift; sourceTree = "<group>"; };
 		5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanOptionsDialog.swift; sourceTree = "<group>"; };
+		5FE53E782C8F606D00FB6400 /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
+		5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanElement.swift; sourceTree = "<group>"; };
+		5FE53E7D2C8F62AC00FB6400 /* RoutinesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,6 +185,7 @@
 				5FE53E562C8CAB3400FB6400 /* WorkoutView.swift */,
 				5FE53E602C8CC05800FB6400 /* SettingsView.swift */,
 				5FE53E622C8CD8C200FB6400 /* PlansView.swift */,
+				5FE53E782C8F606D00FB6400 /* RoutinesView.swift */,
 			);
 			path = MainViews;
 			sourceTree = "<group>";
@@ -204,7 +211,7 @@
 		5FE53E642C8CF1F800FB6400 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				5FE53E652C8CF21100FB6400 /* TrainingPlan.swift */,
+				5FE53E7C2C8F621900FB6400 /* TrainingPlans */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -213,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */,
+				5FE53E7D2C8F62AC00FB6400 /* RoutinesListView.swift */,
 			);
 			path = ListsViews;
 			sourceTree = "<group>";
@@ -232,6 +240,15 @@
 				5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */,
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		5FE53E7C2C8F621900FB6400 /* TrainingPlans */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53E652C8CF21100FB6400 /* TrainingPlan.swift */,
+				5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */,
+			);
+			path = TrainingPlans;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -371,6 +388,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */,
+				5FE53E7E2C8F62AC00FB6400 /* RoutinesListView.swift in Sources */,
+				5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */,
 				5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */,
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
 				5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */,
@@ -380,6 +399,7 @@
 				5FE53E272C8C727C00FB6400 /* LiftHubApp.swift in Sources */,
 				5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */,
 				5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */,
+				5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */,
 				5FE53E572C8CAB3400FB6400 /* WorkoutView.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
 				5FE53E5A2C8CB2B700FB6400 /* Color.swift in Sources */,

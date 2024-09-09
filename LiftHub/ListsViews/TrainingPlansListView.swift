@@ -28,7 +28,9 @@ struct TrainingPlansElementView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
     @State var planName: String = ""
+    @State private var openRoutines = false
     var body: some View {
+        
         HStack {
             Text(planName)
                 .font(.system(size: 25, weight: .medium))
@@ -73,10 +75,16 @@ struct TrainingPlansElementView: View {
         }) {
             PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: position)
         }
+        .onTapGesture {
+            openRoutines = true
+        }
+        .fullScreenCover(isPresented: $openRoutines) {
+            RoutinesView(planName: planName)
+        }
     }
 }
 
-struct TrainingPlansElementView_Previews: PreviewProvider {
+struct TrainingPlansListView_Previews: PreviewProvider {
     @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: PlansView.defaultPlan.name), TrainingPlan(name: "plan2")]
     static var plansDatabaseHelper = PlansDataBaseHelper()
     
