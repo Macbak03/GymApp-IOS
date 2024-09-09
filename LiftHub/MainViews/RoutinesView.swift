@@ -10,6 +10,7 @@ import Foundation
 
 struct RoutinesView: View {
     @State private var routines: [TrainingPlanElement] = []
+    @State private var openRoutine = false
     let planName: String
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     
@@ -25,12 +26,12 @@ struct RoutinesView: View {
                                     // Dismiss the current view to go back
                                     presentationMode.wrappedValue.dismiss()
                                 }) {
-                                    Image(systemName: "chevron.left")
+                                    Image(systemName: "arrow.left")
                                         .font(.system(size: 20, weight: .bold))
                                 }
                                 Spacer()
                             }
-                            .padding(.leading, 40) // Add some padding to keep it away from the edge
+                            .padding(.leading, 30) // Add some padding to keep it away from the edge
                                                         
                             Text(planName)
                                 .font(.system(size: 32, weight: .medium))
@@ -38,15 +39,18 @@ struct RoutinesView: View {
                         }
                     }
                     
-                    RoutinesListView(routines: $routines, geometry: geometry)
+                    RoutinesListView(routines: $routines)
                     
                     Spacer()
                     
-                    AddButton(geometry: geometry)
+                    AddButton(openRoutine: $openRoutine ,geometry: geometry, planName: planName)
                     
                     Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
+                .fullScreenCover(isPresented: $openRoutine) {
+                    RoutineView(planName: planName)
+                }
             }
         }
     }
@@ -54,13 +58,15 @@ struct RoutinesView: View {
 
 
 private struct AddButton: View {
+    @Binding var openRoutine: Bool
     let geometry: GeometryProxy
-    var buttonScale = 0.16
+    var buttonScale = 0.14
     var buttonOffsetX = 0.35
     var buttonOffsetY = 0.1
+    let planName: String
     var body: some View {
         Button(action: {
-            
+            openRoutine = true
         }) {
             Image(systemName: "plus.circle.fill")
                 .resizable()

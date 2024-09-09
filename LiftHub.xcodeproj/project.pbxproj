@@ -31,6 +31,9 @@
 		5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E782C8F606D00FB6400 /* RoutinesView.swift */; };
 		5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */; };
 		5FE53E7E2C8F62AC00FB6400 /* RoutinesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E7D2C8F62AC00FB6400 /* RoutinesListView.swift */; };
+		5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E7F2C8F7A5100FB6400 /* RoutineView.swift */; };
+		5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E812C8F9C1000FB6400 /* RoutineListView.swift */; };
+		5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +81,9 @@
 		5FE53E782C8F606D00FB6400 /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
 		5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanElement.swift; sourceTree = "<group>"; };
 		5FE53E7D2C8F62AC00FB6400 /* RoutinesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesListView.swift; sourceTree = "<group>"; };
+		5FE53E7F2C8F7A5100FB6400 /* RoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineView.swift; sourceTree = "<group>"; };
+		5FE53E812C8F9C1000FB6400 /* RoutineListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineListView.swift; sourceTree = "<group>"; };
+		5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDraft.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +192,7 @@
 				5FE53E602C8CC05800FB6400 /* SettingsView.swift */,
 				5FE53E622C8CD8C200FB6400 /* PlansView.swift */,
 				5FE53E782C8F606D00FB6400 /* RoutinesView.swift */,
+				5FE53E7F2C8F7A5100FB6400 /* RoutineView.swift */,
 			);
 			path = MainViews;
 			sourceTree = "<group>";
@@ -211,6 +218,7 @@
 		5FE53E642C8CF1F800FB6400 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				5FE53E832C8F9C5B00FB6400 /* Routine */,
 				5FE53E7C2C8F621900FB6400 /* TrainingPlans */,
 			);
 			path = Model;
@@ -221,6 +229,7 @@
 			children = (
 				5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */,
 				5FE53E7D2C8F62AC00FB6400 /* RoutinesListView.swift */,
+				5FE53E812C8F9C1000FB6400 /* RoutineListView.swift */,
 			);
 			path = ListsViews;
 			sourceTree = "<group>";
@@ -249,6 +258,14 @@
 				5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */,
 			);
 			path = TrainingPlans;
+			sourceTree = "<group>";
+		};
+		5FE53E832C8F9C5B00FB6400 /* Routine */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */,
+			);
+			path = Routine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -392,7 +409,10 @@
 				5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */,
 				5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */,
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
+				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
+				5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */,
 				5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */,
+				5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */,
 				5FE53E612C8CC05800FB6400 /* SettingsView.swift in Sources */,
 				5FE53E6C2C8DF58300FB6400 /* CreatePlanDialogView.swift in Sources */,
 				5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */,

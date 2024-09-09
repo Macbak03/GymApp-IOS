@@ -20,7 +20,7 @@ struct PlansView: View {
                 Backgroundimage(geometry: geometry)
                 VStack {
                     // RecyclerView equivalent (could be a ScrollView or List in SwiftUI)
-                    TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)
+                    TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
                         .onAppear() {
                             loadPlans()
                         }
@@ -34,10 +34,6 @@ struct PlansView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
         }
-    }
-    
-    func navigateToTrainingPlanDetail(plan: TrainingPlan) {
-        // Navigate to detail view for the training plan
     }
     
     func loadPlans() {
@@ -55,7 +51,7 @@ private struct AddButton: View {
     
     @State private var showCreatePlanDialog = false
     
-    var buttonScale = 0.16
+    var buttonScale = 0.14
     var buttonOffsetX = 0.35
     var buttonOffsetY = 0.02
     var body: some View {

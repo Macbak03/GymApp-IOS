@@ -10,7 +10,6 @@ import SwiftUI
 struct TrainingPlansListView: View {
     @Binding var trainingPlans: [TrainingPlan]
     let plansDatabaseHelper: PlansDataBaseHelper
-    let geometry: GeometryProxy
     var body: some View {
         ScrollView {
             ForEach(trainingPlans.indices, id: \.self) {
@@ -76,7 +75,9 @@ struct TrainingPlansElementView: View {
             PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: position)
         }
         .onTapGesture {
-            openRoutines = true
+            if planName != PlansView.defaultPlan.name {
+                openRoutines = true
+            }
         }
         .fullScreenCover(isPresented: $openRoutines) {
             RoutinesView(planName: planName)
@@ -89,8 +90,6 @@ struct TrainingPlansListView_Previews: PreviewProvider {
     static var plansDatabaseHelper = PlansDataBaseHelper()
     
     static var previews: some View {
-        GeometryReader { geometry in
-            TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)
-        }
+        TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
     }
 }

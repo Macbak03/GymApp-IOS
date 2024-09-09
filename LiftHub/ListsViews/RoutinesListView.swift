@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RoutinesListView: View {
     @Binding var routines: [TrainingPlanElement]
-    let geometry: GeometryProxy
     var body: some View {
         ScrollView {
             ForEach(routines.indices, id: \.self) {
@@ -79,9 +78,7 @@ struct RoutinesElementView: View {
 struct RoutinesListView_Previews: PreviewProvider {
     @State static var routines: [TrainingPlanElement] = [TrainingPlanElement(name: "routine"), TrainingPlanElement(name: "routine1")]
     static var previews: some View {
-        GeometryReader { geometry in
-            RoutinesListView(routines: $routines, geometry: geometry)
-        }
+        RoutinesListView(routines: $routines)
     }
 }
 
