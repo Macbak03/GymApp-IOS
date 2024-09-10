@@ -34,6 +34,18 @@
 		5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E7F2C8F7A5100FB6400 /* RoutineView.swift */; };
 		5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E812C8F9C1000FB6400 /* RoutineListView.swift */; };
 		5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */; };
+		5FE53E872C908C5300FB6400 /* ExercisePace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E862C908C5300FB6400 /* ExercisePace.swift */; };
+		5FE53E8A2C908D7300FB6400 /* ValidationException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E892C908D7300FB6400 /* ValidationException.swift */; };
+		5FE53E8C2C90913700FB6400 /* IntensityIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E8B2C90913700FB6400 /* IntensityIndex.swift */; };
+		5FE53E8E2C90917200FB6400 /* Intensity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E8D2C90917200FB6400 /* Intensity.swift */; };
+		5FE53E902C9091DF00FB6400 /* TimeUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E8F2C9091DF00FB6400 /* TimeUnit.swift */; };
+		5FE53E922C90921200FB6400 /* Pause.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E912C90921100FB6400 /* Pause.swift */; };
+		5FE53E942C90929800FB6400 /* Reps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E932C90929800FB6400 /* Reps.swift */; };
+		5FE53E962C90933E00FB6400 /* WeightUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E952C90933E00FB6400 /* WeightUnit.swift */; };
+		5FE53E982C90936D00FB6400 /* Weight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E972C90936D00FB6400 /* Weight.swift */; };
+		5FE53E9B2C909A6000FB6400 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E9A2C909A6000FB6400 /* ToastView.swift */; };
+		5FE53E9D2C909AF600FB6400 /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E9C2C909AF600FB6400 /* ToastModifier.swift */; };
+		5FE53E9F2C90B13500FB6400 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E9E2C90B13500FB6400 /* Exercise.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +96,18 @@
 		5FE53E7F2C8F7A5100FB6400 /* RoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineView.swift; sourceTree = "<group>"; };
 		5FE53E812C8F9C1000FB6400 /* RoutineListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineListView.swift; sourceTree = "<group>"; };
 		5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDraft.swift; sourceTree = "<group>"; };
+		5FE53E862C908C5300FB6400 /* ExercisePace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePace.swift; sourceTree = "<group>"; };
+		5FE53E892C908D7300FB6400 /* ValidationException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationException.swift; sourceTree = "<group>"; };
+		5FE53E8B2C90913700FB6400 /* IntensityIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntensityIndex.swift; sourceTree = "<group>"; };
+		5FE53E8D2C90917200FB6400 /* Intensity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intensity.swift; sourceTree = "<group>"; };
+		5FE53E8F2C9091DF00FB6400 /* TimeUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeUnit.swift; sourceTree = "<group>"; };
+		5FE53E912C90921100FB6400 /* Pause.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pause.swift; sourceTree = "<group>"; };
+		5FE53E932C90929800FB6400 /* Reps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reps.swift; sourceTree = "<group>"; };
+		5FE53E952C90933E00FB6400 /* WeightUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightUnit.swift; sourceTree = "<group>"; };
+		5FE53E972C90936D00FB6400 /* Weight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weight.swift; sourceTree = "<group>"; };
+		5FE53E9A2C909A6000FB6400 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		5FE53E9C2C909AF600FB6400 /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
+		5FE53E9E2C90B13500FB6400 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +160,8 @@
 		5FE53E252C8C727C00FB6400 /* LiftHub */ = {
 			isa = PBXGroup;
 			children = (
+				5FE53E992C909A5200FB6400 /* Toast */,
+				5FE53E882C908D5C00FB6400 /* Exception */,
 				5FE53E712C8E214B00FB6400 /* Persistence */,
 				5FE53E6A2C8DF55400FB6400 /* DialogViews */,
 				5FE53E672C8DE7E800FB6400 /* ListsViews */,
@@ -264,8 +290,34 @@
 			isa = PBXGroup;
 			children = (
 				5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */,
+				5FE53E862C908C5300FB6400 /* ExercisePace.swift */,
+				5FE53E8B2C90913700FB6400 /* IntensityIndex.swift */,
+				5FE53E8D2C90917200FB6400 /* Intensity.swift */,
+				5FE53E8F2C9091DF00FB6400 /* TimeUnit.swift */,
+				5FE53E912C90921100FB6400 /* Pause.swift */,
+				5FE53E932C90929800FB6400 /* Reps.swift */,
+				5FE53E952C90933E00FB6400 /* WeightUnit.swift */,
+				5FE53E972C90936D00FB6400 /* Weight.swift */,
+				5FE53E9E2C90B13500FB6400 /* Exercise.swift */,
 			);
 			path = Routine;
+			sourceTree = "<group>";
+		};
+		5FE53E882C908D5C00FB6400 /* Exception */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53E892C908D7300FB6400 /* ValidationException.swift */,
+			);
+			path = Exception;
+			sourceTree = "<group>";
+		};
+		5FE53E992C909A5200FB6400 /* Toast */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53E9A2C909A6000FB6400 /* ToastView.swift */,
+				5FE53E9C2C909AF600FB6400 /* ToastModifier.swift */,
+			);
+			path = Toast;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -405,8 +457,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */,
+				5FE53E8E2C90917200FB6400 /* Intensity.swift in Sources */,
+				5FE53E9B2C909A6000FB6400 /* ToastView.swift in Sources */,
+				5FE53E8A2C908D7300FB6400 /* ValidationException.swift in Sources */,
 				5FE53E7E2C8F62AC00FB6400 /* RoutinesListView.swift in Sources */,
+				5FE53E902C9091DF00FB6400 /* TimeUnit.swift in Sources */,
+				5FE53E982C90936D00FB6400 /* Weight.swift in Sources */,
 				5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */,
+				5FE53E9D2C909AF600FB6400 /* ToastModifier.swift in Sources */,
 				5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */,
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
 				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
@@ -415,15 +473,21 @@
 				5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */,
 				5FE53E612C8CC05800FB6400 /* SettingsView.swift in Sources */,
 				5FE53E6C2C8DF58300FB6400 /* CreatePlanDialogView.swift in Sources */,
+				5FE53E9F2C90B13500FB6400 /* Exercise.swift in Sources */,
 				5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */,
 				5FE53E272C8C727C00FB6400 /* LiftHubApp.swift in Sources */,
+				5FE53E8C2C90913700FB6400 /* IntensityIndex.swift in Sources */,
 				5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */,
 				5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */,
 				5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */,
 				5FE53E572C8CAB3400FB6400 /* WorkoutView.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
 				5FE53E5A2C8CB2B700FB6400 /* Color.swift in Sources */,
+				5FE53E962C90933E00FB6400 /* WeightUnit.swift in Sources */,
+				5FE53E942C90929800FB6400 /* Reps.swift in Sources */,
+				5FE53E922C90921200FB6400 /* Pause.swift in Sources */,
 				5FE53E5F2C8CB48C00FB6400 /* Constants.swift in Sources */,
+				5FE53E872C908C5300FB6400 /* ExercisePace.swift in Sources */,
 				5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
