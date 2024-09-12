@@ -9,14 +9,22 @@ import SwiftUI
 import Foundation
 
 struct RoutineView: View {
-    @State private var routine: [ExerciseDraft] = []
+    @State private var routineDraft: [ExerciseDraft] = []
     @State var routineName: String = ""
+    let originalRoutineName: String?
     let planName: String
+    let planId: Int64
+    private let exercisesDatabaseHelper = ExercisesDataBaseHelper()
+    
     @State private var showAlertDialog = false
     @Environment(\.presentationMode) var presentationMode
     
     @State private var showToast = false
     @State private var toastMessage = ""
+    
+    @Binding var refreshRoutines: Bool
+    @Binding var successfullySaved: Bool
+    @Binding var savedMessage: String
     
     @State private var descriptionType: DescriptionType? = nil
     @State private var alertType: AlertType? = nil
@@ -46,7 +54,7 @@ struct RoutineView: View {
                             HStack {
                                 Spacer() // Push the TextField to the center
                                 
-                                TextField("Enter training plan name", text: $routineName)
+                                TextField("Enter routine name", text: $routineName)
                                     .padding()
                                     .background(Color(.systemGray6))
                                     .cornerRadius(10)
@@ -58,16 +66,28 @@ struct RoutineView: View {
                         }
                     }
                     
-                    RoutineListView(routine: $routine, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
+                    RoutineListView(routine: $routineDraft, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
+                        .onAppear() {
+                            loadRoutine()
+                        }
                     
                     Spacer()
                     ZStack{
                         HStack{
-                            AddButton(routine: $routine, geometry: geometry)
+                            AddButton(routine: $routineDraft, geometry: geometry)
                         }
                         HStack{
                             Button(action: {
-                                //save routine
+                                do {
+                                    try saveRoutineIntoDB()
+                                } catch let error as ValidationException {
+                                    showToast = true
+                                    toastMessage = error.message
+                                } catch {
+                                    showToast = true
+                                    toastMessage = "Unexpected error occured: \(error)"
+                                }
+                                
                             }) {
                                 Text("Save")
                                     .font(.system(size: 18))
@@ -93,7 +113,7 @@ struct RoutineView: View {
             case .navigation:
                 return Alert(
                     title: Text("Warning"),
-                    message: Text("Routine or it's changes won't be saved. Do you want to cancel?"),
+                    message: Text("Routine's changes won't be saved. Do you want to cancel?"),
                     primaryButton: .destructive(Text("Yes")) {
                         presentationMode.wrappedValue.dismiss()
                     },
@@ -128,6 +148,58 @@ struct RoutineView: View {
             secondaryButton: .cancel()
         )
     }
+    
+    private func getRoutine() throws -> [Exercise] {
+        var routine = [Exercise]()
+        var routineNames = [String]()
+
+        for exerciseDraft in routineDraft {
+            let exercise = try exerciseDraft.toExercise()
+            
+            if routineNames.contains(exercise.name) {
+                throw ValidationException(message: "You can't create routine with exercises with the same name.")
+            } else {
+                routineNames.append(exercise.name)
+                routine.append(exercise)
+            }
+        }
+        return routine
+    }
+    
+    private func loadRoutine() {
+        guard let checkedOriginalRoutineName = originalRoutineName else {
+            return
+        }
+        routineName = checkedOriginalRoutineName
+        routineDraft = exercisesDatabaseHelper.getRoutine(routineName: checkedOriginalRoutineName, planId: String(planId))
+    }
+
+    
+    private func saveRoutineIntoDB() throws {
+        // Check if routine draft is empty
+        if routineDraft.isEmpty {
+            throw ValidationException(message: "You must add at least one exercise to the routine.")
+        }
+        // Check if routine name is empty
+        if routineName.isEmpty {
+            throw ValidationException(message: "Routine name cannot be empty.")
+        }
+        // Try to get the routine and handle possible exceptions
+        do {
+            let routine = try getRoutine()
+            exercisesDatabaseHelper.addRoutine(routine: routine, routineName: routineName, planId: planId, originalRoutineName: originalRoutineName)
+            
+            successfullySaved = true
+            refreshRoutines = true
+            savedMessage = "Routine \(routineName) saved."
+            presentationMode.wrappedValue.dismiss()
+        } catch let error as ValidationException {
+            // Handle validation errors
+            showToast = true
+            toastMessage = error.message
+        }
+    }
+
 }
 
 enum AlertType: Identifiable {
@@ -179,9 +251,12 @@ private struct AddButton: View {
 }
 
 struct RoutineView_Previews: PreviewProvider {
+    @State static var successfullySaved = false
+    @State static var refreshRoutines = false
+    @State static var savedMessage = ""
     static var previews: some View {
         GeometryReader { geometry in
-            RoutineView(routineName: "", planName: "Plan")
+            RoutineView(routineName: "", originalRoutineName: nil, planName: "Plan", planId: 0, refreshRoutines: $refreshRoutines, successfullySaved: $successfullySaved, savedMessage: $savedMessage)
         }
     }
 }

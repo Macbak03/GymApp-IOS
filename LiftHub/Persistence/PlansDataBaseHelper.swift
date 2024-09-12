@@ -8,32 +8,15 @@
 import Foundation
 import SQLite
 
-class PlansDataBaseHelper {
-    
-    // Define the database connection
-    private var db: Connection?
+class PlansDataBaseHelper: Repository {
+    static let TABLE_NAME = "trainingPlans"
+    static let ID_COLUMN = "planID"
+    static let NAME_COLUMN = "planName"
     
     // Define table and columns
-    private let plansTable = Table("trainingPlans")
-    private let planId = Expression<Int64>("planID")
-    private let planName = Expression<String>("planName")
-    
-    // Initializer
-    init() {
-        do {
-            // Set up the connection to the database
-            let dbPath = try FileManager.default
-                .urls(for: .documentDirectory, in: .userDomainMask)
-                .first!
-                .appendingPathComponent("plans.sqlite3")
-                .path
-                        
-            db = try Connection(dbPath)
-            createTableIfNotExists()
-        } catch {
-            print("Error connecting to the database: \(error)")
-        }
-    }
+    private let plansTable = Table(TABLE_NAME)
+    private let planId = Expression<Int64>(ID_COLUMN)
+    private let planName = Expression<String>(NAME_COLUMN)
     
     func getPlans() -> [TrainingPlan] {
         var plans: [TrainingPlan] = []
@@ -51,7 +34,7 @@ class PlansDataBaseHelper {
     }
     
     // Create the table if it doesn't exist
-    private func createTableIfNotExists() {
+    override func createTableIfNotExists() {
         do {
             try db?.run(plansTable.create(ifNotExists: true) { table in
                 table.column(planId, primaryKey: .autoincrement)

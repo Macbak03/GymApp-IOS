@@ -8,7 +8,7 @@
 import Foundation
 
 struct Weight {
-    let weight: Float
+    let weight: Double
     let unit: WeightUnit
 
     // Custom string representation
@@ -17,13 +17,13 @@ struct Weight {
     }
 
     // Private initializer to enforce validation
-    private init(weight: Float, unit: WeightUnit) {
+    private init(weight: Double, unit: WeightUnit) {
         self.weight = weight
         self.unit = unit
     }
 
     // Factory method using the invoke pattern in Swift
-    static func create(weight: Float, unit: WeightUnit) -> Weight? {
+    static func create(weight: Double, unit: WeightUnit) -> Weight? {
         if weight < 0 {
             return nil
         } else {
@@ -37,14 +37,14 @@ struct Weight {
             throw ValidationException(message: "Weight cannot be empty")
         }
 
-        guard let floatWeight = Float(weight) else {
+        guard let doubleWeight = Double(weight) else {
             throw ValidationException(message: "Weight must be a number")
         }
 
-        if floatWeight < 0 {
+        if doubleWeight < 0 {
             throw ValidationException(message: "Weight cannot be negative")
         }
 
-        return Weight(weight: floatWeight, unit: unit)
+        return Weight(weight: doubleWeight, unit: unit)
     }
 }

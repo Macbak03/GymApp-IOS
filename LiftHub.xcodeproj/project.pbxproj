@@ -25,7 +25,7 @@
 		5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E652C8CF21100FB6400 /* TrainingPlan.swift */; };
 		5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */; };
 		5FE53E6C2C8DF58300FB6400 /* CreatePlanDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */; };
-		5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */; };
+		5FE53E732C8E216800FB6400 /* PlansDataBaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E722C8E216800FB6400 /* PlansDataBaseHelper.swift */; };
 		5FE53E752C8E223500FB6400 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 5FE53E742C8E223500FB6400 /* SQLite */; };
 		5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */; };
 		5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E782C8F606D00FB6400 /* RoutinesView.swift */; };
@@ -46,6 +46,10 @@
 		5FE53E9B2C909A6000FB6400 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E9A2C909A6000FB6400 /* ToastView.swift */; };
 		5FE53E9D2C909AF600FB6400 /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E9C2C909AF600FB6400 /* ToastModifier.swift */; };
 		5FE53E9F2C90B13500FB6400 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E9E2C90B13500FB6400 /* Exercise.swift */; };
+		5FE53EA42C91CDF900FB6400 /* RoutinesDataBaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EA32C91CDF900FB6400 /* RoutinesDataBaseHelper.swift */; };
+		5FE53EA62C91D23700FB6400 /* ExercisesDataBaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EA52C91D23700FB6400 /* ExercisesDataBaseHelper.swift */; };
+		5FE53EA82C9204B200FB6400 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EA72C9204B200FB6400 /* Repository.swift */; };
+		5FE53EAB2C93342F00FB6400 /* DeleteBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,7 +92,7 @@
 		5FE53E682C8DE7FF00FB6400 /* TrainingPlansListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlansListView.swift; sourceTree = "<group>"; };
 		5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanDialogView.swift; sourceTree = "<group>"; };
 		5FE53E6F2C8E026600FB6400 /* .gitignore.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = .gitignore.md; sourceTree = "<group>"; };
-		5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansDatabaseHelper.swift; sourceTree = "<group>"; };
+		5FE53E722C8E216800FB6400 /* PlansDataBaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansDataBaseHelper.swift; sourceTree = "<group>"; };
 		5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanOptionsDialog.swift; sourceTree = "<group>"; };
 		5FE53E782C8F606D00FB6400 /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
 		5FE53E7A2C8F621300FB6400 /* TrainingPlanElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanElement.swift; sourceTree = "<group>"; };
@@ -108,6 +112,10 @@
 		5FE53E9A2C909A6000FB6400 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		5FE53E9C2C909AF600FB6400 /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
 		5FE53E9E2C90B13500FB6400 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
+		5FE53EA32C91CDF900FB6400 /* RoutinesDataBaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesDataBaseHelper.swift; sourceTree = "<group>"; };
+		5FE53EA52C91D23700FB6400 /* ExercisesDataBaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisesDataBaseHelper.swift; sourceTree = "<group>"; };
+		5FE53EA72C9204B200FB6400 /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
+		5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteBackgroundView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +168,7 @@
 		5FE53E252C8C727C00FB6400 /* LiftHub */ = {
 			isa = PBXGroup;
 			children = (
+				5FE53EA92C93341C00FB6400 /* DeleteBackground */,
 				5FE53E992C909A5200FB6400 /* Toast */,
 				5FE53E882C908D5C00FB6400 /* Exception */,
 				5FE53E712C8E214B00FB6400 /* Persistence */,
@@ -272,7 +281,10 @@
 		5FE53E712C8E214B00FB6400 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
-				5FE53E722C8E216800FB6400 /* PlansDatabaseHelper.swift */,
+				5FE53E722C8E216800FB6400 /* PlansDataBaseHelper.swift */,
+				5FE53EA32C91CDF900FB6400 /* RoutinesDataBaseHelper.swift */,
+				5FE53EA52C91D23700FB6400 /* ExercisesDataBaseHelper.swift */,
+				5FE53EA72C9204B200FB6400 /* Repository.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -318,6 +330,14 @@
 				5FE53E9C2C909AF600FB6400 /* ToastModifier.swift */,
 			);
 			path = Toast;
+			sourceTree = "<group>";
+		};
+		5FE53EA92C93341C00FB6400 /* DeleteBackground */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */,
+			);
+			path = DeleteBackground;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -465,7 +485,7 @@
 				5FE53E982C90936D00FB6400 /* Weight.swift in Sources */,
 				5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */,
 				5FE53E9D2C909AF600FB6400 /* ToastModifier.swift in Sources */,
-				5FE53E732C8E216800FB6400 /* PlansDatabaseHelper.swift in Sources */,
+				5FE53E732C8E216800FB6400 /* PlansDataBaseHelper.swift in Sources */,
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
 				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
 				5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */,
@@ -479,6 +499,7 @@
 				5FE53E8C2C90913700FB6400 /* IntensityIndex.swift in Sources */,
 				5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */,
 				5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */,
+				5FE53EAB2C93342F00FB6400 /* DeleteBackgroundView.swift in Sources */,
 				5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */,
 				5FE53E572C8CAB3400FB6400 /* WorkoutView.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
@@ -486,9 +507,12 @@
 				5FE53E962C90933E00FB6400 /* WeightUnit.swift in Sources */,
 				5FE53E942C90929800FB6400 /* Reps.swift in Sources */,
 				5FE53E922C90921200FB6400 /* Pause.swift in Sources */,
+				5FE53EA62C91D23700FB6400 /* ExercisesDataBaseHelper.swift in Sources */,
 				5FE53E5F2C8CB48C00FB6400 /* Constants.swift in Sources */,
+				5FE53EA42C91CDF900FB6400 /* RoutinesDataBaseHelper.swift in Sources */,
 				5FE53E872C908C5300FB6400 /* ExercisePace.swift in Sources */,
 				5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */,
+				5FE53EA82C9204B200FB6400 /* Repository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,7 +17,7 @@ struct RoutineListView: View {
         ScrollView {
             ForEach(routine.indices, id: \.self) {
                 index in
-                ExerciseView(descriptionType: $descriptionType, alertType: $alertType, showToast: $showToast, toastMessage: $toastMessage)
+                ExerciseView(exercise: $routine[index], descriptionType: $descriptionType, alertType: $alertType, showToast: $showToast, toastMessage: $toastMessage)
             }
         }
     }
@@ -25,8 +25,7 @@ struct RoutineListView: View {
 
 struct ExerciseView: View {
     @State private var isDetailsVisible: Bool = true
-    @State private var exercise: ExerciseDraft = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit.kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex.RPE, pace: "", wasModified: false)
-    // Define a fixed width for all the labels to align the TextFields
+    @Binding var exercise: ExerciseDraft
     let labelWidth: CGFloat = 50
     
     @FocusState private var isExerciseNameFocused: Bool

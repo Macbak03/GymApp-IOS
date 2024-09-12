@@ -12,9 +12,21 @@ struct RoutinesView: View {
     @State private var routines: [TrainingPlanElement] = []
     @State private var openRoutine = false
     let planName: String
+    let plansDatabaseHelper: PlansDataBaseHelper
+    private let routinesDatabaseHelper = RoutinesDataBaseHelper()
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     
+    @State private var showToast = false
+    @State private var refreshRoutines = false
+    @State private var toastMessage = ""
+    
+    @State private var performDelete = false
+    
+    @State private var planId: Int64 = -1
+    
     var body: some View {
+        
+        
         GeometryReader { geometry in
             ZStack {
                 VStack {
@@ -39,7 +51,17 @@ struct RoutinesView: View {
                         }
                     }
                     
-                    RoutinesListView(routines: $routines)
+                    RoutinesListView(routines: $routines, planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
+                        .onChange(of: refreshRoutines) { refreshNeeded in
+                            if refreshNeeded {
+                                loadRoutines()
+                                refreshRoutines = false
+                            }
+                            
+                        }
+                        .onAppear() {
+                            loadRoutines()
+                        }
                     
                     Spacer()
                     
@@ -49,10 +71,22 @@ struct RoutinesView: View {
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .fullScreenCover(isPresented: $openRoutine) {
-                    RoutineView(planName: planName)
+                    RoutineView(originalRoutineName: nil, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage)
                 }
             }
+            .toast(isShowing: $showToast, message: toastMessage)
+            .onAppear() {
+                guard let checkedPlanId = plansDatabaseHelper.getPlanId(planName: planName) else {
+                    return
+                }
+                planId = checkedPlanId
+            }
+            
         }
+    }
+    
+    private func loadRoutines() {
+        routines = routinesDatabaseHelper.getRoutinesInPlan(planId: planId)
     }
 }
 
@@ -81,7 +115,8 @@ private struct AddButton: View {
 }
 
 struct RoutinesView_Previews: PreviewProvider {
+    static var plansDatabaseHelper = PlansDataBaseHelper()
     static var previews: some View {
-        RoutinesView(planName: "Plan")
+        RoutinesView(planName: "Plan", plansDatabaseHelper: plansDatabaseHelper)
     }
 }

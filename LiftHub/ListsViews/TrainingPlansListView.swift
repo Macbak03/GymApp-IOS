@@ -44,20 +44,17 @@ struct TrainingPlansElementView: View {
             
             Spacer()
             
-            
-            if planName != PlansView.defaultPlan.name {
-                Button(action: {
-                    showOptionsDialog = true
-                }) {
-                    Image(systemName: "ellipsis")
-                        .resizable()
-                        .frame(width: 20, height: 5)
-                        .padding()
-                        .rotationEffect(.degrees(90))
-                }
-                .frame(width: 30, height: 50)
-                .background(Color.clear) // You can modify this to fit the background style
+            Button(action: {
+                showOptionsDialog = true
+            }) {
+                Image(systemName: "ellipsis")
+                    .resizable()
+                    .frame(width: 20, height: 5)
+                    .padding()
+                    .rotationEffect(.degrees(90))
             }
+            .frame(width: 30, height: 50)
+            .background(Color.clear) // You can modify this to fit the background style
         }
         .frame(maxWidth: .infinity, minHeight: 50)
         .padding(5)
@@ -75,18 +72,16 @@ struct TrainingPlansElementView: View {
             PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: position)
         }
         .onTapGesture {
-            if planName != PlansView.defaultPlan.name {
-                openRoutines = true
-            }
+            openRoutines = true
         }
         .fullScreenCover(isPresented: $openRoutines) {
-            RoutinesView(planName: planName)
+            RoutinesView(planName: planName, plansDatabaseHelper: plansDatabaseHelper)
         }
     }
 }
 
 struct TrainingPlansListView_Previews: PreviewProvider {
-    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: PlansView.defaultPlan.name), TrainingPlan(name: "plan2")]
+    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
     static var plansDatabaseHelper = PlansDataBaseHelper()
     
     static var previews: some View {

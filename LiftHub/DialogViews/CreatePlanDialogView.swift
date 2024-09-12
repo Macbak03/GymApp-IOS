@@ -99,16 +99,12 @@ struct CreatePlanDialogView: View {
     }
     
     func addPlan() throws {
-        if planNameText.isEmpty || planNameText == PlansView.defaultPlan.name {
+        if planNameText.isEmpty {
             throw ValidationException(message: "Plan's name cannot be empty")
         }
         
         if trainingPlans.contains(where: { $0.name == planNameText }) {
             throw ValidationException(message: "A plan with this name already exists")
-        }
-        
-        if trainingPlans.first?.name == PlansView.defaultPlan.name {
-            trainingPlans.removeAll()
         }
         
         plansDatabaseHelper.addPlan(planName: planNameText)
@@ -117,7 +113,7 @@ struct CreatePlanDialogView: View {
     }
     
     func editPlan() throws {
-        if planNameText.isEmpty || planNameText == PlansView.defaultPlan.name {
+        if planNameText.isEmpty {
             throw ValidationException(message: "Plan's name cannot be empty")
         }
         if trainingPlans.contains(where: { $0.name == planNameText }) {

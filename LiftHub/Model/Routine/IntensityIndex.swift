@@ -7,8 +7,9 @@
 
 import Foundation
 
-enum IntensityIndex {
-    case RPE, RIR
+enum IntensityIndex: String {
+    case RPE = "RPE"
+    case RIR = "RIR"
     
     var descritpion: String {
         switch self {

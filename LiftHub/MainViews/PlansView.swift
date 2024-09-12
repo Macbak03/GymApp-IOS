@@ -12,8 +12,6 @@ struct PlansView: View {
     @State private var trainingPlans: [TrainingPlan] = []
     private let plansDatabaseHelper = PlansDataBaseHelper()
     
-    static var defaultPlan = TrainingPlan(name: "Create training plan")
-    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -38,9 +36,6 @@ struct PlansView: View {
     
     func loadPlans() {
         trainingPlans = plansDatabaseHelper.getPlans()
-        if trainingPlans.isEmpty {
-            trainingPlans.append(PlansView.defaultPlan)
-        }
     }
 }
 
