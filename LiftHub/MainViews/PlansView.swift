@@ -15,7 +15,7 @@ struct PlansView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Backgroundimage(geometry: geometry)
+                Backgroundimage(geometry: geometry, imageName: "plans_icon")
                 VStack {
                     // RecyclerView equivalent (could be a ScrollView or List in SwiftUI)
                     TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
@@ -68,22 +68,6 @@ private struct AddButton: View {
         }
     }
 }
-
-private struct Backgroundimage: View {
-    let geometry: GeometryProxy
-    
-    var body: some View {
-        Image("plans_icon")
-            .resizable()
-            .frame(width: 300, height: 300)
-            .opacity(0.2)
-            .frame(
-                width: geometry.size.width,
-                height: geometry.size.height
-            )
-    }
-}
-
 
 struct PlansView_Previews: PreviewProvider {
     static var previews: some View {

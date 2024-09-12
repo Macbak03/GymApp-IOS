@@ -16,7 +16,7 @@
 		5FE53E442C8C727D00FB6400 /* LiftHubUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E432C8C727D00FB6400 /* LiftHubUITestsLaunchTests.swift */; };
 		5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E502C8C9E1D00FB6400 /* BottomNavigationBarView.swift */; };
 		5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E522C8C9F4000FB6400 /* SafeAreaManager.swift */; };
-		5FE53E572C8CAB3400FB6400 /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E562C8CAB3400FB6400 /* WorkoutView.swift */; };
+		5FE53E572C8CAB3400FB6400 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E562C8CAB3400FB6400 /* HomeView.swift */; };
 		5FE53E5A2C8CB2B700FB6400 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E592C8CB2B700FB6400 /* Color.swift */; };
 		5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E5C2C8CB42000FB6400 /* UserDefaults.Utils.swift */; };
 		5FE53E5F2C8CB48C00FB6400 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E5E2C8CB48C00FB6400 /* Constants.swift */; };
@@ -50,6 +50,7 @@
 		5FE53EA62C91D23700FB6400 /* ExercisesDataBaseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EA52C91D23700FB6400 /* ExercisesDataBaseHelper.swift */; };
 		5FE53EA82C9204B200FB6400 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EA72C9204B200FB6400 /* Repository.swift */; };
 		5FE53EAB2C93342F00FB6400 /* DeleteBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */; };
+		5FE53EAE2C935D4F00FB6400 /* BackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EAD2C935D4F00FB6400 /* BackgroundImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,7 +83,7 @@
 		5FE53E432C8C727D00FB6400 /* LiftHubUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftHubUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		5FE53E502C8C9E1D00FB6400 /* BottomNavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavigationBarView.swift; sourceTree = "<group>"; };
 		5FE53E522C8C9F4000FB6400 /* SafeAreaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeAreaManager.swift; sourceTree = "<group>"; };
-		5FE53E562C8CAB3400FB6400 /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
+		5FE53E562C8CAB3400FB6400 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5FE53E592C8CB2B700FB6400 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		5FE53E5C2C8CB42000FB6400 /* UserDefaults.Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.Utils.swift; sourceTree = "<group>"; };
 		5FE53E5E2C8CB48C00FB6400 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -116,6 +117,7 @@
 		5FE53EA52C91D23700FB6400 /* ExercisesDataBaseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisesDataBaseHelper.swift; sourceTree = "<group>"; };
 		5FE53EA72C9204B200FB6400 /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
 		5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteBackgroundView.swift; sourceTree = "<group>"; };
+		5FE53EAD2C935D4F00FB6400 /* BackgroundImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,7 +170,7 @@
 		5FE53E252C8C727C00FB6400 /* LiftHub */ = {
 			isa = PBXGroup;
 			children = (
-				5FE53EA92C93341C00FB6400 /* DeleteBackground */,
+				5FE53EAC2C935D3000FB6400 /* UtilViews */,
 				5FE53E992C909A5200FB6400 /* Toast */,
 				5FE53E882C908D5C00FB6400 /* Exception */,
 				5FE53E712C8E214B00FB6400 /* Persistence */,
@@ -223,7 +225,7 @@
 		5FE53E552C8CAB1000FB6400 /* MainViews */ = {
 			isa = PBXGroup;
 			children = (
-				5FE53E562C8CAB3400FB6400 /* WorkoutView.swift */,
+				5FE53E562C8CAB3400FB6400 /* HomeView.swift */,
 				5FE53E602C8CC05800FB6400 /* SettingsView.swift */,
 				5FE53E622C8CD8C200FB6400 /* PlansView.swift */,
 				5FE53E782C8F606D00FB6400 /* RoutinesView.swift */,
@@ -332,12 +334,13 @@
 			path = Toast;
 			sourceTree = "<group>";
 		};
-		5FE53EA92C93341C00FB6400 /* DeleteBackground */ = {
+		5FE53EAC2C935D3000FB6400 /* UtilViews */ = {
 			isa = PBXGroup;
 			children = (
 				5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */,
+				5FE53EAD2C935D4F00FB6400 /* BackgroundImage.swift */,
 			);
-			path = DeleteBackground;
+			path = UtilViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -493,6 +496,7 @@
 				5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */,
 				5FE53E612C8CC05800FB6400 /* SettingsView.swift in Sources */,
 				5FE53E6C2C8DF58300FB6400 /* CreatePlanDialogView.swift in Sources */,
+				5FE53EAE2C935D4F00FB6400 /* BackgroundImage.swift in Sources */,
 				5FE53E9F2C90B13500FB6400 /* Exercise.swift in Sources */,
 				5FE53E772C8E3F6700FB6400 /* PlanOptionsDialog.swift in Sources */,
 				5FE53E272C8C727C00FB6400 /* LiftHubApp.swift in Sources */,
@@ -501,7 +505,7 @@
 				5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */,
 				5FE53EAB2C93342F00FB6400 /* DeleteBackgroundView.swift in Sources */,
 				5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */,
-				5FE53E572C8CAB3400FB6400 /* WorkoutView.swift in Sources */,
+				5FE53E572C8CAB3400FB6400 /* HomeView.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
 				5FE53E5A2C8CB2B700FB6400 /* Color.swift in Sources */,
 				5FE53E962C90933E00FB6400 /* WeightUnit.swift in Sources */,
