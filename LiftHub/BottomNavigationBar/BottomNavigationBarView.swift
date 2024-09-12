@@ -19,7 +19,7 @@ struct BottomBar: View {
                 .tag(BottomBarSelectedTab.stats)
             PlansView()
                 .tag(BottomBarSelectedTab.plans)
-            WorkoutView()
+            HomeView()
                 .tag(BottomBarSelectedTab.workout)
             HistoryView()
                 .tag(BottomBarSelectedTab.history)
