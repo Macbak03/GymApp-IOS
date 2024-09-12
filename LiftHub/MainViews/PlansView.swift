@@ -10,12 +10,7 @@ import Foundation
 
 struct PlansView: View {
     @State private var trainingPlans: [TrainingPlan] = []
-    @State private var showDeleteAlert = false
-    @State private var selectedPlan: TrainingPlan?
-    @State private var isPlanDefault = false
     private let plansDatabaseHelper = PlansDataBaseHelper()
-    
-    static var defaultPlan = TrainingPlan(name: "Create training plan")
     
     var body: some View {
         GeometryReader { geometry in
@@ -23,7 +18,7 @@ struct PlansView: View {
                 Backgroundimage(geometry: geometry)
                 VStack {
                     // RecyclerView equivalent (could be a ScrollView or List in SwiftUI)
-                    TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)
+                    TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
                         .onAppear() {
                             loadPlans()
                         }
@@ -39,26 +34,19 @@ struct PlansView: View {
         }
     }
     
-    func navigateToTrainingPlanDetail(plan: TrainingPlan) {
-        // Navigate to detail view for the training plan
-    }
-    
     func loadPlans() {
         trainingPlans = plansDatabaseHelper.getPlans()
-        if trainingPlans.isEmpty {
-            trainingPlans.append(PlansView.defaultPlan)
-        }
     }
 }
 
-struct AddButton: View {
+private struct AddButton: View {
     let geometry: GeometryProxy
     @Binding var trainingPlans: [TrainingPlan]
     let plansDatabaseHelper: PlansDataBaseHelper
     
     @State private var showCreatePlanDialog = false
     
-    var buttonScale = 0.16
+    var buttonScale = 0.14
     var buttonOffsetX = 0.35
     var buttonOffsetY = 0.02
     var body: some View {
@@ -81,7 +69,7 @@ struct AddButton: View {
     }
 }
 
-struct Backgroundimage: View {
+private struct Backgroundimage: View {
     let geometry: GeometryProxy
     
     var body: some View {

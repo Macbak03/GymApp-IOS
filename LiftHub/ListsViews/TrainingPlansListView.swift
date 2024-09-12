@@ -10,7 +10,6 @@ import SwiftUI
 struct TrainingPlansListView: View {
     @Binding var trainingPlans: [TrainingPlan]
     let plansDatabaseHelper: PlansDataBaseHelper
-    let geometry: GeometryProxy
     var body: some View {
         ScrollView {
             ForEach(trainingPlans.indices, id: \.self) {
@@ -28,7 +27,9 @@ struct TrainingPlansElementView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
     @State var planName: String = ""
+    @State private var openRoutines = false
     var body: some View {
+        
         HStack {
             Text(planName)
                 .font(.system(size: 25, weight: .medium))
@@ -43,20 +44,17 @@ struct TrainingPlansElementView: View {
             
             Spacer()
             
-            
-            if planName != PlansView.defaultPlan.name {
-                Button(action: {
-                    showOptionsDialog = true
-                }) {
-                    Image(systemName: "ellipsis")
-                        .resizable()
-                        .frame(width: 20, height: 5)
-                        .padding()
-                        .rotationEffect(.degrees(90))
-                }
-                .frame(width: 30, height: 50)
-                .background(Color.clear) // You can modify this to fit the background style
+            Button(action: {
+                showOptionsDialog = true
+            }) {
+                Image(systemName: "ellipsis")
+                    .resizable()
+                    .frame(width: 20, height: 5)
+                    .padding()
+                    .rotationEffect(.degrees(90))
             }
+            .frame(width: 30, height: 50)
+            .background(Color.clear) // You can modify this to fit the background style
         }
         .frame(maxWidth: .infinity, minHeight: 50)
         .padding(5)
@@ -73,16 +71,20 @@ struct TrainingPlansElementView: View {
         }) {
             PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: position)
         }
+        .onTapGesture {
+            openRoutines = true
+        }
+        .fullScreenCover(isPresented: $openRoutines) {
+            RoutinesView(planName: planName, plansDatabaseHelper: plansDatabaseHelper)
+        }
     }
 }
 
-struct TrainingPlansElementView_Previews: PreviewProvider {
-    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: PlansView.defaultPlan.name), TrainingPlan(name: "plan2")]
+struct TrainingPlansListView_Previews: PreviewProvider {
+    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
     static var plansDatabaseHelper = PlansDataBaseHelper()
     
     static var previews: some View {
-        GeometryReader { geometry in
-            TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, geometry: geometry)
-        }
+        TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
     }
 }

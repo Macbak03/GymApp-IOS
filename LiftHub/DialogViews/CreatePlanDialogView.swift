@@ -17,6 +17,8 @@ struct CreatePlanDialogView: View {
     let position: Int?
     @State var planName: String = ""
     @Environment(\.presentationMode) var presentationMode
+    @State private var showToast = false
+    @State private var toastMessage = ""
     
     
     var body: some View {
@@ -52,9 +54,25 @@ struct CreatePlanDialogView: View {
                         
                         Button(action: {
                             if state == DialogState.add {
-                                addPlan()
+                                do {
+                                    try addPlan()
+                                } catch let error as ValidationException {
+                                    toastMessage = error.message
+                                    showToast = true
+                                } catch {
+                                    toastMessage = "An unexpected error occured \(error)"
+                                    showToast = true
+                                }
                             } else {
-                                editPlan()
+                                do {
+                                    try editPlan()
+                                } catch let error as ValidationException {
+                                    toastMessage = error.message
+                                    showToast = true
+                                } catch {
+                                    toastMessage = "An unexpected error occured \(error)"
+                                    showToast = true
+                                }
                             }
                         }) {
                             Text(confirmButtonTitle)
@@ -76,21 +94,17 @@ struct CreatePlanDialogView: View {
                     }
                 }
             }
+            .toast(isShowing: $showToast, message: toastMessage)
         }
     }
     
-    func addPlan() {
-        if planNameText.isEmpty || planNameText == PlansView.defaultPlan.name {
-            return
+    func addPlan() throws {
+        if planNameText.isEmpty {
+            throw ValidationException(message: "Plan's name cannot be empty")
         }
         
         if trainingPlans.contains(where: { $0.name == planNameText }) {
-            // Show error: plan with this name already exists
-            return
-        }
-        
-        if trainingPlans.first?.name == PlansView.defaultPlan.name {
-            trainingPlans.removeAll()
+            throw ValidationException(message: "A plan with this name already exists")
         }
         
         plansDatabaseHelper.addPlan(planName: planNameText)
@@ -98,13 +112,12 @@ struct CreatePlanDialogView: View {
         presentationMode.wrappedValue.dismiss()
     }
     
-    func editPlan(){
-        if planNameText.isEmpty || planNameText == PlansView.defaultPlan.name {
-            return
+    func editPlan() throws {
+        if planNameText.isEmpty {
+            throw ValidationException(message: "Plan's name cannot be empty")
         }
         if trainingPlans.contains(where: { $0.name == planNameText }) {
-            // Show error: plan with this name already exists
-            return
+            throw ValidationException(message: "A plan with this name already exists")
         }
         let planId = plansDatabaseHelper.getPlanId(planName: planName)
         guard let checkedPlanId = planId else {
