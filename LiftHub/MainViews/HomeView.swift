@@ -7,8 +7,12 @@
 import SwiftUI
 
 struct HomeView: View {
+    @State var routines: [TrainingPlanElement] = []
     @State private var plans: [TrainingPlan] = []
     @State private var selectedPlan = ""
+    @State private var openStartWorkoutSheet = false
+    
+    let plansDatabaseHelper = PlansDataBaseHelper()
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -85,7 +89,8 @@ struct HomeView: View {
                         .padding(.horizontal, 70)
                         
                         Button(action: {
-                            // Action for "Start Workout"
+                            //if trainingPlan.name != "no training plan"
+                            openStartWorkoutSheet = true
                         }) {
                             Text("Start Workout")
                                 .font(.system(size: 18))
@@ -108,13 +113,16 @@ struct HomeView: View {
                     selectedPlan = plans[0].name
                 }
             }
+            .sheet(isPresented: $openStartWorkoutSheet) {
+                StartWorkoutSheetView(planName: selectedPlan)
+            }
         }
     }
     
     private func initSpinner() {
-        let plansDatabaseHelper = PlansDataBaseHelper()
         plans = plansDatabaseHelper.getPlans()
     }
+    
 }
 
 struct HomeView_Previews: PreviewProvider {

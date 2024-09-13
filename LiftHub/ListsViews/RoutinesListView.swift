@@ -23,6 +23,7 @@ struct RoutinesListView: View {
             ForEach(routines.indices, id: \.self) { index in
                 RoutinesElementView(routines: $routines, position: index, routine: $routines[index], planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
             }
+            .padding(.top, 5)
         }
     }
 }

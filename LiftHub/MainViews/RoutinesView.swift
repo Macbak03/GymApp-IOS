@@ -44,10 +44,12 @@ struct RoutinesView: View {
                                 Spacer()
                             }
                             .padding(.leading, 30) // Add some padding to keep it away from the edge
-                                                        
+                            
                             Text(planName)
+                                .frame(maxWidth: 250, maxHeight: 100)
                                 .font(.system(size: 32, weight: .medium))
                                 .foregroundColor(Color.TextColorPrimary)
+                                .multilineTextAlignment(.center)
                         }
                     }
                     
@@ -81,7 +83,6 @@ struct RoutinesView: View {
                 }
                 planId = checkedPlanId
             }
-            
         }
     }
     
