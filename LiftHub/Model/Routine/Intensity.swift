@@ -37,7 +37,7 @@ struct IntensityFactory {
     // Helper function for Intensity creation
     static func fromString(_ intensity: String?, index: IntensityIndex) throws -> Intensity {
         guard let intensity = intensity else {
-            throw ValidationException(message: "RPE cannot be empty")
+            throw ValidationException(message: "Intensity cannot be empty")
         }
         
         // Regex to match single values or ranges

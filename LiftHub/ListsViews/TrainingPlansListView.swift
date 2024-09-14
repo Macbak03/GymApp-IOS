@@ -16,6 +16,7 @@ struct TrainingPlansListView: View {
                 index in
                 TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: index)
             }
+            .padding(.top, 5)
         }
     }
 }
@@ -26,7 +27,7 @@ struct TrainingPlansElementView: View {
     let position: Int
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
-    @State var planName: String = ""
+    @State private var planName: String = ""
     @State private var openRoutines = false
     var body: some View {
         
