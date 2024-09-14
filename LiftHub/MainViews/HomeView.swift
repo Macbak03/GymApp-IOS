@@ -12,6 +12,13 @@ struct HomeView: View {
     @State private var selectedPlan = ""
     @State private var openStartWorkoutSheet = false
     
+    private var isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    
+    @State private var startWorkout = false
+    @State private var unfinishedRoutineName = ""
+    @State private var closeStartWorkoutSheet = false
+    @State private var isWorkoutEnded = true
+    
     let plansDatabaseHelper = PlansDataBaseHelper()
     var body: some View {
         GeometryReader { geometry in
@@ -32,6 +39,10 @@ struct HomeView: View {
                         .frame(minWidth: 100, minHeight: 30)
                         .clipped()
                         .pickerStyle(MenuPickerStyle())
+                        .onChange(of: selectedPlan) { plan in
+                            UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
+                        }
+                        .disabled(!isWorkoutEnded)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.top, 6)
@@ -74,19 +85,21 @@ struct HomeView: View {
                     
                     // Two buttons (Return to workout and Start Workout)
                     VStack(spacing: 20) {
-                        Button(action: {
-                            // Action for "Return to workout"
-                        }) {
-                            Text("Return to workout")
-                                .font(.system(size: 18))
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 70)
-                                .background(Color.accentColor)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                                .shadow(radius: 5)
+                        if !isWorkoutEnded {
+                            Button(action: {
+                                startWorkout = true
+                            }) {
+                                Text("Return to workout")
+                                    .font(.system(size: 18))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 65)
+                                    .background(Color.accentColor)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                    .shadow(radius: 5)
+                            }
+                            .padding(.horizontal, 70)
                         }
-                        .padding(.horizontal, 70)
                         
                         Button(action: {
                             //if trainingPlan.name != "no training plan"
@@ -95,7 +108,7 @@ struct HomeView: View {
                             Text("Start Workout")
                                 .font(.system(size: 18))
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 70)
+                                .frame(height: 65)
                                 .background(Color.accentColor)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
@@ -108,18 +121,29 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .onAppear() {
-                initSpinner()
+                initPickerData()
                 if !plans.isEmpty {
-                    selectedPlan = plans[0].name
+                    initPickerChoice()
                 }
+                isWorkoutEnded = isWorkoutSaved
+                unfinishedRoutineName = UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name"
             }
             .sheet(isPresented: $openStartWorkoutSheet) {
-                StartWorkoutSheetView(planName: selectedPlan)
+                StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded)
+            }
+            .fullScreenCover(isPresented: $startWorkout) {
+                WorkoutView(planName: selectedPlan, routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name", closeStartWorkoutSheet: $closeStartWorkoutSheet, isWorkoutEnded: $isWorkoutEnded)
             }
         }
     }
     
-    private func initSpinner() {
+    private func initPickerChoice() {
+        guard let selectedPlan = UserDefaults.standard.string(forKey: Constants.SELECTED_PLAN_NAME) else {
+            return
+        }
+        self.selectedPlan = selectedPlan
+    }
+    private func initPickerData() {
         plans = plansDatabaseHelper.getPlans()
     }
     

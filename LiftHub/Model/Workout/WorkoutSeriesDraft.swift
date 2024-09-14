@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WorkoutSeriesDraft {
+struct WorkoutSeriesDraft: Codable {
     var id = UUID()
     var actualReps: String
     var actualLoad: String

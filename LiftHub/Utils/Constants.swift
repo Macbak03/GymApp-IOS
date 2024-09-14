@@ -10,6 +10,10 @@ import Foundation
 class Constants {
     public static let DARK_MODE = "DARK_MODE"
     public static let LIGHT_MODE = "LIGHT_MODE"
+    
+    public static let IS_WORKOUT_SAVED_KEY = "IsWorkoutUnsaved"
+    public static let UNFINISHED_WORKOUT_ROUTINE_NAME = "UnfinishedRoutineName"
+    public static let SELECTED_PLAN_NAME = "SelectedPlanName"
 }
 
 enum DialogState {

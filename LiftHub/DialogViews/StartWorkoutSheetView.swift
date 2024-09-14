@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct StartWorkoutSheetView: View {
+    @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     let planName: String
     @State private var routines: [TrainingPlanElement] = []
+    @State private var closeWorkoutSheetView = false
+    @Binding var isWorkoutEnded: Bool
     var body: some View {
         ZStack{
             Color.black.opacity(0.3)
@@ -29,7 +32,7 @@ struct StartWorkoutSheetView: View {
                     ScrollView {
                         ForEach(routines.indices, id: \.self) {
                             index in
-                            SheetListElement(routine: routines[index], planName: planName)
+                            SheetListElement(routine: routines[index], planName: planName, closeWorkoutSheetElement: $closeWorkoutSheetView, isWorkoutEnded: $isWorkoutEnded)
                         }
                         .padding(.top, 5)
                     }
@@ -46,6 +49,11 @@ struct StartWorkoutSheetView: View {
         .onAppear(){
             initRoutines()
         }
+        .onChange(of: closeWorkoutSheetView) { close in
+            if close {
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
     }
     
     private func initRoutines(){
@@ -60,9 +68,11 @@ struct StartWorkoutSheetView: View {
 }
 
 private struct SheetListElement: View {
-    @State private var startWorkout = false
+    @State private var startWorkout: Bool = false
     let routine: TrainingPlanElement
     let planName: String
+    @Binding var closeWorkoutSheetElement: Bool
+    @Binding var isWorkoutEnded: Bool
     var body: some View {
         HStack {
             Text(routine.name)
@@ -83,20 +93,24 @@ private struct SheetListElement: View {
         .padding(.horizontal, 8) // Card marginHorizontal
         
         .onTapGesture {
+            UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
             startWorkout = true
         }
         .fullScreenCover(isPresented: $startWorkout) {
-            WorkoutView(planName: planName, routineName: routine.name)
+            WorkoutView(planName: planName, routineName: routine.name, closeStartWorkoutSheet: $closeWorkoutSheetElement, isWorkoutEnded: $isWorkoutEnded)
         }
     }
 }
 
 
 struct StartWorkoutSheet_Previews: PreviewProvider {
+    @State static var isWorkoutEnded = false
+    @State static var startWorkout = false
+    @State static var unfinishedRoutineName: String = ""
     static var planName = "Plan"
     static var previews: some View {
-        StartWorkoutSheetView(planName: planName)
-        SheetListElement(routine: TrainingPlanElement(name: "Rotuine"), planName: planName)
+        StartWorkoutSheetView(planName: planName, isWorkoutEnded: $isWorkoutEnded)
+        //SheetListElement(routine: TrainingPlanElement(name: "Rotuine"), planName: planName)
     }
 }
 

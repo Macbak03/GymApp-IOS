@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WorkoutExerciseDraft {
+struct WorkoutExerciseDraft: Codable {
     var id = UUID()
     var name: String
     var pause: String
@@ -17,8 +17,9 @@ struct WorkoutExerciseDraft {
     var intensity: String
     var intensityIndex: IntensityIndex
     var pace: String
+    var note: String
 
-    init(name: String, pause: String, pauseUnit: TimeUnit, series: String, reps: String, intensity: String, intensityIndex: IntensityIndex, pace: String) {
+    init(name: String, pause: String, pauseUnit: TimeUnit, series: String, reps: String, intensity: String, intensityIndex: IntensityIndex, pace: String, note: String) {
         self.name = name
         self.pause = pause
         self.pauseUnit = pauseUnit
@@ -27,5 +28,6 @@ struct WorkoutExerciseDraft {
         self.intensity = intensity
         self.intensityIndex = intensityIndex
         self.pace = pace
+        self.note = note
     }
 }
