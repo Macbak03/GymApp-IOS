@@ -8,7 +8,7 @@
 import Foundation
 
 struct WorkoutSeries {
-    var actualReps: Float
+    var actualReps: Double
     var seriesCount: Int
     var load: Weight
     var actualIntensity: Intensity

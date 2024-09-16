@@ -12,9 +12,12 @@ struct WorkoutView: View {
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     @Environment(\.scenePhase) var scenePhase
     
-    @State private var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])] = []
+    @State private var workoutDraft: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])] = []
     
     @State private var workoutHints: [WorkoutHints] = []
+    
+    private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
+    private let workoutSeriesDatabaseHelper = WorkoutSeriesDatabaseHelper()
     
     private let isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
     
@@ -26,6 +29,11 @@ struct WorkoutView: View {
     @State private var isWorkoutFinished = false
     
     @State private var showCancelAlert = false
+    
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    
+    let date: String
     
     var body: some View {
         GeometryReader { geometry  in
@@ -51,7 +59,7 @@ struct WorkoutView: View {
                     }
                 }
                 
-                WorkoutListView(workout: $workout, workoutHints: $workoutHints)
+                WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints)
                 
                 // Horizontal layout for buttons
                 HStack(spacing: 10) {
@@ -83,9 +91,7 @@ struct WorkoutView: View {
                     Spacer()
                     
                     Button(action: {
-                        UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
-                        isWorkoutEnded = true
-                        isWorkoutFinished = true
+                        saveWorkoutToHistory(date: date)
                     }) {
                         Text("Save Workout")                    }
                     .frame(width: 140, height: 45)
@@ -130,6 +136,7 @@ struct WorkoutView: View {
                     secondaryButton: .cancel()
                 )
             }
+            .toast(isShowing: $showToast, message: toastMessage)
         }
     }
     
@@ -144,8 +151,7 @@ struct WorkoutView: View {
         for (index, savedExercise) in savedRoutine.enumerated() {
             let exercise = WorkoutExerciseDraft(name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
             let seriesList: [WorkoutSeriesDraft] = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
-            workout.append((workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
-            
+            workoutDraft.append((workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
             //            if savedNotes.isEmpty {
             //                let note = savedNotes[index]
             //                let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
@@ -160,7 +166,7 @@ struct WorkoutView: View {
     }
     
     private func saveWorkoutToFile() {
-        let workoutList = workout.map {
+        let workoutList = workoutDraft.map {
             WorkoutDraft(workoutExerciseDraft: $0.workoutExerciseDraft, workoutSeriesDraftList: $0.workoutSeriesDraftList)
         }
         let encoder = JSONEncoder()
@@ -173,6 +179,7 @@ struct WorkoutView: View {
                 try jsonData.write(to: fileURL)
                 UserDefaults.standard.setValue(false, forKey: Constants.IS_WORKOUT_SAVED_KEY)
                 UserDefaults.standard.setValue(routineName, forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME)
+                UserDefaults.standard.setValue(date, forKey: Constants.DATE)
                 print("Workout data saved at: \(fileURL)")
             }
         } catch {
@@ -202,13 +209,61 @@ struct WorkoutView: View {
             return
         }
         for (index, exercise) in recoveredWorkout.enumerated() {
-            workout[index].workoutExerciseDraft.note = exercise.workoutExerciseDraft.note
+            workoutDraft[index].workoutExerciseDraft.note = exercise.workoutExerciseDraft.note
             for (setIndex, set) in exercise.workoutSeriesDraftList.enumerated() {
-                workout[index].workoutSeriesDraftList[setIndex].actualReps = set.actualReps
-                workout[index].workoutSeriesDraftList[setIndex].actualLoad = set.actualLoad
-                workout[index].workoutSeriesDraftList[setIndex].actualIntensity = set.actualIntensity
+                workoutDraft[index].workoutSeriesDraftList[setIndex].actualReps = set.actualReps
+                workoutDraft[index].workoutSeriesDraftList[setIndex].actualLoad = set.actualLoad
+                workoutDraft[index].workoutSeriesDraftList[setIndex].actualIntensity = set.actualIntensity
             }
         }
+    }
+    
+    private func saveWorkoutToHistory(date: String) {
+        var workout = [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])]()
+        //var exercises = [WorkoutExercise]()
+        var series = [WorkoutSeries]()
+        for (index, pair) in workoutDraft.enumerated() {
+            let loadUnit = pair.workoutSeriesDraftList[0].loadUnit
+            let exerciseDraft = ExerciseDraft(
+                name: pair.workoutExerciseDraft.name,
+                pause: pair.workoutExerciseDraft.pause,
+                pauseUnit: pair.workoutExerciseDraft.pauseUnit,
+                load: "0",
+                loadUnit: loadUnit,
+                series: pair.workoutExerciseDraft.series,
+                reps: pair.workoutExerciseDraft.reps,
+                intensity: pair.workoutExerciseDraft.intensity,
+                intensityIndex: pair.workoutExerciseDraft.intensityIndex,
+                pace: pair.workoutExerciseDraft.pace,
+                wasModified: false)
+            for (index, setDraft) in pair.workoutSeriesDraftList.enumerated() {
+                do {
+                    let set = try setDraft.toWorkoutSeries(seriesCount: (index + 1))
+                    series.append(set)
+                } catch let error as ValidationException {
+                    showToast = true
+                    toastMessage = error.message
+                    return
+                } catch {
+                    print("Unexpected error occured when saving workout: \(error)")
+                    return
+                }
+            }
+            do {
+                let exercise = try exerciseDraft.toExercise()
+                workout.append((workoutExercise: WorkoutExercise(exercise: exercise, exerciseCount: (index + 1), note: pair.workoutExerciseDraft.note), exerciseSeries: series))
+                series.removeAll()
+            } catch {
+                print("Error in WorkoutExercise in saving workout \(error)")
+                return
+            }
+        }
+        workoutHistoryDatabaseHelper.checkForeignKeysEnabled()
+        workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
+        UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
+        isWorkoutEnded = true
+        isWorkoutFinished = true
+        presentationMode.wrappedValue.dismiss()
     }
 }
 
@@ -218,7 +273,7 @@ struct WorkoutView_Previews: PreviewProvider {
     @State static var unfinishedRoutineName: String? = nil
     @State static var rotineName = "Routine"
     static var previews: some View {
-        WorkoutView(planName: "Plan", routineName: "Routine", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded)
+        WorkoutView(planName: "Plan", routineName: "Routine", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded, date: "")
     }
 }
 
