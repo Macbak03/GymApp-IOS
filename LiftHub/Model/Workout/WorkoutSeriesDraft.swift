@@ -32,7 +32,7 @@ struct WorkoutSeriesDraft: Codable {
             throw ValidationException(message: "Reps must be a number")
         }
         let load = try Weight.fromStringWithUnit(actualLoad, unit: loadUnit)
-        let intensity = try IntensityFactory.fromString(actualIntensity, index: intensityIndex)
+        let intensity = try IntensityFactory.fromStringForWorkout(actualIntensity, index: intensityIndex)
         
         return WorkoutSeries(actualReps: doubleReps, seriesCount: seriesCount, load: load, actualIntensity: intensity)
     }

@@ -128,13 +128,13 @@ class WorkoutHistoryDataBaseHelper: Repository {
     
     func addSeriesToHistory(series: WorkoutSeries, exerciseId: Int64) {
         do {
-            let seriesTable = Table(WorkoutSeriesDatabaseHelper.TABLE_NAME)
-            let exerciseIdColumn = Expression<Int64>(WorkoutSeriesDatabaseHelper.EXERCISE_ID_COLUMN)
-            let seriesOrder = Expression<Int64>(WorkoutSeriesDatabaseHelper.SERIES_ORDER_COLUMN)
-            let actualReps = Expression<Double>(WorkoutSeriesDatabaseHelper.ACTUAL_REPS_COLUMN)
-            let loadValue = Expression<Double>(WorkoutSeriesDatabaseHelper.LOAD_VALUE_COLUMN)
-            let intensityValue = Expression<Int>(WorkoutSeriesDatabaseHelper.INTENSITY_VALUE)
-
+            let seriesTable = Table(WorkoutSeriesDataBaseHelper.TABLE_NAME)
+            let exerciseIdColumn = Expression<Int64>(WorkoutSeriesDataBaseHelper.EXERCISE_ID_COLUMN)
+            let seriesOrder = Expression<Int64>(WorkoutSeriesDataBaseHelper.SERIES_ORDER_COLUMN)
+            let actualReps = Expression<Double>(WorkoutSeriesDataBaseHelper.ACTUAL_REPS_COLUMN)
+            let loadValue = Expression<Double>(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)
+            let intensityValue = Expression<Int>(WorkoutSeriesDataBaseHelper.INTENSITY_VALUE)
+            
             
             try db?.run(seriesTable.insert(
                 exerciseIdColumn <- exerciseId,
@@ -148,12 +148,11 @@ class WorkoutHistoryDataBaseHelper: Repository {
         }
     }
     
-    // Add workout exercises to history in a transaction
+    //MARK: Add workout exercises to history in a transaction
     func addExercises(workout: [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])], date: String, planName: String, routineName: String) {
         do {
             try db?.transaction {
-                for (index, exercise) in workout.enumerated() {
-                    
+                for exercise in workout {
                     addExerciseToHistory(date: date, workoutExercise: exercise.workoutExercise, planName: planName, routineName: routineName)
                     if let lastId = getLastExerciseId() {
                         addSeries(seriesList: exercise.exerciseSeries, exerciseId: lastId)
@@ -172,7 +171,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
         }
     }
     
-    // Delete exercises from history by date
+    //MARK: Delete exercises from history by date
     func deleteFromHistory(date: String) {
         do {
             let query = workoutHistoryTable.filter(self.date == date)
@@ -182,34 +181,40 @@ class WorkoutHistoryDataBaseHelper: Repository {
         }
     }
     
-//    // Get workout history
-//    func getHistory() -> [WorkoutHistoryElement] {
-//        var workoutHistory: [WorkoutHistoryElement] = []
-//        let customDate = CustomDate()
-//        
-//        do {
-//            let query = workoutHistoryTable
-//                .select(planName, date, routineName)
-//                .order(date.desc)
-//                .group(date, planName, routineName)
-//            
-//            for row in try db!.prepare(query) {
-//                let savedDate = row[date]
-//                let formattedDate = customDate.getFormattedDate(savedDate)
-//                let workoutHistoryElement = WorkoutHistoryElement(
-//                    planName: row[planName],
-//                    routineName: row[routineName],
-//                    date: formattedDate,
-//                    savedDate: savedDate
-//                )
-//                workoutHistory.append(workoutHistoryElement)
-//            }
-//        } catch {
-//            print("Error retrieving history: \(error)")
-//        }
-//        
-//        return workoutHistory
-//    }
+    //MARK: Get workout history
+    func getHistory() -> [WorkoutHistoryElement] {
+        var workoutHistory: [WorkoutHistoryElement] = []
+        let customDate = CustomDate()
+        
+        do {
+            // Use raw SQL to enforce DISTINCT and proper ordering
+            let query = """
+            SELECT DISTINCT planName, date, routineName FROM workoutHistory ORDER BY date DESC
+            """
+            
+            let rows = try db!.prepare(query)
+                for row in rows {
+                    if let savedDate = row[1] as? String,
+                       let planName = row[0] as? String,
+                        let routineName = row[2] as? String {
+                        let formattedDate = customDate.getFormattedDate(savedDate: savedDate)
+                        
+                        let workoutHistoryElement = WorkoutHistoryElement(
+                            planName: planName,
+                            routineName: routineName,
+                            formattedDate: formattedDate,
+                            rawDate: savedDate
+                        )
+                        workoutHistory.append(workoutHistoryElement)
+                    }
+                }
+        } catch {
+            print("Error retrieving history: \(error)")
+        }
+        
+        return workoutHistory
+    }
+    
     
     // MARK: - Get Exercise ID by Date and Name
     func getExerciseID(date: String, exerciseName: String) -> Int64? {
@@ -261,7 +266,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
         return nil
     }
     
-    // Function to retrieve exercises for a workout
+    //MARK: Function to retrieve exercises for a workout
     func getWorkoutExercises(date: String, routineName: String, planName: String) -> [WorkoutExerciseDraft] {
         var workoutExercises: [WorkoutExerciseDraft] = []
         let seconds = 60
@@ -273,9 +278,16 @@ class WorkoutHistoryDataBaseHelper: Repository {
             
             for row in try db!.prepare(query) {
                 let exerciseName = try row.get(self.exerciseName)
-                let pauseRangeFromInt = try row.get(self.pauseRangeFrom)
-                let pauseRangeToInt = try row.get(self.pauseRangeTo)
-                let pauseUnit: TimeUnit = (pauseRangeFromInt % seconds == 0 && pauseRangeToInt % seconds == 0) ? .min : .s
+                var pauseRangeFromInt = try row.get(self.pauseRangeFrom)
+                var pauseRangeToInt = try row.get(self.pauseRangeTo)
+                let pauseUnit: TimeUnit
+                if pauseRangeFromInt % seconds == 0 && pauseRangeToInt % seconds == 0 {
+                    pauseRangeFromInt /= seconds
+                    pauseRangeToInt /= seconds
+                    pauseUnit = .min
+                } else {
+                    pauseUnit = .s
+                }
                 
                 let pause: String = if (pauseRangeFromInt == pauseRangeToInt) {
                     ExactPause(value: pauseRangeFromInt, pauseUnit: pauseUnit).description
@@ -407,9 +419,8 @@ class WorkoutHistoryDataBaseHelper: Repository {
         do {
             let selectQuery = "SELECT DISTINCT LOWER\(self.exerciseName) AS exercise_name FROM \(self.workoutHistoryTable) ORDER BY exercise_name"
             let cursor = try db!.prepare(selectQuery)
-            
             for row in cursor {
-                if let exerciseName = row[0] as? String {
+                if let exerciseName = row[5] as? String {
                     exerciseNames.append(exerciseName)
                 }
             }
@@ -418,30 +429,30 @@ class WorkoutHistoryDataBaseHelper: Repository {
         }
         return exerciseNames
     }
-
     
-//    // MARK: - Get Exercises for Chart
-//    func getExercisesToChart(exerciseName: String) -> (exerciseIds: [Int64], dates: [String]) {
-//        var exerciseIds: [Int64] = []
-//        var dates: [String] = []
-//        let customDate = CustomDate()
-//        
-//        do {
-//            let query = workoutHistoryTable
-//                .select(exerciseId, self.date)
-//                .filter(self.exerciseName.lowercaseString == exerciseName.lowercased())
-//            
-//            for row in try db!.prepare(query) {
-//                exerciseIds.append(row[exerciseId])
-//                let formattedDate = customDate.getChartFormattedDate(row[self.date])
-//                dates.append(formattedDate)
-//            }
-//        } catch {
-//            print("Error fetching exercises for chart: \(error)")
-//        }
-//        
-//        return (exerciseIds, dates)
-//    }
+    
+    //    // MARK: - Get Exercises for Chart
+    //    func getExercisesToChart(exerciseName: String) -> (exerciseIds: [Int64], dates: [String]) {
+    //        var exerciseIds: [Int64] = []
+    //        var dates: [String] = []
+    //        let customDate = CustomDate()
+    //
+    //        do {
+    //            let query = workoutHistoryTable
+    //                .select(exerciseId, self.date)
+    //                .filter(self.exerciseName.lowercaseString == exerciseName.lowercased())
+    //
+    //            for row in try db!.prepare(query) {
+    //                exerciseIds.append(row[exerciseId])
+    //                let formattedDate = customDate.getChartFormattedDate(row[self.date])
+    //                dates.append(formattedDate)
+    //            }
+    //        } catch {
+    //            print("Error fetching exercises for chart: \(error)")
+    //        }
+    //
+    //        return (exerciseIds, dates)
+    //    }
     
     // MARK: - Get Load Unit
     func getLoadUnit(exerciseId: Int64) -> String? {

@@ -8,7 +8,7 @@
 import Foundation
 import SQLite
 
-class WorkoutSeriesDatabaseHelper : Repository{
+class WorkoutSeriesDataBaseHelper : Repository{
     static let TABLE_NAME = "workoutSeries"
     static let EXERCISE_ID_COLUMN = "exerciseID"
     static let SERIES_ORDER_COLUMN = "seriesOrder"

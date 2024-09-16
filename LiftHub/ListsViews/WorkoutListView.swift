@@ -5,7 +5,7 @@
 //  Created by Maciej "wielki" Bąk on 13/09/2024.
 //
 
-//TODO: add text fields validation, add toast when workout is saved
+//TODO: add text fields validation, add toast when workout is saved 
 
 import Foundation
 import SwiftUI
@@ -13,12 +13,15 @@ import SwiftUI
 struct WorkoutListView: View {
     @Binding var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
     @Binding var workoutHints: [WorkoutHints]
-    @State private var isExpanded = false
+    
+    @Binding var showToast: Bool
+    @Binding var toastMessage: String
+
     var body: some View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints, position: index)
+                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints, position: index, showToast: $showToast, toastMessage: $toastMessage)
             }
         }
     }
@@ -28,6 +31,9 @@ private struct WorkoutListExerciseView: View {
     @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
     @Binding var workoutHints: [WorkoutHints]
     let position: Int
+    
+    @Binding var showToast: Bool
+    @Binding var toastMessage: String
     
     @State private var isDetailsVisible = false
     @State private var displayNote = false
@@ -115,7 +121,7 @@ private struct WorkoutListExerciseView: View {
         if isDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints[position], seriesCount: exercise.workoutSeriesDraftList.count, position: index)
+                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints[position], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage)
             }
             // Note Input
             TextField(noteHint, text: $exercise.workoutExerciseDraft.note)
@@ -146,6 +152,8 @@ private struct WorkoutListSeriesView: View {
     @Binding var workoutHint: WorkoutHints
     let seriesCount: Int
     let position: Int
+    @Binding var showToast: Bool
+    @Binding var toastMessage: String
     
     @State private var repsHint: String = "Reps"
     @State private var weightHint: String = "Weight"
@@ -154,21 +162,41 @@ private struct WorkoutListSeriesView: View {
     @State private var intensityIndexText: String = "RPE"
     @State private var weightUnitText: String = "kg"
     
+    @State private var showLoadError = false
+    @State private var showRepsError = false
+    @State private var showIntensityError = false
+    
+    @FocusState private var isLoadFocused: Bool
+    @FocusState private var isRepsFocused: Bool
+    @FocusState private var isIntensityFocused: Bool
+
+
+    private let textFieldCornerRadius: CGFloat = 5
+    private let textFieldStrokeLineWidth: CGFloat = 0.5
+    
     var body: some View {
         VStack(alignment: .leading) {
             // First Horizontal Layout for Series Count, Reps, Weight
             HStack(spacing: 5) {
                 // Series Count
-                Text("1.")
+                Text("\(position + 1).")
                     .font(.system(size: 18))
                     .padding(.leading, 4) // Equivalent to layout_marginStart="10dp"
                 
                 // Reps Input
                 TextField(repsHint, text: $series.actualReps)
                     .keyboardType(.decimalPad)
-                    .frame(height: 50)
-                    .multilineTextAlignment(.trailing) // Equivalent to textAlignment="textEnd"
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .frame(height: 30)
+                    .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
+                    .padding(.horizontal, 10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                            .stroke((showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                    )
+                    .focused($isRepsFocused)
+                    .onChange(of: isRepsFocused) { focused in
+                        validateReps(focused: focused)
+                    }
                 
                 // Multiplication Sign
                 Text("x")
@@ -179,8 +207,17 @@ private struct WorkoutListSeriesView: View {
                 // Weight Input
                 TextField(weightHint, text: $series.actualLoad)
                     .keyboardType(.decimalPad)
-                    .frame(height: 50)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .frame(height: 30)
+                    .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                    .padding(.horizontal, 10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                            .stroke((showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                    )
+                    .focused($isLoadFocused)
+                    .onChange(of: isLoadFocused) { focused in
+                        validateLoad(focused: focused)
+                    }
                 
                 // Weight Unit Value
                 Text(weightUnitText)  // Assuming the weight unit is kilograms
@@ -196,8 +233,17 @@ private struct WorkoutListSeriesView: View {
                 // Intensity Input
                 TextField(intensityHint, text: $series.actualIntensity)
                     .keyboardType(.decimalPad)
-                    .frame(maxWidth: 50, maxHeight: 50)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .frame(width: 25,height: 30)
+                    .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                    .padding(.horizontal, 10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                            .stroke((showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                    )
+                    .focused($isIntensityFocused)
+                    .onChange(of: isIntensityFocused) { focused in
+                        validateIntensity(focused: focused)
+                    }
                     .padding(.trailing, 5)
                 
             }
@@ -215,6 +261,56 @@ private struct WorkoutListSeriesView: View {
         self.repsHint = workoutHint.repsHint
         self.weightHint = workoutHint.weightHint
         self.intensityHint = workoutHint.intensityHint
+    }
+    
+    private func setToast(errorMessage: String) {
+        toastMessage = errorMessage
+        showToast = true
+    }
+    
+    private func validateReps(focused: Bool) {
+        if !focused {
+            do {
+                try _ = RepsFactory.fromString(series.actualReps)
+            } catch let error as ValidationException {
+                showRepsError = true
+                setToast(errorMessage: error.message)
+            } catch {
+                toastMessage = "An unexpected error occured \(error)"
+            }
+        } else {
+            showRepsError = false
+        }
+    }
+    
+    private func validateLoad(focused: Bool) {
+        if !focused {
+            do {
+                try _ = Weight.fromStringWithUnit(series.actualLoad, unit: series.loadUnit)
+            } catch let error as ValidationException {
+                showLoadError = true
+                setToast(errorMessage: error.message)
+            } catch {
+                toastMessage = "An unexpected error occured \(error)"
+            }
+        } else {
+            showLoadError = false
+        }
+    }
+    
+    func validateIntensity(focused: Bool) {
+        if !focused {
+            do {
+                try _ = IntensityFactory.fromStringForWorkout(series.actualIntensity, index: series.intensityIndex)
+            } catch let error as ValidationException {
+                showIntensityError = true
+                setToast(errorMessage: error.message)
+            } catch {
+                toastMessage = "An unexpected error occured \(error)"
+            }
+        } else {
+            showIntensityError = false
+        }
     }
 }
 
@@ -236,8 +332,11 @@ struct WorkoutListView_previews: PreviewProvider {
     @State static var workoutHint2 = WorkoutHints(repsHint: "2", weightHint: "2", intensityHint: "2", noteHint: "Note2")
     @State static var workoutHints = [workoutHint1, workoutHint2]
     
+    @State static var showToast = false
+    @State static var toastMessage = ""
+    
     static var previews: some View {
-        WorkoutListView(workout: $workout, workoutHints: $workoutHints)
+        WorkoutListView(workout: $workout, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
 //        WorkoutListExerciseView(exercise: $wholeExercise2)
 //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }

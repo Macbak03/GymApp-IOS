@@ -9,6 +9,15 @@ import SwiftUI
 import UIKit
 
 struct WorkoutView: View {
+    let planName: String
+    let routineName: String
+    let date: String
+    @Binding var closeStartWorkoutSheet: Bool
+    @Binding var isWorkoutEnded: Bool
+    @Binding var showWorkoutSavedToast: Bool
+    @Binding var savedWorkoutToastMessage: String
+    
+    
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     @Environment(\.scenePhase) var scenePhase
     
@@ -17,23 +26,16 @@ struct WorkoutView: View {
     @State private var workoutHints: [WorkoutHints] = []
     
     private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
-    private let workoutSeriesDatabaseHelper = WorkoutSeriesDatabaseHelper()
+    private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
     
     private let isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
-    
-    let planName: String
-    let routineName: String
-    
-    @Binding var closeStartWorkoutSheet: Bool
-    @Binding var isWorkoutEnded: Bool
+
     @State private var isWorkoutFinished = false
     
     @State private var showCancelAlert = false
     
     @State private var showToast = false
     @State private var toastMessage = ""
-    
-    let date: String
     
     var body: some View {
         GeometryReader { geometry  in
@@ -59,7 +61,7 @@ struct WorkoutView: View {
                     }
                 }
                 
-                WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints)
+                WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
                 
                 // Horizontal layout for buttons
                 HStack(spacing: 10) {
@@ -263,6 +265,8 @@ struct WorkoutView: View {
         UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
         isWorkoutEnded = true
         isWorkoutFinished = true
+        showWorkoutSavedToast = true
+        savedWorkoutToastMessage = "Workout Saved!"
         presentationMode.wrappedValue.dismiss()
     }
 }
@@ -271,9 +275,11 @@ struct WorkoutView_Previews: PreviewProvider {
     @State static var closeWorkutSheet = true
     @State static var isWorkoutEnded = true
     @State static var unfinishedRoutineName: String? = nil
+    @State static var showToast = true
+    @State static var toastMessage: String = ""
     @State static var rotineName = "Routine"
     static var previews: some View {
-        WorkoutView(planName: "Plan", routineName: "Routine", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded, date: "")
+        WorkoutView(planName: "Plan", routineName: "Routine", date: "", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
     }
 }
 

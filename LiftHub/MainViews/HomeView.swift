@@ -18,6 +18,9 @@ struct HomeView: View {
     @State private var closeStartWorkoutSheet = false
     @State private var isWorkoutEnded = true
     
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    
     let plansDatabaseHelper = PlansDataBaseHelper()
     var body: some View {
         GeometryReader { geometry in
@@ -127,11 +130,18 @@ struct HomeView: View {
                 isWorkoutEnded = isWorkoutSaved
             }
             .sheet(isPresented: $openStartWorkoutSheet) {
-                StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded)
+                StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
             }
             .fullScreenCover(isPresented: $startWorkout) {
-                WorkoutView(planName: selectedPlan, routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name", closeStartWorkoutSheet: $closeStartWorkoutSheet, isWorkoutEnded: $isWorkoutEnded, date: UserDefaults.standard.string(forKey: Constants.DATE) ?? "Error date")
+                WorkoutView(planName: selectedPlan,
+                            routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name",
+                            date: UserDefaults.standard.string(forKey: Constants.DATE) ?? "Error date",
+                            closeStartWorkoutSheet: $closeStartWorkoutSheet,
+                            isWorkoutEnded: $isWorkoutEnded,
+                            showWorkoutSavedToast: $showToast,
+                            savedWorkoutToastMessage: $toastMessage)
             }
+            .toast(isShowing: $showToast, message: toastMessage)
         }
     }
     
