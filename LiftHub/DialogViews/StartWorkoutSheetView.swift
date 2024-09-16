@@ -73,6 +73,7 @@ private struct SheetListElement: View {
     let planName: String
     @Binding var closeWorkoutSheetElement: Bool
     @Binding var isWorkoutEnded: Bool
+    @State private var date: String = CustomDate.getDate()
     var body: some View {
         HStack {
             Text(routine.name)
@@ -94,10 +95,13 @@ private struct SheetListElement: View {
         
         .onTapGesture {
             UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
+            //let customDate = CustomDate()
+            //date = customDate.getDate()
+
             startWorkout = true
         }
         .fullScreenCover(isPresented: $startWorkout) {
-            WorkoutView(planName: planName, routineName: routine.name, closeStartWorkoutSheet: $closeWorkoutSheetElement, isWorkoutEnded: $isWorkoutEnded)
+            WorkoutView(planName: planName, routineName: routine.name, closeStartWorkoutSheet: $closeWorkoutSheetElement, isWorkoutEnded: $isWorkoutEnded, date: date)
         }
     }
 }

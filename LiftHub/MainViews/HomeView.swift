@@ -15,7 +15,6 @@ struct HomeView: View {
     private var isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
     
     @State private var startWorkout = false
-    @State private var unfinishedRoutineName = ""
     @State private var closeStartWorkoutSheet = false
     @State private var isWorkoutEnded = true
     
@@ -126,13 +125,12 @@ struct HomeView: View {
                     initPickerChoice()
                 }
                 isWorkoutEnded = isWorkoutSaved
-                unfinishedRoutineName = UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name"
             }
             .sheet(isPresented: $openStartWorkoutSheet) {
                 StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded)
             }
             .fullScreenCover(isPresented: $startWorkout) {
-                WorkoutView(planName: selectedPlan, routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name", closeStartWorkoutSheet: $closeStartWorkoutSheet, isWorkoutEnded: $isWorkoutEnded)
+                WorkoutView(planName: selectedPlan, routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error rotuine name", closeStartWorkoutSheet: $closeStartWorkoutSheet, isWorkoutEnded: $isWorkoutEnded, date: UserDefaults.standard.string(forKey: Constants.DATE) ?? "Error date")
             }
         }
     }

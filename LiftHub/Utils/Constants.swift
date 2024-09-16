@@ -14,6 +14,7 @@ class Constants {
     public static let IS_WORKOUT_SAVED_KEY = "IsWorkoutUnsaved"
     public static let UNFINISHED_WORKOUT_ROUTINE_NAME = "UnfinishedRoutineName"
     public static let SELECTED_PLAN_NAME = "SelectedPlanName"
+    public static let DATE = "WorkoutDate"
 }
 
 enum DialogState {

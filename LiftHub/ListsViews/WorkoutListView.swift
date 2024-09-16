@@ -5,6 +5,8 @@
 //  Created by Maciej "wielki" Bąk on 13/09/2024.
 //
 
+//TODO: add text fields validation, add toast when workout is saved
+
 import Foundation
 import SwiftUI
 
@@ -26,8 +28,6 @@ private struct WorkoutListExerciseView: View {
     @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
     @Binding var workoutHints: [WorkoutHints]
     let position: Int
-    
-    //@State private var workoutHint = WorkoutHints(repsHint: "Reps", weightHint: "Weight", intensityHint: "RPE", noteHint: "Note")
     
     @State private var isDetailsVisible = false
     @State private var displayNote = false

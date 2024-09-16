@@ -28,12 +28,12 @@ struct WorkoutSeriesDraft: Codable {
         if actualReps.isEmpty {
             throw ValidationException(message: "Reps cannot be empty")
         }
-        guard let floatReps = Float(actualReps) else {
+        guard let doubleReps = Double(actualReps) else {
             throw ValidationException(message: "Reps must be a number")
         }
         let load = try Weight.fromStringWithUnit(actualLoad, unit: loadUnit)
         let intensity = try IntensityFactory.fromString(actualIntensity, index: intensityIndex)
         
-        return WorkoutSeries(actualReps: floatReps, seriesCount: seriesCount, load: load, actualIntensity: intensity)
+        return WorkoutSeries(actualReps: doubleReps, seriesCount: seriesCount, load: load, actualIntensity: intensity)
     }
 }

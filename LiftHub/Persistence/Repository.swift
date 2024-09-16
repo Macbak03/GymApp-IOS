@@ -40,4 +40,5 @@ class Repository {
     open func createTableIfNotExists() throws {
         fatalError("Subclasses must override createTableIfNotExists")
     }
+    
 }
