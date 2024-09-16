@@ -84,7 +84,6 @@ struct BottomBarButtonView: View {
 
 // Dummy Views for each tab
 struct StatsView: View { var body: some View { Text("Stats View") } }
-struct HistoryView: View { var body: some View { Text("History View") } }
 
 struct BottomBar_Previews: PreviewProvider {
     static var previews: some View {
