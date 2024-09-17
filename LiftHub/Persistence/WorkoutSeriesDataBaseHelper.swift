@@ -116,14 +116,15 @@ class WorkoutSeriesDataBaseHelper : Repository{
     }
 
     // MARK: - Update Series Values
-    func updateSeriesValues(exerciseId: Int64, setOrder: Int64, actualReps: Float, loadValue: Float, intensityValue: Int) {
+    func updateSeriesValues(exerciseId: Int64, setOrder: Int64, actualReps: Double, loadValue: Double, intensityValue: Int) {
         do {
             let query = workoutSeriesTable
-                .filter(self.exerciseId == exerciseId && self.seriesOrder == setOrder && self.intensityValue == intensityValue)
+                .filter(self.exerciseId == exerciseId && self.seriesOrder == setOrder)
             
             try db?.run(query.update(
-                self.actualReps <- Double(actualReps),
-                self.loadValue <- Double(loadValue)
+                self.actualReps <- actualReps,
+                self.loadValue <- loadValue,
+                self.intensityValue <- intensityValue
             ))
         } catch {
             print("Error updating series values: \(error)")

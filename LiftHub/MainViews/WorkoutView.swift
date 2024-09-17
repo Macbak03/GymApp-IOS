@@ -154,13 +154,17 @@ struct WorkoutView: View {
             let exercise = WorkoutExerciseDraft(name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
             let seriesList: [WorkoutSeriesDraft] = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
             workoutDraft.append((workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
-            //            if savedNotes.isEmpty {
-            //                let note = savedNotes[index]
-            //                let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-            //                self.workoutHints.append(workoutHint)
-            //            } else
-            let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-            self.workoutHints.append(workoutHint)
+            let savedNotes = workoutHistoryDatabaseHelper.getLastTrainingNotes(planName: planName, routineName: routineName)
+            if !savedNotes.isEmpty {
+                let note = savedNotes[index]
+                if !note.isEmpty {
+                    let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
+                    self.workoutHints.append(workoutHint)
+                }
+            } else {
+                let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
+                self.workoutHints.append(workoutHint)
+            }
         }
         if !isWorkoutSaved {
             initRecoveredWorkoutData()

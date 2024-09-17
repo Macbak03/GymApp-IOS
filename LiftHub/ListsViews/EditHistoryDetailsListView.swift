@@ -1,16 +1,15 @@
 //
-//  WorkoutListView.swift
+//  EditHistoryDetailsListView.swift
 //  LiftHub
 //
-//  Created by Maciej "wielki" Bąk on 13/09/2024.
+//  Created by Maciej "wielki" Bąk on 17/09/2024.
 //
+
 import Foundation
 import SwiftUI
 
-struct WorkoutListView: View {
+struct EditHistoryDetailsListView: View {
     @Binding var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
-    @Binding var workoutHints: [WorkoutHints]
-    
     @Binding var showToast: Bool
     @Binding var toastMessage: String
 
@@ -18,17 +17,15 @@ struct WorkoutListView: View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                EditHistoryDetailsListExerciseView(exercise: $workout[index], position: index, showToast: $showToast, toastMessage: $toastMessage)
             }
         }
     }
 }
 
-private struct WorkoutListExerciseView: View {
+private struct EditHistoryDetailsListExerciseView: View {
     @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
-    @Binding var workoutHints: [WorkoutHints]
     let position: Int
-    
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     
@@ -44,7 +41,7 @@ private struct WorkoutListExerciseView: View {
     @State private var intensityValue = "val"
     @State private var paceValue = "val"
     
-    @State private var noteHint: String = "afwa"
+    @State private var noteHint = "Note"
     
     var body: some View {
         HStack {
@@ -118,7 +115,7 @@ private struct WorkoutListExerciseView: View {
         if isDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints[position], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                HistoryDetailsListSeriesView(series: $exercise.workoutSeriesDraftList[index], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage)
             }
             // Note Input
             TextField(noteHint, text: $exercise.workoutExerciseDraft.note)
@@ -140,17 +137,16 @@ private struct WorkoutListExerciseView: View {
         self.seriesValue = workoutExerciseDraft.series
         self.intensityValue = workoutExerciseDraft.intensity
         self.paceValue = workoutExerciseDraft.pace
-        self.noteHint = workoutHints[position].noteHint
     }
 }
 
-private struct WorkoutListSeriesView: View {
+private struct HistoryDetailsListSeriesView: View {
     @Binding var series: WorkoutSeriesDraft
-    @Binding var workoutHint: WorkoutHints
     let seriesCount: Int
     let position: Int
     @Binding var showToast: Bool
     @Binding var toastMessage: String
+    
     
     @State private var repsHint: String = "Reps"
     @State private var weightHint: String = "Weight"
@@ -166,7 +162,6 @@ private struct WorkoutListSeriesView: View {
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
     @FocusState private var isIntensityFocused: Bool
-
 
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldStrokeLineWidth: CGFloat = 0.5
@@ -248,16 +243,13 @@ private struct WorkoutListSeriesView: View {
             .padding(.horizontal, 10)
         }
         .onAppear() {
-            initValues(series: series, hint: workoutHint)
+            initValues(series: series)
         }
     }
     
-    private func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints){
+    private func initValues(series: WorkoutSeriesDraft){
         self.weightUnitText = series.loadUnit.rawValue
         self.intensityIndexText = series.intensityIndex.rawValue
-        self.repsHint = workoutHint.repsHint
-        self.weightHint = workoutHint.weightHint
-        self.intensityHint = workoutHint.intensityHint
     }
     
     private func setToast(errorMessage: String) {
@@ -311,7 +303,7 @@ private struct WorkoutListSeriesView: View {
     }
 }
 
-struct WorkoutListView_previews: PreviewProvider {
+struct EditHistoryDetailsListView_previews: PreviewProvider {
     @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "3-5", pauseUnit: TimeUnit.min, series: "1", reps: "1", intensity: "1", intensityIndex: IntensityIndex.RPE, pace: "1111", note: "note1")
     @State static var series1_1 = WorkoutSeriesDraft(actualReps: "11", actualLoad: "11", loadUnit: WeightUnit.kg, intensityIndex: IntensityIndex.RPE, actualIntensity: "1")
     
@@ -333,8 +325,9 @@ struct WorkoutListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        WorkoutListView(workout: $workout, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
+        EditHistoryDetailsListView(workout: $workout, showToast: $showToast, toastMessage: $toastMessage)
 //        WorkoutListExerciseView(exercise: $wholeExercise2)
 //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }
 }
+

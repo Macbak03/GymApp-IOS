@@ -394,8 +394,8 @@ class WorkoutHistoryDataBaseHelper: Repository {
     }
     
     // MARK: - Get Last Training Notes
-    func getLastTrainingNotes(planName: String, routineName: String) -> [String?] {
-        var notesList: [String?] = []
+    func getLastTrainingNotes(planName: String, routineName: String) -> [String] {
+        var notesList: [String] = []
         if let lastDate = getLastTrainingSessionDate(planName: planName, routineName: routineName) {
             do {
                 let query = workoutHistoryTable
