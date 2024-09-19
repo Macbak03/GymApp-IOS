@@ -15,6 +15,8 @@ class Constants {
     public static let UNFINISHED_WORKOUT_ROUTINE_NAME = "UnfinishedRoutineName"
     public static let SELECTED_PLAN_NAME = "SelectedPlanName"
     public static let DATE = "WorkoutDate"
+    
+    public static let NO_PLAN_NAME = "No training plan"
 }
 
 enum DialogState {

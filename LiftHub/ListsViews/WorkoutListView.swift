@@ -32,7 +32,7 @@ private struct WorkoutListExerciseView: View {
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     
-    @State private var isDetailsVisible = false
+    @State private var isDetailsVisible = true
     @State private var displayNote = false
     
     @State private var exerciseName = "Exercise"

@@ -48,7 +48,7 @@ struct HistoryDetailsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
             .frame(height: 70)
-            HistoryDetailsListView(workout: $workout)
+            HistoryDetailsListView(workout: $workout, planName: planName)
         }
         .onAppear() {
             loadHistoryDetails()

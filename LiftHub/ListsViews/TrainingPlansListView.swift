@@ -64,7 +64,7 @@ struct TrainingPlansElementView: View {
                 .fill(Color.BackgroundColorList)
                 .shadow(radius: 3)
         )
-        .padding(.horizontal, 8) // Card marginHorizontal
+        .padding(.horizontal, 10) // Card marginHorizontal
         .sheet(isPresented: $showOptionsDialog, onDismiss: {
             if position < trainingPlans.count {
                 planName = trainingPlans[position].name
