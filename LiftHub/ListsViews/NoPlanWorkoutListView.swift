@@ -39,7 +39,7 @@ private struct WorkoutListExerciseView: View {
     let intensityIndex: IntensityIndex
     let weightUnit: WeightUnit
     
-    @State private var isDetailsVisible = false
+    @State private var isDetailsVisible = true
     @State private var displayNote = false
     @State private var showNameError = false
     
@@ -94,11 +94,6 @@ private struct WorkoutListExerciseView: View {
         }
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation {
-                isDetailsVisible.toggle()
-            }
-        }
         Divider()
             .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
             .background(Color(.systemGray6)) // Set color for the line
@@ -143,7 +138,7 @@ private struct WorkoutListExerciseView: View {
     }
     
     private func addExercise() {
-        let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, series: "", reps: "", intensity: "", intensityIndex: intensityIndex, pace: "", note: "")
+        let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "0", pauseUnit: TimeUnit.min, series: "0", reps: "0", intensity: "0", intensityIndex: intensityIndex, pace: "0000", note: "")
         let exerciseSetDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
         workout.append((workoutExerciseDraft: exerciseDraft, workoutSeriesDraftList: [exerciseSetDraft]))
     }
@@ -191,7 +186,7 @@ private struct WorkoutListSeriesView: View {
                 // Reps Input
                 TextField(repsHint, text: $set.actualReps)
                     .keyboardType(.decimalPad)
-                    .frame(height: 30)
+                    .frame(width: 40, height: 30)
                     .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
                     .padding(.horizontal, 10)
                     .overlay(
@@ -212,7 +207,7 @@ private struct WorkoutListSeriesView: View {
                 // Weight Input
                 TextField(weightHint, text: $set.actualLoad)
                     .keyboardType(.decimalPad)
-                    .frame(height: 30)
+                    .frame(width: 55, height: 30)
                     .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
                     .padding(.horizontal, 10)
                     .overlay(
@@ -238,7 +233,7 @@ private struct WorkoutListSeriesView: View {
                 // Intensity Input
                 TextField(intensityHint, text: $set.actualIntensity)
                     .keyboardType(.decimalPad)
-                    .frame(width: 40,height: 30)
+                    .frame(width: 35,height: 30)
                     .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
                     .padding(.horizontal, 10)
                     .overlay(
@@ -249,18 +244,17 @@ private struct WorkoutListSeriesView: View {
                     .onChange(of: isIntensityFocused) { focused in
                         validateIntensity(focused: focused)
                     }
-                    .padding(.trailing, seriesCount == (position + 1) ? 5 : 55)
+                    .padding(.trailing, seriesCount == (position + 1) ? 5 : 48)
                 if seriesCount == position + 1 {
                     Button(action: {
                         addSet()
                     }) {
                         Image(systemName: "plus.circle")
                             .resizable()  // Enable image resizing
-                            .frame(width: 23, height: 23)
+                            .frame(width: 20, height: 20)
                             .padding(.trailing, 5)
                     }
                     .frame(width: 40, height: 40)
-                    .padding(.trailing, 5)
                 }
                 
             }
@@ -333,7 +327,7 @@ struct NoPlanWorkoutListView_previews: PreviewProvider {
     
     @State static var exercise2 = WorkoutExerciseDraft(name: "Exercise2", pause: "2", pauseUnit: TimeUnit.s, series: "2", reps: "2", intensity: "2", intensityIndex: IntensityIndex.RIR, pace: "2222", note: "note2")
     @State static var series2_1 = WorkoutSeriesDraft(actualReps: "21", actualLoad: "21", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "2")
-    @State static var series2_2 = WorkoutSeriesDraft(actualReps: "22", actualLoad: "22", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "3")
+    @State static var series2_2 = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "")
     
     @State static var wholeExercise2 = (workoutExerciseDraft: exercise2, workoutSeriesDraftList: [series2_1, series2_2])
     

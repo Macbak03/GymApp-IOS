@@ -9,13 +9,14 @@ import SwiftUI
 
 struct HistoryDetailsListView: View {
     @Binding var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
+    let planName: String
     
     @State private var isExpanded = false
     var body: some View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                HistoryDetailsListExerciseView(exercise: $workout[index])
+                HistoryDetailsListExerciseView(exercise: $workout[index], planName: planName)
             }
         }
     }
@@ -23,8 +24,9 @@ struct HistoryDetailsListView: View {
 
 private struct HistoryDetailsListExerciseView: View {
     @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
+    let planName: String
     
-    @State private var isDetailsVisible = false
+    @State private var isDetailsVisible = true
     @State private var displayNote = false
     
     var body: some View {
@@ -44,49 +46,53 @@ private struct HistoryDetailsListExerciseView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                // Second Horizontal Layout (Rest, Series, Intensity, Pace)
-                HStack(alignment: .center) {
-                    let VSpacing: CGFloat = 3
+                if planName != Constants.NO_PLAN_NAME {
                     
-                    // Rest Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Rest:")
-                        HStack(spacing: 1) {
-                            Text(exercise.workoutExerciseDraft.pause)
-                                .frame(alignment: .trailing)
-                            
-                            Text(exercise.workoutExerciseDraft.pauseUnit.rawValue)
-                                .frame(alignment: .leading)
+                    // Second Horizontal Layout (Rest, Series, Intensity, Pace)
+                    HStack(alignment: .center) {
+                        let VSpacing: CGFloat = 3
+                        
+                        // Rest Layout
+                        VStack(spacing: VSpacing) {
+                            Text("Rest:")
+                            HStack(spacing: 1) {
+                                Text(exercise.workoutExerciseDraft.pause)
+                                    .frame(alignment: .trailing)
+                                
+                                Text(exercise.workoutExerciseDraft.pauseUnit.rawValue)
+                                    .frame(alignment: .leading)
+                            }
+                        }
+                        Spacer()
+                        
+                        // Series Layout
+                        VStack(spacing: VSpacing) {
+                            Text("Series:")
+                            Text(exercise.workoutExerciseDraft.series)
+                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+                        }
+                        Spacer()
+                        
+                        // Intensity Layout
+                        VStack(spacing: VSpacing) {
+                            Text(exercise.workoutExerciseDraft.intensityIndex.rawValue)
+                            Text(exercise.workoutExerciseDraft.intensity)
+                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+                        }
+                        Spacer()
+                        
+                        // Pace Layout
+                        VStack(spacing: VSpacing) {
+                            Text("Pace:")
+                            Text(exercise.workoutExerciseDraft.pace)
+                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
                     }
-                    Spacer()
-                    
-                    // Series Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Series:")
-                        Text(exercise.workoutExerciseDraft.series)
-                        //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
-                    Spacer()
-                    
-                    // Intensity Layout
-                    VStack(spacing: VSpacing) {
-                        Text(exercise.workoutExerciseDraft.intensityIndex.rawValue)
-                        Text(exercise.workoutExerciseDraft.intensity)
-                        //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
-                    Spacer()
-                    
-                    // Pace Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Pace:")
-                        Text(exercise.workoutExerciseDraft.pace)
-                        //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
+                    .frame(maxWidth: .infinity, idealHeight: 100)
+                    .padding(.horizontal, 15)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 15)
             }
+            .frame(height: (planName != Constants.NO_PLAN_NAME) ? 70 : 35)
             .padding(.horizontal, 15)  // General padding for the whole view
         }
         .onTapGesture {
@@ -203,7 +209,7 @@ struct HistoryDetailsListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        HistoryDetailsListView(workout: $workout)
+        HistoryDetailsListView(workout: $workout, planName: Constants.NO_PLAN_NAME)
     }
 }
 

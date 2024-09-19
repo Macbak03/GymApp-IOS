@@ -15,6 +15,7 @@ struct HomeView: View {
     private var isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
     
     @State private var startWorkout = false
+    @State private var startNoPlanWorkout = false
     @State private var closeStartWorkoutSheet = false
     @State private var isWorkoutEnded = true
     
@@ -31,6 +32,8 @@ struct HomeView: View {
     
     @State private var intensityIndex = IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity())!
     @State private var weightUnit = WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight())!
+    
+    @State private var showNewWorkoutAlert = false
 
    
     let plansDatabaseHelper = PlansDataBaseHelper()
@@ -112,7 +115,11 @@ struct HomeView: View {
                     VStack(spacing: 20) {
                         if !isWorkoutEnded {
                             Button(action: {
-                                startWorkout = true
+                                if selectedPlan == Constants.NO_PLAN_NAME {
+                                    startNoPlanWorkout = true
+                                } else {
+                                    startWorkout = true
+                                }
                             }) {
                                 Text("Return to workout")
                                     .foregroundColor(Color.TextColorSecondary)
@@ -127,8 +134,15 @@ struct HomeView: View {
                         }
                         
                         Button(action: {
-                            //if trainingPlan.name != "no training plan"
-                            openStartWorkoutSheet = true
+                            if isWorkoutEnded {
+                                if selectedPlan == Constants.NO_PLAN_NAME {
+                                    startNoPlanWorkout = true
+                                } else {
+                                    openStartWorkoutSheet = true
+                                }
+                            } else {
+                                showNewWorkoutAlert = true
+                            }
                         }) {
                             Text("Start Workout")
                                 .foregroundColor(Color.TextColorButton)
@@ -158,11 +172,12 @@ struct HomeView: View {
                 StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
             }
             .fullScreenCover(isPresented: Binding(get: {
-                startWorkout || openLastWorkout
+                startWorkout || openLastWorkout || startNoPlanWorkout
             }, set: { newValue in
                 if !newValue {
                     startWorkout = false
                     openLastWorkout = false
+                    startNoPlanWorkout = false
                 }
             }), onDismiss: {
                 loadLastWorkout()
@@ -177,9 +192,30 @@ struct HomeView: View {
                                 savedWorkoutToastMessage: $toastMessage)
                 } else if openLastWorkout {
                     HistoryDetailsView(rawDate: lastWorkoutRawDate, date: lastWorkoutDate, planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName)
+                } else if startNoPlanWorkout {
+                    NoPlanWorkoutView(planName: selectedPlan,
+                                      date: UserDefaults.standard.string(forKey: Constants.DATE) ?? "Error date",
+                                      isWorkoutEnded: $isWorkoutEnded, 
+                                      showWorkoutSavedToast: $showToast,
+                                      savedWorkoutToastMessage: $toastMessage,
+                                      intensityIndex: intensityIndex,
+                                      weightUnit: weightUnit)
                 }
             }
             .toast(isShowing: $showToast, message: toastMessage)
+            .alert(isPresented: $showNewWorkoutAlert) {
+                Alert(title: Text("Warning"),
+                      message: Text("You have unsaved workout. Are you sure you want to start a new one?"),
+                      primaryButton: .destructive(Text("YES")) {
+                        if selectedPlan == Constants.NO_PLAN_NAME {
+                            startNoPlanWorkout = true
+                        } else {
+                            openStartWorkoutSheet = true
+                        }
+                      },
+                      secondaryButton: .cancel()
+                )
+            }
         }
     }
     
@@ -191,7 +227,7 @@ struct HomeView: View {
     }
     private func initPickerData() {
         plans = plansDatabaseHelper.getPlans()
-        plans.insert(TrainingPlan(name: "No training plan"), at: 0)
+        plans.insert(TrainingPlan(name: Constants.NO_PLAN_NAME), at: 0)
     }
     
     private func loadLastWorkout(){

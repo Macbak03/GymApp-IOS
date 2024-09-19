@@ -11,7 +11,6 @@ struct NoPlanWorkoutView: View {
     let planName: String
     @State private var routineName: String = ""
     let date: String
-    @Binding var closeStartWorkoutSheet: Bool
     @Binding var isWorkoutEnded: Bool
     @Binding var showWorkoutSavedToast: Bool
     @Binding var savedWorkoutToastMessage: String
@@ -34,6 +33,10 @@ struct NoPlanWorkoutView: View {
     
     @State private var showToast = false
     @State private var toastMessage = ""
+    
+    @FocusState private var isWorkoutNameFocused: Bool
+    @State private var showNameError = false
+
     
     var body: some View {
         GeometryReader { geometry  in
@@ -65,8 +68,22 @@ struct NoPlanWorkoutView: View {
                                 .cornerRadius(10)
                                 .frame(maxWidth: 250)
                                 .multilineTextAlignment(.center)
+                                .focused($isWorkoutNameFocused)
+                                .onChange(of: isWorkoutNameFocused) { focused in
+                                    validateWorkoutName(focused: focused)
+                                }
                             
                             Spacer() // Push the TextField to the center
+                        }
+                        if showNameError {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "exclamationmark.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.red)
+                                    .frame(width: 25, height: 25)
+                            }
+                            .padding(.trailing, 80)
                         }
                     }
                 }
@@ -133,7 +150,6 @@ struct NoPlanWorkoutView: View {
                     isWorkoutEnded = false
                     saveWorkoutToFile()
                 }
-                closeStartWorkoutSheet = true
             }
             .onChange(of: scenePhase) { newPhase in
                 if newPhase == .inactive {
@@ -163,13 +179,13 @@ struct NoPlanWorkoutView: View {
         } else {
             workoutDraft.append((workoutExerciseDraft: WorkoutExerciseDraft(
                 name: "",
-                pause: "",
+                pause: "0",
                 pauseUnit: TimeUnit.min,
-                series: "",
-                reps: "",
-                intensity: "",
+                series: "0",
+                reps: "0",
+                intensity: "0",
                 intensityIndex: intensityIndex,
-                pace: "",
+                pace: "0000",
                 note: ""),
               workoutSeriesDraftList: [WorkoutSeriesDraft(
                 actualReps: "",
@@ -220,18 +236,12 @@ struct NoPlanWorkoutView: View {
     }
     
     private func initRecoveredWorkoutData() {
+        routineName = UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? ""
         guard let recoveredWorkout = loadWorkoutFromFile() else {
-            print("recovered workout was null in WorkoutView")
+            print("recovered workout was null in NoPlanWorkoutView")
             return
         }
-        for (index, exercise) in recoveredWorkout.enumerated() {
-            workoutDraft[index].workoutExerciseDraft.note = exercise.workoutExerciseDraft.note
-            for (setIndex, set) in exercise.workoutSeriesDraftList.enumerated() {
-                workoutDraft[index].workoutSeriesDraftList[setIndex].actualReps = set.actualReps
-                workoutDraft[index].workoutSeriesDraftList[setIndex].actualLoad = set.actualLoad
-                workoutDraft[index].workoutSeriesDraftList[setIndex].actualIntensity = set.actualIntensity
-            }
-        }
+        workoutDraft = recoveredWorkout
     }
     
     private func saveWorkoutToHistory(date: String) {
@@ -282,6 +292,28 @@ struct NoPlanWorkoutView: View {
         savedWorkoutToastMessage = "Workout Saved!"
         presentationMode.wrappedValue.dismiss()
     }
+    
+    private func handleWorkoutNameException() throws {
+        if routineName.isEmpty {
+            throw ValidationException(message: "Workout name cannot be empty")
+        }
+    }
+    
+    private func validateWorkoutName(focused: Bool) {
+        if !focused {
+            do {
+                try handleWorkoutNameException()
+            } catch let error as ValidationException {
+                showNameError = true
+                showToast = true
+                toastMessage = error.message
+            } catch {
+                toastMessage = "An unexpected error occured \(error)"
+            }
+        } else {
+            showNameError = false
+        }
+    }
 }
 
 struct NoPlanWorkoutView_Previews: PreviewProvider {
@@ -292,7 +324,7 @@ struct NoPlanWorkoutView_Previews: PreviewProvider {
     @State static var toastMessage: String = ""
     @State static var rotineName = "Routine"
     static var previews: some View {
-        NoPlanWorkoutView(planName: "Plan", date: "", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage, intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg)
+        NoPlanWorkoutView(planName: "Plan", date: "", isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage, intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg)
     }
 }
 

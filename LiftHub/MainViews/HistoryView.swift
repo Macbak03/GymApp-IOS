@@ -20,23 +20,23 @@ struct HistoryView: View {
                 Backgroundimage(geometry: geometry, imageName: "history_icon")
                 VStack {
                      //Search bar
-                    HStack {
-                        Image(systemName: "magnifyingglass") // Use system icon for magnifier
-                            .foregroundColor(.gray) // Set the color of the icon
-                            .padding(.leading, 10)
-
-                        TextField("Search in history...", text: $searchText)
-                            .padding(10) // Padding inside the text field
-                            .frame(height: 50)
-                            .onChange(of: searchText) { newText in
-                                filterSearchResults()
-                            }
-                        
-                    }
-                    
-                    .background(Color.ShadowColor) // Background color similar to Android search view
-                    .cornerRadius(10)
-                    .padding(.horizontal, 10)
+//                    HStack {
+//                        Image(systemName: "magnifyingglass") // Use system icon for magnifier
+//                            .foregroundColor(.gray) // Set the color of the icon
+//                            .padding(.leading, 10)
+//
+//                        TextField("Search in history...", text: $searchText)
+//                            .padding(10) // Padding inside the text field
+//                            .frame(height: 50)
+//                            .onChange(of: searchText) { newText in
+//                                filterSearchResults()
+//                            }
+//                        
+//                    }
+//                    
+//                    .background(Color.ShadowColor) // Background color similar to Android search view
+//                    .cornerRadius(10)
+//                    .padding(.horizontal, 10)
                     
                     // Workout history list (Equivalent to RecyclerView)
                     HistoryListView(history: $searchList, showToast: $showToast, toastMessage: $toastMessage)
