@@ -23,10 +23,10 @@ struct HistoryDetailsView: View {
                     VStack {
                         Text(routineName)
                             .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color.primary)
+                            .foregroundColor(Color.TextColorPrimary)
                         Text(date)
                             .font(.system(size: 25, weight: .bold))
-                            .foregroundColor(Color.primary)
+                            .foregroundColor(Color.TextColorPrimary)
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
                     

@@ -55,12 +55,14 @@ struct EditHistoryDetailsView: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Cancel")
+                            .foregroundColor(Color.TextColorSecondary)
                             .frame(alignment: .center)
                     }
-                    .frame(width: 140, height: 45)
-                    .background(Color.accentColor)
+                    .frame(width: 100, height: 45)
+                    .background(Color.ColorSecondary)
                     .foregroundColor(.white)
-                    .cornerRadius(8)
+                    .cornerRadius(20)
+                    .shadow(radius: 2)
                     
                     Spacer()
                     
@@ -68,11 +70,14 @@ struct EditHistoryDetailsView: View {
                         editHistoryDetails()
                     }) {
                         Text("Save")
+                            .foregroundColor(Color.TextColorButton)
+
                     }
-                    .frame(width: 140, height: 45)
-                    .background(Color.accentColor)
+                    .frame(width: 100, height: 45)
+                    .background(Color.colorPrimary)
                     .foregroundColor(.white)
-                    .cornerRadius(8)
+                    .cornerRadius(20)
+                    .shadow(radius: 5)
                 }
                 .padding(.top, 32)
                 .padding(.horizontal, 50)

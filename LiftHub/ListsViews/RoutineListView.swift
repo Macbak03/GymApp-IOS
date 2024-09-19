@@ -80,7 +80,7 @@ struct ExerciseView: View {
                     
                         .overlay(Rectangle() // Add underline
                             .frame(height: 1) // Thickness of underline
-                            .foregroundColor(showNameError ? .red : .black) // Color of underline
+                            .foregroundColor(showNameError ? .red : Color.TextUnderline) // Color of underline
                             .padding(.trailing, 37)
                             .padding(.leading, 10)
                             .padding(.top, 40),
@@ -99,7 +99,7 @@ struct ExerciseView: View {
                 
                 // Details Section (Toggleable)
                 if isDetailsVisible {
-                    VStack(spacing: 14) {
+                    VStack(spacing: 10) {
                         // Pause Section
                         HStack {
                             Text("Rest")

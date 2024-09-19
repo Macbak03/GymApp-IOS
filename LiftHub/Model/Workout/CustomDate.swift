@@ -23,7 +23,7 @@ class CustomDate {
     }
     
     // Converts the savedDate string into the formatted string using PATTERN
-    func getFormattedDate(savedDate: String) -> String {
+    static func getFormattedDate(savedDate: String) -> String {
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = CustomDate.RAW_PATTERN
         inputFormatter.timeZone = TimeZone.current

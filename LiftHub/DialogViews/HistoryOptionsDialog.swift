@@ -56,7 +56,7 @@ struct HistoryOptionsDialog: View {
                     }) {
                         Text("Edit")
                             .font(.system(size: 18))
-                            .foregroundColor(Color.white)
+                            .foregroundColor(Color.TextColorButton)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
@@ -80,7 +80,7 @@ struct HistoryOptionsDialog: View {
                             .frame(maxWidth: .infinity)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.red)
+                                    .fill(Color.ShadowColor)
                                     .shadow(radius: 3)
                             )
                     }
@@ -104,7 +104,7 @@ struct HistoryOptionsDialog: View {
                     }) {
                         Text("Cancel")
                             .font(.system(size: 18))
-                            .foregroundColor(Color.white)
+                            .foregroundColor(Color.TextColorButton)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(

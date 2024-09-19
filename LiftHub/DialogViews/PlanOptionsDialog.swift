@@ -55,8 +55,8 @@ struct PlanOptionsDialog: View {
                         showEditPlanDialog = true
                     }) {
                         Text("Edit plan's name")
+                            .foregroundColor(Color.TextColorButton)
                             .font(.system(size: 18))
-                            .foregroundColor(Color.white)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
@@ -86,7 +86,7 @@ struct PlanOptionsDialog: View {
                             .frame(maxWidth: .infinity)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.red)
+                                    .fill(Color.ShadowColor)
                                     .shadow(radius: 3)
                             )
                     }
@@ -109,8 +109,8 @@ struct PlanOptionsDialog: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Cancel")
+                            .foregroundColor(Color.TextColorButton)
                             .font(.system(size: 18))
-                            .foregroundColor(Color.white)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(

@@ -184,7 +184,6 @@ class WorkoutHistoryDataBaseHelper: Repository {
     //MARK: Get workout history
     func getHistory() -> [WorkoutHistoryElement] {
         var workoutHistory: [WorkoutHistoryElement] = []
-        let customDate = CustomDate()
         
         do {
             // Use raw SQL to enforce DISTINCT and proper ordering
@@ -197,7 +196,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
                     if let savedDate = row[1] as? String,
                        let planName = row[0] as? String,
                         let routineName = row[2] as? String {
-                        let formattedDate = customDate.getFormattedDate(savedDate: savedDate)
+                        let formattedDate = CustomDate.getFormattedDate(savedDate: savedDate)
                         
                         let workoutHistoryElement = WorkoutHistoryElement(
                             planName: planName,
@@ -341,9 +340,10 @@ class WorkoutHistoryDataBaseHelper: Repository {
     // MARK: - Check if Table is Not Empty
     func isTableNotEmpty() -> Bool {
         do {
-            let query = workoutHistoryTable.count
-            let count = try db?.scalar(query) as? Int64 ?? 0
-            return count > 0
+            let query = "SELECT COUNT(*) FROM workoutHistory"
+            if let count = try db?.scalar(query) as? Int64 {
+                return count > 0
+            }
         } catch {
             print("Error checking if table is empty: \(error)")
         }
