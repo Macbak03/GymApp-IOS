@@ -7,6 +7,9 @@ struct ContentView: View {
             Spacer()
             BottomBar(selectedTab: $selectedTab)
         }
+        .onAppear(){
+            SettingsView.applyTheme(theme: UserDefaultsUtils.shared.getTheme())
+        }
         
     }
 }

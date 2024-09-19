@@ -38,7 +38,7 @@ struct CreatePlanDialogView: View {
                     // TextField for entering plan name
                     TextField("Enter training plan name", text: $planNameText)
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color.ShadowColor)
                         .cornerRadius(10)
                         .padding(.horizontal)
                     
@@ -76,6 +76,7 @@ struct CreatePlanDialogView: View {
                             }
                         }) {
                             Text(confirmButtonTitle)
+
                         }
                         .disabled(planNameText.isEmpty)
                         .padding()

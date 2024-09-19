@@ -68,6 +68,13 @@
 		5FE53ED02C98BB0100FB6400 /* WorkoutHistoryElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ECF2C98BB0100FB6400 /* WorkoutHistoryElement.swift */; };
 		5FE53ED22C98DF0600FB6400 /* HistoryDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED12C98DF0600FB6400 /* HistoryDetailsView.swift */; };
 		5FE53ED42C98E38300FB6400 /* HistoryDetailsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED32C98E38300FB6400 /* HistoryDetailsListView.swift */; };
+		5FE53ED62C99A6A700FB6400 /* HistoryOptionsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED52C99A6A700FB6400 /* HistoryOptionsDialog.swift */; };
+		5FE53ED82C99B41500FB6400 /* EditHistoryDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED72C99B41500FB6400 /* EditHistoryDetailsView.swift */; };
+		5FE53EDA2C99BF7B00FB6400 /* EditHistoryDetailsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED92C99BF7B00FB6400 /* EditHistoryDetailsListView.swift */; };
+		5FE53EDC2C9B53C400FB6400 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EDB2C9B53C400FB6400 /* StatsView.swift */; };
+		5FE53EDF2C9BC33500FB6400 /* HistoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EDE2C9BC33500FB6400 /* HistoryListViewModel.swift */; };
+		5FE53EE12C9C8C6F00FB6400 /* NoPlanWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EE02C9C8C6F00FB6400 /* NoPlanWorkoutView.swift */; };
+		5FE53EE32C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EE22C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -152,6 +159,13 @@
 		5FE53ECF2C98BB0100FB6400 /* WorkoutHistoryElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryElement.swift; sourceTree = "<group>"; };
 		5FE53ED12C98DF0600FB6400 /* HistoryDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailsView.swift; sourceTree = "<group>"; };
 		5FE53ED32C98E38300FB6400 /* HistoryDetailsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailsListView.swift; sourceTree = "<group>"; };
+		5FE53ED52C99A6A700FB6400 /* HistoryOptionsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryOptionsDialog.swift; sourceTree = "<group>"; };
+		5FE53ED72C99B41500FB6400 /* EditHistoryDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsView.swift; sourceTree = "<group>"; };
+		5FE53ED92C99BF7B00FB6400 /* EditHistoryDetailsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsListView.swift; sourceTree = "<group>"; };
+		5FE53EDB2C9B53C400FB6400 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		5FE53EDE2C9BC33500FB6400 /* HistoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListViewModel.swift; sourceTree = "<group>"; };
+		5FE53EE02C9C8C6F00FB6400 /* NoPlanWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutView.swift; sourceTree = "<group>"; };
+		5FE53EE22C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +218,7 @@
 		5FE53E252C8C727C00FB6400 /* LiftHub */ = {
 			isa = PBXGroup;
 			children = (
+				5FE53EDD2C9BC31300FB6400 /* ViewModel */,
 				5FE53EAC2C935D3000FB6400 /* UtilViews */,
 				5FE53E992C909A5200FB6400 /* Toast */,
 				5FE53E882C908D5C00FB6400 /* Exception */,
@@ -267,6 +282,9 @@
 				5FE53EB12C94ADD700FB6400 /* WorkoutView.swift */,
 				5FE53ECA2C98974400FB6400 /* HistoryView.swift */,
 				5FE53ED12C98DF0600FB6400 /* HistoryDetailsView.swift */,
+				5FE53ED72C99B41500FB6400 /* EditHistoryDetailsView.swift */,
+				5FE53EDB2C9B53C400FB6400 /* StatsView.swift */,
+				5FE53EE02C9C8C6F00FB6400 /* NoPlanWorkoutView.swift */,
 			);
 			path = MainViews;
 			sourceTree = "<group>";
@@ -309,6 +327,8 @@
 				5FE53EBA2C94BC7000FB6400 /* WorkoutListView.swift */,
 				5FE53ECC2C98BA5100FB6400 /* HistoryListView.swift */,
 				5FE53ED32C98E38300FB6400 /* HistoryDetailsListView.swift */,
+				5FE53ED92C99BF7B00FB6400 /* EditHistoryDetailsListView.swift */,
+				5FE53EE22C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift */,
 			);
 			path = ListsViews;
 			sourceTree = "<group>";
@@ -319,6 +339,7 @@
 				5FE53E6B2C8DF58300FB6400 /* CreatePlanDialogView.swift */,
 				5FE53E762C8E3F6700FB6400 /* PlanOptionsDialog.swift */,
 				5FE53EAF2C949E3700FB6400 /* StartWorkoutSheetView.swift */,
+				5FE53ED52C99A6A700FB6400 /* HistoryOptionsDialog.swift */,
 			);
 			path = DialogViews;
 			sourceTree = "<group>";
@@ -408,6 +429,14 @@
 				5FE53ECF2C98BB0100FB6400 /* WorkoutHistoryElement.swift */,
 			);
 			path = History;
+			sourceTree = "<group>";
+		};
+		5FE53EDD2C9BC31300FB6400 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				5FE53EDE2C9BC33500FB6400 /* HistoryListViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -549,6 +578,7 @@
 				5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */,
 				5FE53E8E2C90917200FB6400 /* Intensity.swift in Sources */,
 				5FE53E9B2C909A6000FB6400 /* ToastView.swift in Sources */,
+				5FE53EDF2C9BC33500FB6400 /* HistoryListViewModel.swift in Sources */,
 				5FE53EC32C9723F200FB6400 /* WorkoutHistoryDataBaseHelper.swift in Sources */,
 				5FE53EB92C94B8ED00FB6400 /* WorkoutSeries.swift in Sources */,
 				5FE53E8A2C908D7300FB6400 /* ValidationException.swift in Sources */,
@@ -563,6 +593,8 @@
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
 				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
 				5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */,
+				5FE53EE32C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift in Sources */,
+				5FE53EDC2C9B53C400FB6400 /* StatsView.swift in Sources */,
 				5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */,
 				5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */,
 				5FE53E612C8CC05800FB6400 /* SettingsView.swift in Sources */,
@@ -581,6 +613,7 @@
 				5FE53EAB2C93342F00FB6400 /* DeleteBackgroundView.swift in Sources */,
 				5FE53EB02C949E3700FB6400 /* StartWorkoutSheetView.swift in Sources */,
 				5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */,
+				5FE53ED82C99B41500FB6400 /* EditHistoryDetailsView.swift in Sources */,
 				5FE53E572C8CAB3400FB6400 /* HomeView.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
 				5FE53EC72C9732C800FB6400 /* WorkoutSeriesDataBaseHelper.swift in Sources */,
@@ -592,14 +625,17 @@
 				5FE53EA62C91D23700FB6400 /* ExercisesDataBaseHelper.swift in Sources */,
 				5FE53ECD2C98BA5100FB6400 /* HistoryListView.swift in Sources */,
 				5FE53EB72C94B79400FB6400 /* WorkoutSeriesDraft.swift in Sources */,
+				5FE53EE12C9C8C6F00FB6400 /* NoPlanWorkoutView.swift in Sources */,
 				5FE53EB22C94ADD700FB6400 /* WorkoutView.swift in Sources */,
 				5FE53EB52C94B78200FB6400 /* WorkoutExerciseDraft.swift in Sources */,
 				5FE53EBB2C94BC7000FB6400 /* WorkoutListView.swift in Sources */,
 				5FE53E5F2C8CB48C00FB6400 /* Constants.swift in Sources */,
 				5FE53EA42C91CDF900FB6400 /* RoutinesDataBaseHelper.swift in Sources */,
+				5FE53ED62C99A6A700FB6400 /* HistoryOptionsDialog.swift in Sources */,
 				5FE53E872C908C5300FB6400 /* ExercisePace.swift in Sources */,
 				5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */,
 				5FE53ECB2C98974400FB6400 /* HistoryView.swift in Sources */,
+				5FE53EDA2C99BF7B00FB6400 /* EditHistoryDetailsListView.swift in Sources */,
 				5FE53EA82C9204B200FB6400 /* Repository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -771,7 +807,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -800,7 +836,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -1,116 +1,103 @@
 //
-//  WorkoutListView.swift
+//  NoPlanWorkoutListView.swift
 //  LiftHub
 //
-//  Created by Maciej "wielki" Bąk on 13/09/2024.
+//  Created by Maciej "wielki" Bąk on 19/09/2024.
 //
+
 import Foundation
 import SwiftUI
 
-struct WorkoutListView: View {
+struct NoPlanWorkoutListView: View {
     @Binding var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
-    @Binding var workoutHints: [WorkoutHints]
     
     @Binding var showToast: Bool
     @Binding var toastMessage: String
+    
+    let intensityIndex: IntensityIndex
+    let weightUnit: WeightUnit
 
     var body: some View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                WorkoutListExerciseView(workout: $workout, exercise: $workout[index], position: index, exerciseCount: workout.count, showToast: $showToast, toastMessage: $toastMessage, intensityIndex: intensityIndex, weightUnit: weightUnit)
             }
         }
     }
 }
 
 private struct WorkoutListExerciseView: View {
+    @Binding var workout:  [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
     @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
-    @Binding var workoutHints: [WorkoutHints]
     let position: Int
+    let exerciseCount: Int
     
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     
+    let intensityIndex: IntensityIndex
+    let weightUnit: WeightUnit
+    
     @State private var isDetailsVisible = false
     @State private var displayNote = false
+    @State private var showNameError = false
     
-    @State private var exerciseName = "Exercise"
-    
-    @State private var intensityIndexText = "Intensity"
-    @State private var restValue = "val"
-    @State private var restUnit = "val"
-    @State private var seriesValue = "val"
-    @State private var intensityValue = "val"
-    @State private var paceValue = "val"
-    
-    @State private var noteHint: String = "Note"
+    @FocusState private var isExerciseNameFocused: Bool
     
     var body: some View {
         HStack {
             Image(systemName: "chevron.down")
                 .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
-                .frame(width: 20, height: 20)
-                .padding(.leading, 15)
-            VStack(alignment: .leading, spacing: 5) {
-                // First Horizontal Layout (Exercise Name)
-                HStack {
-                    Text(exerciseName)
-                        .font(.system(size: 24, weight: .bold))  // Equivalent to bold and textSize 24sp
-                        .frame(height: 20)  // Equivalent to layout_height="30dp"
-                    //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
-                    Spacer()  // To take up the remaining space
-                }
-                .frame(maxWidth: .infinity)
-                
-                // Second Horizontal Layout (Rest, Series, Intensity, Pace)
-                HStack(alignment: .center) {
-                    let VSpacing: CGFloat = 3
-                    // Rest Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Rest:")
-                        HStack(spacing: 1) {
-                            Text(restValue)
-                                .frame(alignment: .trailing)
-                            
-                            Text(restUnit)
-                                .frame(alignment: .leading)
-                        }
-                    }
-                    Spacer()
-                    // Series Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Series:")
-                        Text(seriesValue)
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
-                    Spacer()
-                    // Intensity Layout
-                    VStack(spacing: VSpacing) {
-                        Text(intensityIndexText)
-                        Text(intensityValue)
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
-                    Spacer()
-                    // Pace Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Pace:")
-                        Text(paceValue)
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+                .frame(width: 40, height: 40)
+                .onTapGesture {
+                    withAnimation {
+                        isDetailsVisible.toggle()
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 15)
+            
+            TextField("Exercise name", text: $exercise.workoutExerciseDraft.name)
+                .font(.system(size: 22, weight: .bold))
+                .frame(height: 40)
+                .padding(.leading, 10)
+                .padding(.trailing, 20)
+                .lineLimit(1)
+                .truncationMode(.tail)
+            
+                .overlay(Rectangle() // Add underline
+                    .frame(height: 1) // Thickness of underline
+                    .foregroundColor(showNameError ? .red : Color.TextUnderline) // Color of underline
+                    .padding(.trailing, exerciseCount == (position + 1) ? 20 : 75)
+                    .padding(.leading, 10)
+                    .padding(.top, 40),
+                         alignment: .bottom
+                )// Adjust underline position
+                .focused($isExerciseNameFocused)
+                .onChange(of: isExerciseNameFocused) { focused in
+                    validateExerciseName(focused: focused)
+                }
+            
+            
+            if exerciseCount == position + 1 {
+                Button(action: {
+                    addExercise()
+                }) {
+                    Image(systemName: "plus.circle")
+                        .resizable()  // Enable image resizing
+                        .frame(width: 23, height: 23)
+                        .padding(.trailing, 15)
+                }
+                .frame(width: 40, height: 40)
+                .padding(.trailing, 7)
             }
-            .padding(.horizontal, 10)  // General padding for the whole view
+
         }
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
         .onTapGesture {
             withAnimation {
                 isDetailsVisible.toggle()
             }
-        }
-        .onAppear() {
-            initValues(workoutExerciseDraft: exercise.workoutExerciseDraft)
         }
         Divider()
             .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
@@ -118,10 +105,10 @@ private struct WorkoutListExerciseView: View {
         if isDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints[position], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                WorkoutListSeriesView(sets: $exercise.workoutSeriesDraftList, set: $exercise.workoutSeriesDraftList[index], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage, intensityIndex: intensityIndex, weightUnit: weightUnit)
             }
             // Note Input
-            TextField(noteHint, text: $exercise.workoutExerciseDraft.note)
+            TextField("Note", text: $exercise.workoutExerciseDraft.note)
                 .font(.system(size: 21))
                 .padding(.horizontal, 10) // Equivalent to layout_marginStart and layout_marginEnd
                 .padding(.bottom, 10)  // Equivalent to layout_marginBottom
@@ -132,32 +119,53 @@ private struct WorkoutListExerciseView: View {
         }
         
     }
-    private func initValues(workoutExerciseDraft: WorkoutExerciseDraft) {
-        self.exerciseName = workoutExerciseDraft.name
-        self.intensityIndexText = workoutExerciseDraft.intensityIndex.rawValue
-        self.restValue = workoutExerciseDraft.pause
-        self.restUnit = workoutExerciseDraft.pauseUnit.rawValue
-        self.seriesValue = workoutExerciseDraft.series
-        self.intensityValue = workoutExerciseDraft.intensity
-        self.paceValue = workoutExerciseDraft.pace
-        self.noteHint = workoutHints[position].noteHint
+    
+    private func handleExerciseNameException() throws {
+        if exercise.workoutExerciseDraft.name.isEmpty {
+            throw ValidationException(message: "Exercise name cannot be empty")
+        }
+    }
+    
+    private func validateExerciseName(focused: Bool) {
+        if !focused {
+            do {
+                try handleExerciseNameException()
+            } catch let error as ValidationException {
+                showNameError = true
+                showToast = true
+                toastMessage = error.message
+            } catch {
+                toastMessage = "An unexpected error occured \(error)"
+            }
+        } else {
+            showNameError = false
+        }
+    }
+    
+    private func addExercise() {
+        let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, series: "", reps: "", intensity: "", intensityIndex: intensityIndex, pace: "", note: "")
+        let exerciseSetDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
+        workout.append((workoutExerciseDraft: exerciseDraft, workoutSeriesDraftList: [exerciseSetDraft]))
     }
 }
 
 private struct WorkoutListSeriesView: View {
-    @Binding var series: WorkoutSeriesDraft
-    @Binding var workoutHint: WorkoutHints
+    @Binding var sets: [WorkoutSeriesDraft]
+    @Binding var set: WorkoutSeriesDraft
     let seriesCount: Int
     let position: Int
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     
+    let intensityIndex: IntensityIndex
+    let weightUnit: WeightUnit
+    
     @State private var repsHint: String = "Reps"
     @State private var weightHint: String = "Weight"
-    @State private var intensityHint: String = "RPE"
+    @State private var intensityHint: String = UserDefaultsUtils.shared.getIntensity()
     
-    @State private var intensityIndexText: String = "RPE"
-    @State private var weightUnitText: String = "kg"
+    @State private var intensityIndexText: String = UserDefaultsUtils.shared.getIntensity()
+    @State private var weightUnitText: String = UserDefaultsUtils.shared.getWeight()
     
     @State private var showLoadError = false
     @State private var showRepsError = false
@@ -181,7 +189,7 @@ private struct WorkoutListSeriesView: View {
                     .padding(.leading, 4) // Equivalent to layout_marginStart="10dp"
                 
                 // Reps Input
-                TextField(repsHint, text: $series.actualReps)
+                TextField(repsHint, text: $set.actualReps)
                     .keyboardType(.decimalPad)
                     .frame(height: 30)
                     .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
@@ -202,7 +210,7 @@ private struct WorkoutListSeriesView: View {
                     .multilineTextAlignment(.center)
                 
                 // Weight Input
-                TextField(weightHint, text: $series.actualLoad)
+                TextField(weightHint, text: $set.actualLoad)
                     .keyboardType(.decimalPad)
                     .frame(height: 30)
                     .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
@@ -228,7 +236,7 @@ private struct WorkoutListSeriesView: View {
                 Text("\(intensityIndexText):")
                     .font(.system(size: 18))
                 // Intensity Input
-                TextField(intensityHint, text: $series.actualIntensity)
+                TextField(intensityHint, text: $set.actualIntensity)
                     .keyboardType(.decimalPad)
                     .frame(width: 40,height: 30)
                     .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
@@ -241,23 +249,29 @@ private struct WorkoutListSeriesView: View {
                     .onChange(of: isIntensityFocused) { focused in
                         validateIntensity(focused: focused)
                     }
+                    .padding(.trailing, seriesCount == (position + 1) ? 5 : 55)
+                if seriesCount == position + 1 {
+                    Button(action: {
+                        addSet()
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .resizable()  // Enable image resizing
+                            .frame(width: 23, height: 23)
+                            .padding(.trailing, 5)
+                    }
+                    .frame(width: 40, height: 40)
                     .padding(.trailing, 5)
+                }
                 
             }
             .padding(.top, 5)  // Equivalent to layout_marginTop="5dp"
             .padding(.horizontal, 10)
         }
-        .onAppear() {
-            initValues(series: series, hint: workoutHint)
-        }
     }
     
-    private func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints){
-        self.weightUnitText = series.loadUnit.rawValue
-        self.intensityIndexText = series.intensityIndex.rawValue
-        self.repsHint = workoutHint.repsHint
-        self.weightHint = workoutHint.weightHint
-        self.intensityHint = workoutHint.intensityHint
+    private func addSet() {
+        let setDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
+        sets.append(setDraft)
     }
     
     private func setToast(errorMessage: String) {
@@ -268,7 +282,7 @@ private struct WorkoutListSeriesView: View {
     private func validateReps(focused: Bool) {
         if !focused {
             do {
-                try _ = RepsFactory.fromString(series.actualReps)
+                try _ = RepsFactory.fromString(set.actualReps)
             } catch let error as ValidationException {
                 showRepsError = true
                 setToast(errorMessage: error.message)
@@ -283,7 +297,7 @@ private struct WorkoutListSeriesView: View {
     private func validateLoad(focused: Bool) {
         if !focused {
             do {
-                try _ = Weight.fromStringWithUnit(series.actualLoad, unit: series.loadUnit)
+                try _ = Weight.fromStringWithUnit(set.actualLoad, unit: set.loadUnit)
             } catch let error as ValidationException {
                 showLoadError = true
                 setToast(errorMessage: error.message)
@@ -298,7 +312,7 @@ private struct WorkoutListSeriesView: View {
     func validateIntensity(focused: Bool) {
         if !focused {
             do {
-                try _ = IntensityFactory.fromStringForWorkout(series.actualIntensity, index: series.intensityIndex)
+                try _ = IntensityFactory.fromStringForWorkout(set.actualIntensity, index: set.intensityIndex)
             } catch let error as ValidationException {
                 showIntensityError = true
                 setToast(errorMessage: error.message)
@@ -311,7 +325,7 @@ private struct WorkoutListSeriesView: View {
     }
 }
 
-struct WorkoutListView_previews: PreviewProvider {
+struct NoPlanWorkoutListView_previews: PreviewProvider {
     @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "3-5", pauseUnit: TimeUnit.min, series: "1", reps: "1", intensity: "1", intensityIndex: IntensityIndex.RPE, pace: "1111", note: "note1")
     @State static var series1_1 = WorkoutSeriesDraft(actualReps: "11", actualLoad: "11", loadUnit: WeightUnit.kg, intensityIndex: IntensityIndex.RPE, actualIntensity: "1")
     
@@ -325,16 +339,13 @@ struct WorkoutListView_previews: PreviewProvider {
     
     @State static var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])] =  [(workoutExerciseDraft: exercise1, workoutSeriesDraftList: [series1_1]), (workoutExerciseDraft: exercise2, workoutSeriesDraftList: [series2_1, series2_2])]
     
-    @State static var workoutHint1 = WorkoutHints(repsHint: "1", weightHint: "1", intensityHint: "1", noteHint: "Note1")
-    @State static var workoutHint2 = WorkoutHints(repsHint: "2", weightHint: "2", intensityHint: "2", noteHint: "Note2")
-    @State static var workoutHints = [workoutHint1, workoutHint2]
-    
     @State static var showToast = false
     @State static var toastMessage = ""
     
     static var previews: some View {
-        WorkoutListView(workout: $workout, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
+        NoPlanWorkoutListView(workout: $workout, showToast: $showToast, toastMessage: $toastMessage, intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg)
 //        WorkoutListExerciseView(exercise: $wholeExercise2)
 //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }
 }
+

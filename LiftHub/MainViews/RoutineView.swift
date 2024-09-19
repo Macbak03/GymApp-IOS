@@ -56,7 +56,7 @@ struct RoutineView: View {
                                 
                                 TextField("Enter routine name", text: $routineName)
                                     .padding()
-                                    .background(Color(.systemGray6))
+                                    .background(Color.ShadowColor)
                                     .cornerRadius(10)
                                     .frame(maxWidth: 250)
                                     .multilineTextAlignment(.center)
@@ -90,6 +90,7 @@ struct RoutineView: View {
                                 
                             }) {
                                 Text("Save")
+                                    .foregroundColor(Color.TextColorButton)
                                     .font(.system(size: 18))
                                     .foregroundColor(Color.white)
                                     .padding()
@@ -233,7 +234,8 @@ private struct AddButton: View {
     var buttonScale = 0.135
     var buttonOffsetX = 0.4
     var buttonOffsetY = 0.1
-    private let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit.kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex.RPE, pace: "", wasModified: false)
+    
+    private let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
     var body: some View {
         Button(action: {
             routine.append(newExercise)

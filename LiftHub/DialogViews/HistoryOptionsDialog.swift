@@ -1,22 +1,22 @@
 //
-//  OptionsDialog.swift
+//  HistoryOptionsDialog.swift
 //  LiftHub
 //
-//  Created by Maciej "wielki" Bąk on 08/09/2024.
+//  Created by Maciej "wielki" Bąk on 17/09/2024.
 //
-
 
 import SwiftUI
 
-struct PlanOptionsDialog: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+struct HistoryOptionsDialog: View {
+    @Binding var history: [WorkoutHistoryElement]
+    private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
     let position: Int
+    @Binding var showToast: Bool
+    @Binding var toastMessage: String
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
-    @State private var showEditPlanDialog = false
+    @State private var openEditHistory = false
     @State private var showAlertDialog = false
-    @State var planName: String = ""
     var body: some View {
         ZStack{
             Color.black.opacity(0.3)
@@ -34,29 +34,29 @@ struct PlanOptionsDialog: View {
                         .frame(maxWidth: .infinity)
                     
                     // Text Views inside a VStack
-                    VStack(alignment: .center, spacing: 15) {
-                        Text(planName)
+                    VStack(alignment: .center, spacing: 5) {
+                        Text(history[position].routineName)
                             .font(.system(size: 25, weight: .bold))
                             .foregroundColor(Color.textColorPrimary)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
-                            .onAppear {
-                                // Set the initial value of planName
-                                if position < trainingPlans.count {
-                                    planName = trainingPlans[position].name
-                                }
-                            }
+                        
+                        Text(history[position].formattedDate)
+                            .font(.system(size: 25, weight: .bold))
+                            .foregroundColor(Color.textColorPrimary)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                     }
                     .padding(.top, 15)
                     .padding(.horizontal, 10)
                     
                     // Edit Button
                     Button(action: {
-                        showEditPlanDialog = true
+                        openEditHistory = true
                     }) {
-                        Text("Edit plan's name")
-                            .foregroundColor(Color.TextColorButton)
+                        Text("Edit")
                             .font(.system(size: 18))
+                            .foregroundColor(Color.TextColorButton)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
@@ -67,13 +67,7 @@ struct PlanOptionsDialog: View {
                     }
                     .padding(.horizontal, 30)
                     .padding(.top, 10)
-                    .sheet(isPresented: $showEditPlanDialog, onDismiss: {
-                        if position < trainingPlans.count {
-                            planName = trainingPlans[position].name
-                        }
-                    }) {
-                        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planName, position: position)
-                    }
+                    
                     
                     // Delete Button
                     Button(action: {
@@ -95,9 +89,9 @@ struct PlanOptionsDialog: View {
                     .alert(isPresented: $showAlertDialog) {
                         Alert(
                             title: Text("Warning"),
-                            message: Text("Are you sure you want to delete \(planName)?"),
+                            message: Text("Are you sure you want to delete \(history[position].routineName) from \(history[position].formattedDate)?"),
                             primaryButton: .destructive(Text("OK")) {
-                                deletePlan()
+                                deleteHistory()
                                 presentationMode.wrappedValue.dismiss()
                             },
                             secondaryButton: .cancel()
@@ -109,8 +103,8 @@ struct PlanOptionsDialog: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Cancel")
-                            .foregroundColor(Color.TextColorButton)
                             .font(.system(size: 18))
+                            .foregroundColor(Color.TextColorButton)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
@@ -130,20 +124,30 @@ struct PlanOptionsDialog: View {
                 .padding(.horizontal)
                 .frame(maxWidth: .infinity) // Take the full width at the bottom
             }
+            .fullScreenCover(isPresented: $openEditHistory) {
+                EditHistoryDetailsView(workoutHistoryElement: history[position], showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
+            }
+            .onChange(of: showToast) { exit in
+                if exit {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
         }
     }
     
-    func deletePlan() {
-        plansDatabaseHelper.deletePlan(planName: planName)
-        trainingPlans.remove(at: position)
+    func deleteHistory() {
+        workoutHistoryDatabaseHelper.deleteFromHistory(date: history[position].rawDate)
+        history.remove(at: position)
     }
 }
 
-struct OptionsDialog_Previews: PreviewProvider {
-    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
-    static var plansDatabaseHelper = PlansDataBaseHelper()
-    @State static var planName = "Plan"
+struct HistoryOptionsDialog_Previews: PreviewProvider {
+    @State static var history: [WorkoutHistoryElement] = [WorkoutHistoryElement(planName: "Plan", routineName: "Routine", formattedDate: "17.09.2024", rawDate: "17.09.2024 22:52:12")]
+    static var workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
+    @State static var showToast = true
+    @State static var toastMessage: String = ""
     static var previews: some View {
-        PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: 1)
+        HistoryOptionsDialog(history: $history, position: 0, showToast: $showToast, toastMessage: $toastMessage)
     }
 }
+

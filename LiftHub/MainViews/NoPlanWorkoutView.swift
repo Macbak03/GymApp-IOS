@@ -1,30 +1,28 @@
 //
-//  WorkoutView.swift
+//  NoPlanWorkoutView.swift
 //  LiftHub
 //
-//  Created by Maciej "wielki" Bąk on 13/09/2024.
+//  Created by Maciej "wielki" Bąk on 19/09/2024.
 //
 
 import SwiftUI
-import UIKit
 
-struct WorkoutView: View {
+struct NoPlanWorkoutView: View {
     let planName: String
-    let routineName: String
+    @State private var routineName: String = ""
     let date: String
     @Binding var closeStartWorkoutSheet: Bool
     @Binding var isWorkoutEnded: Bool
     @Binding var showWorkoutSavedToast: Bool
     @Binding var savedWorkoutToastMessage: String
     
+    let intensityIndex: IntensityIndex
+    let weightUnit: WeightUnit
     
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     @Environment(\.scenePhase) var scenePhase
     
     @State private var workoutDraft: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])] = []
-    
-    @State private var workoutHints: [WorkoutHints] = []
-    
     private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
     private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
     
@@ -42,8 +40,9 @@ struct WorkoutView: View {
             VStack {
                 // Back button as ZStack
                 HStack {
-                    ZStack{
-                        HStack{
+                    ZStack {
+                        // HStack to position the back button on the left
+                        HStack {
                             Button(action: {
                                 // Dismiss the current view to go back
                                 presentationMode.wrappedValue.dismiss()
@@ -51,17 +50,29 @@ struct WorkoutView: View {
                                 Image(systemName: "arrow.left")
                                     .font(.system(size: 20, weight: .bold))
                             }
-                            Spacer()
+                            .padding(.leading, 30) // Padding to keep the button away from the edge
+                            
+                            Spacer() // Pushes the button to the left
                         }
-                        .padding(.leading, 30) // Add some padding to keep it away from the edge
                         
-                        Text(routineName)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color.TextColorPrimary)
+                        // Centered TextField
+                        HStack {
+                            Spacer() // Push the TextField to the center
+                            
+                            TextField("Enter workout name", text: $routineName)
+                                .padding()
+                                .background(Color.ShadowColor)
+                                .cornerRadius(10)
+                                .frame(maxWidth: 250)
+                                .multilineTextAlignment(.center)
+                            
+                            Spacer() // Push the TextField to the center
+                        }
                     }
                 }
+                .padding(.bottom, 10)
                 
-                WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
+                NoPlanWorkoutListView(workout: $workoutDraft, showToast: $showToast, toastMessage: $toastMessage, intensityIndex: intensityIndex, weightUnit: weightUnit)
                 
                 // Horizontal layout for buttons
                 HStack(spacing: 90) {
@@ -147,34 +158,26 @@ struct WorkoutView: View {
     }
     
     private func loadRoutine() {
-        let exercisesDatabaseHelper = ExercisesDataBaseHelper()
-        let plansDatabaseHelper = PlansDataBaseHelper()
-        guard let planId = plansDatabaseHelper.getPlanId(planName: planName) else {
-            print("planId was null in workoutView")
-            return
-        }
-        let savedRoutine = exercisesDatabaseHelper.getRoutine(routineName: routineName, planId: String(planId))
-        for (index, savedExercise) in savedRoutine.enumerated() {
-            let exercise = WorkoutExerciseDraft(name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
-            let seriesList: [WorkoutSeriesDraft] = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
-            workoutDraft.append((workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
-            let savedNotes = workoutHistoryDatabaseHelper.getLastTrainingNotes(planName: planName, routineName: routineName)
-            if !savedNotes.isEmpty {
-                let note = savedNotes[index]
-                if !note.isEmpty {
-                    let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
-                    self.workoutHints.append(workoutHint)
-                } else {
-                    let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-                    self.workoutHints.append(workoutHint)
-                }
-            } else {
-                let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-                self.workoutHints.append(workoutHint)
-            }
-        }
         if !isWorkoutSaved {
             initRecoveredWorkoutData()
+        } else {
+            workoutDraft.append((workoutExerciseDraft: WorkoutExerciseDraft(
+                name: "",
+                pause: "",
+                pauseUnit: TimeUnit.min,
+                series: "",
+                reps: "",
+                intensity: "",
+                intensityIndex: intensityIndex,
+                pace: "",
+                note: ""),
+              workoutSeriesDraftList: [WorkoutSeriesDraft(
+                actualReps: "",
+                actualLoad: "",
+                loadUnit: weightUnit,
+                intensityIndex: intensityIndex,
+                actualIntensity: "")]
+            ))
         }
     }
     
@@ -233,7 +236,6 @@ struct WorkoutView: View {
     
     private func saveWorkoutToHistory(date: String) {
         var workout = [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])]()
-        //var exercises = [WorkoutExercise]()
         var series = [WorkoutSeries]()
         for (index, pair) in workoutDraft.enumerated() {
             let loadUnit = pair.workoutSeriesDraftList[0].loadUnit
@@ -282,7 +284,7 @@ struct WorkoutView: View {
     }
 }
 
-struct WorkoutView_Previews: PreviewProvider {
+struct NoPlanWorkoutView_Previews: PreviewProvider {
     @State static var closeWorkutSheet = true
     @State static var isWorkoutEnded = true
     @State static var unfinishedRoutineName: String? = nil
@@ -290,7 +292,8 @@ struct WorkoutView_Previews: PreviewProvider {
     @State static var toastMessage: String = ""
     @State static var rotineName = "Routine"
     static var previews: some View {
-        WorkoutView(planName: "Plan", routineName: "Routine", date: "", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
+        NoPlanWorkoutView(planName: "Plan", date: "", closeStartWorkoutSheet: $closeWorkutSheet, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage, intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg)
     }
 }
+
 

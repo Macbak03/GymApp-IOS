@@ -45,7 +45,7 @@ private struct HistoryDetailsListExerciseView: View {
                 .frame(maxWidth: .infinity)
                 
                 // Second Horizontal Layout (Rest, Series, Intensity, Pace)
-                HStack(alignment: .center, spacing: 45) {
+                HStack(alignment: .center) {
                     let VSpacing: CGFloat = 3
                     
                     // Rest Layout
@@ -59,6 +59,7 @@ private struct HistoryDetailsListExerciseView: View {
                                 .frame(alignment: .leading)
                         }
                     }
+                    Spacer()
                     
                     // Series Layout
                     VStack(spacing: VSpacing) {
@@ -66,6 +67,7 @@ private struct HistoryDetailsListExerciseView: View {
                         Text(exercise.workoutExerciseDraft.series)
                         //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                     }
+                    Spacer()
                     
                     // Intensity Layout
                     VStack(spacing: VSpacing) {
@@ -73,6 +75,7 @@ private struct HistoryDetailsListExerciseView: View {
                         Text(exercise.workoutExerciseDraft.intensity)
                         //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                     }
+                    Spacer()
                     
                     // Pace Layout
                     VStack(spacing: VSpacing) {
@@ -82,6 +85,7 @@ private struct HistoryDetailsListExerciseView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
+                .padding(.horizontal, 15)
             }
             .padding(.horizontal, 15)  // General padding for the whole view
         }
