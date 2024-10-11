@@ -31,6 +31,9 @@ struct WorkoutSeriesDraft: Codable {
         guard let doubleReps = Double(actualReps) else {
             throw ValidationException(message: "Reps must be a number")
         }
+        if doubleReps < 0 {
+            throw ValidationException(message: "Reps cannot be negative")
+        }
         let load = try Weight.fromStringWithUnit(actualLoad, unit: loadUnit)
         let intensity = try IntensityFactory.fromStringForWorkout(actualIntensity, index: intensityIndex)
         

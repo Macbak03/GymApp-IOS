@@ -13,12 +13,14 @@ struct WorkoutListView: View {
     
     @Binding var showToast: Bool
     @Binding var toastMessage: String
+    
+    @Binding var isSavedClicked: Bool
 
     var body: some View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints, position: index, showToast: $showToast, toastMessage: $toastMessage, isSavedCLicked: $isSavedClicked)
             }
         }
     }
@@ -31,6 +33,8 @@ private struct WorkoutListExerciseView: View {
     
     @Binding var showToast: Bool
     @Binding var toastMessage: String
+    
+    @Binding var isSavedCLicked: Bool
     
     @State private var isDetailsVisible = true
     @State private var displayNote = false
@@ -118,7 +122,7 @@ private struct WorkoutListExerciseView: View {
         if isDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints[position], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints[position], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage, isSavedClicked: $isSavedCLicked)
             }
             // Note Input
             TextField(noteHint, text: $exercise.workoutExerciseDraft.note)
@@ -151,6 +155,8 @@ private struct WorkoutListSeriesView: View {
     let position: Int
     @Binding var showToast: Bool
     @Binding var toastMessage: String
+    
+    @Binding var isSavedClicked: Bool
     
     @State private var repsHint: String = "Reps"
     @State private var weightHint: String = "Weight"
@@ -250,6 +256,19 @@ private struct WorkoutListSeriesView: View {
         .onAppear() {
             initValues(series: series, hint: workoutHint)
         }
+        .onChange(of: isSavedClicked) { clicked in
+            if clicked {
+                do {
+                    try convertHintsToData()
+                } catch let error as ValidationException {
+                    showToast = true
+                    toastMessage = error.message
+                } catch {
+                    showToast = true
+                    print("Unexpected error occured when converting hints: \(error)")
+                }
+            }
+        }
     }
     
     private func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints){
@@ -265,10 +284,25 @@ private struct WorkoutListSeriesView: View {
         showToast = true
     }
     
+    private func handleRepsExcpetion() throws {
+        if series.actualReps.isEmpty {
+            guard let _ = Double(repsHint) else {
+                throw ValidationException(message: "Reps can't be in ranged value")
+            }
+        } else {
+            guard let doubleReps = Double(series.actualReps) else {
+                throw ValidationException(message: "Reps must be a number")
+            }
+            if doubleReps < 0 {
+                throw ValidationException(message: "Reps cannot be negative")
+            }
+        }
+    }
+    
     private func validateReps(focused: Bool) {
         if !focused {
             do {
-                try _ = RepsFactory.fromString(series.actualReps)
+                try handleRepsExcpetion()
             } catch let error as ValidationException {
                 showRepsError = true
                 setToast(errorMessage: error.message)
@@ -283,7 +317,9 @@ private struct WorkoutListSeriesView: View {
     private func validateLoad(focused: Bool) {
         if !focused {
             do {
-                try _ = Weight.fromStringWithUnit(series.actualLoad, unit: series.loadUnit)
+                if !series.actualLoad.isEmpty {
+                    try _ = Weight.fromStringWithUnit(series.actualLoad, unit: series.loadUnit)
+                }
             } catch let error as ValidationException {
                 showLoadError = true
                 setToast(errorMessage: error.message)
@@ -295,10 +331,20 @@ private struct WorkoutListSeriesView: View {
         }
     }
     
-    func validateIntensity(focused: Bool) {
+    private func handleEmptyIntensityException() throws {
+        guard let _ = Int(intensityHint) else {
+            throw ValidationException(message: "\(series.intensityIndex) can't be in ranged or floating point number value")
+        }
+    }
+    
+    private func validateIntensity(focused: Bool) {
         if !focused {
             do {
-                try _ = IntensityFactory.fromStringForWorkout(series.actualIntensity, index: series.intensityIndex)
+                if series.actualIntensity.isEmpty {
+                    try handleEmptyIntensityException()
+                } else {
+                    try _ = IntensityFactory.fromStringForWorkout(series.actualIntensity, index: series.intensityIndex)
+                }
             } catch let error as ValidationException {
                 showIntensityError = true
                 setToast(errorMessage: error.message)
@@ -308,6 +354,31 @@ private struct WorkoutListSeriesView: View {
         } else {
             showIntensityError = false
         }
+    }
+    
+    func convertHintsToData() throws {
+        if series.actualReps.isEmpty {
+            guard let _ = Double(repsHint) else {
+                showRepsError = true
+                isSavedClicked = false
+                throw ValidationException(message: "Reps can't be in ranged value")
+            }
+            series.actualReps = repsHint
+        }
+        
+        if series.actualLoad.isEmpty {
+            series.actualLoad = weightHint
+        }
+        
+        if series.actualIntensity.isEmpty {
+            guard let _ = Int(intensityHint) else {
+                showIntensityError = true
+                isSavedClicked = false
+                throw ValidationException(message: "\(series.intensityIndex) can't be in ranged or floating point number value")
+            }
+            series.actualIntensity = intensityHint
+        }
+        
     }
 }
 
@@ -333,7 +404,7 @@ struct WorkoutListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        WorkoutListView(workout: $workout, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
+        WorkoutListView(workout: $workout, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage, isSavedClicked: $showToast)
 //        WorkoutListExerciseView(exercise: $wholeExercise2)
 //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }

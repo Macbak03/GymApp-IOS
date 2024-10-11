@@ -245,6 +245,17 @@ struct NoPlanWorkoutView: View {
     }
     
     private func saveWorkoutToHistory(date: String) {
+        do {
+            try handleWorkoutNameException()
+        } catch let error as ValidationException {
+            showNameError = true
+            showToast = true
+            toastMessage = error.message
+            return
+        } catch {
+            toastMessage = "An unexpected error occured \(error)"
+            return
+        }
         var workout = [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])]()
         var series = [WorkoutSeries]()
         for (index, pair) in workoutDraft.enumerated() {
@@ -278,12 +289,15 @@ struct NoPlanWorkoutView: View {
                 let exercise = try exerciseDraft.toExercise()
                 workout.append((workoutExercise: WorkoutExercise(exercise: exercise, exerciseCount: (index + 1), note: pair.workoutExerciseDraft.note), exerciseSeries: series))
                 series.removeAll()
+            } catch let error as ValidationException {
+                showToast = true
+                toastMessage = error.message
+                return
             } catch {
-                print("Error in WorkoutExercise in saving workout \(error)")
+                print("Error in WorkoutExercise when saving workout \(error)")
                 return
             }
         }
-        workoutHistoryDatabaseHelper.checkForeignKeysEnabled()
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
         UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
         isWorkoutEnded = true

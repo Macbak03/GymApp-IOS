@@ -37,6 +37,8 @@ struct WorkoutView: View {
     @State private var showToast = false
     @State private var toastMessage = ""
     
+    @State private var isSaveClicked = false
+    
     var body: some View {
         GeometryReader { geometry  in
             VStack {
@@ -61,7 +63,7 @@ struct WorkoutView: View {
                     }
                 }
                 
-                WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage)
+                WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage, isSavedClicked: $isSaveClicked)
                 
                 // Horizontal layout for buttons
                 HStack(spacing: 90) {
@@ -94,7 +96,15 @@ struct WorkoutView: View {
 
                     
                     Button(action: {
-                        saveWorkoutToHistory(date: date)
+                        isSaveClicked = true
+                        if isSaveClicked {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                saveWorkoutToHistory(date: date)
+                            }
+                        } else {
+                            saveWorkoutToHistory(date: date)
+                        }
+                        
                     }) {
                         Text("Save")
                             .foregroundColor(Color.TextColorButton)
@@ -233,7 +243,6 @@ struct WorkoutView: View {
     
     private func saveWorkoutToHistory(date: String) {
         var workout = [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])]()
-        //var exercises = [WorkoutExercise]()
         var series = [WorkoutSeries]()
         for (index, pair) in workoutDraft.enumerated() {
             let loadUnit = pair.workoutSeriesDraftList[0].loadUnit
@@ -254,8 +263,10 @@ struct WorkoutView: View {
                     let set = try setDraft.toWorkoutSeries(seriesCount: (index + 1))
                     series.append(set)
                 } catch let error as ValidationException {
-                    showToast = true
-                    toastMessage = error.message
+                    if isSaveClicked {
+                        showToast = true
+                        toastMessage = error.message
+                    }
                     return
                 } catch {
                     print("Unexpected error occured when saving workout: \(error)")
@@ -271,7 +282,6 @@ struct WorkoutView: View {
                 return
             }
         }
-        workoutHistoryDatabaseHelper.checkForeignKeysEnabled()
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
         UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
         isWorkoutEnded = true
