@@ -20,28 +20,28 @@ struct HistoryView: View {
                 Backgroundimage(geometry: geometry, imageName: "history_icon")
                 VStack {
                      //Search bar
-//                    HStack {
-//                        Image(systemName: "magnifyingglass") // Use system icon for magnifier
-//                            .foregroundColor(.gray) // Set the color of the icon
-//                            .padding(.leading, 10)
-//
-//                        TextField("Search in history...", text: $searchText)
-//                            .padding(10) // Padding inside the text field
-//                            .frame(height: 50)
-//                            .onChange(of: searchText) { newText in
-//                                filterSearchResults()
-//                            }
-//                        
-//                    }
-//                    
-//                    .background(Color.ShadowColor) // Background color similar to Android search view
-//                    .cornerRadius(10)
-//                    .padding(.horizontal, 10)
+                    HStack {
+                        Image(systemName: "magnifyingglass") // Use system icon for magnifier
+                            .foregroundColor(.gray) // Set the color of the icon
+                            .padding(.leading, 10)
+
+                        TextField("Search in history...", text: $searchText)
+                            .padding(10) // Padding inside the text field
+                            .frame(height: 50)
+                            .onChange(of: searchText) { newText in
+                                filterSearchResults()
+                            }
+                        
+                    }
+                    
+                    .background(Color.ShadowColor) // Background color similar to Android search view
+                    .cornerRadius(10)
+                    .padding(.horizontal, 10)
                     
                     // Workout history list (Equivalent to RecyclerView)
-                    HistoryListView(history: $searchList, showToast: $showToast, toastMessage: $toastMessage)
+                    HistoryListView(history: $searchList, noFilteredHistory: $history, showToast: $showToast, toastMessage: $toastMessage)
                 }
-                //.searchable(text: $searchText)
+                .searchable(text: $searchText)
 
             }
             .onAppear() {
@@ -63,16 +63,20 @@ struct HistoryView: View {
         } else {
             let lowercasedQuery = searchText.lowercased()
             searchList = history.filter { historyItem in
-                let planNameMatch = historyItem.planName.lowercased().contains(lowercasedQuery)
-                let routineNameMatch = historyItem.routineName.lowercased().contains(lowercasedQuery)
+                let planNameMatch = historyItem.planName.lowercased().starts(with: lowercasedQuery)
+                let routineNameMatch = historyItem.routineName.lowercased().starts(with: lowercasedQuery)
                 let dateMatch = historyItem.formattedDate.lowercased().contains(lowercasedQuery)
                 
-                print("Query: \(lowercasedQuery), Plan: \(historyItem.planName), Routine: \(historyItem.routineName), Date: \(historyItem.formattedDate)")
-                print("Matches - Plan: \(planNameMatch), Routine: \(routineNameMatch), Date: \(dateMatch)")
+//                print("Query: \(lowercasedQuery), Plan: \(historyItem.planName), Routine: \(historyItem.routineName), Date: \(historyItem.formattedDate)")
+//                print("Matches - Plan: \(planNameMatch), Routine: \(routineNameMatch), Date: \(dateMatch)")
+//                print("List elements:\n")
+//                for result in searchList {
+//                    print("\(result.formattedDate) \(result.planName) \(result.routineName)\n")
+//                }
                 
                 return planNameMatch || routineNameMatch || dateMatch
             }
-            print("------------------------------------")
+            //print("------------------------------------")
         }
     }
 }

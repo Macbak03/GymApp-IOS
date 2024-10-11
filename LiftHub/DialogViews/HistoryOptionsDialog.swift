@@ -9,8 +9,9 @@ import SwiftUI
 
 struct HistoryOptionsDialog: View {
     @Binding var history: [WorkoutHistoryElement]
+    @Binding var noFilteredHistory: [WorkoutHistoryElement]
     private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
-    let position: Int
+    let historyItem: WorkoutHistoryElement
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     @Environment(\.colorScheme) var colorScheme
@@ -35,13 +36,13 @@ struct HistoryOptionsDialog: View {
                     
                     // Text Views inside a VStack
                     VStack(alignment: .center, spacing: 5) {
-                        Text(history[position].routineName)
+                        Text(historyItem.routineName)
                             .font(.system(size: 25, weight: .bold))
                             .foregroundColor(Color.textColorPrimary)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                         
-                        Text(history[position].formattedDate)
+                        Text(historyItem.formattedDate)
                             .font(.system(size: 25, weight: .bold))
                             .foregroundColor(Color.textColorPrimary)
                             .frame(maxWidth: .infinity)
@@ -89,7 +90,7 @@ struct HistoryOptionsDialog: View {
                     .alert(isPresented: $showAlertDialog) {
                         Alert(
                             title: Text("Warning"),
-                            message: Text("Are you sure you want to delete \(history[position].routineName) from \(history[position].formattedDate)?"),
+                            message: Text("Are you sure you want to delete \(historyItem.routineName) from \(historyItem.formattedDate)?"),
                             primaryButton: .destructive(Text("OK")) {
                                 deleteHistory()
                                 presentationMode.wrappedValue.dismiss()
@@ -125,7 +126,7 @@ struct HistoryOptionsDialog: View {
                 .frame(maxWidth: .infinity) // Take the full width at the bottom
             }
             .fullScreenCover(isPresented: $openEditHistory) {
-                EditHistoryDetailsView(workoutHistoryElement: history[position], showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
+                EditHistoryDetailsView(workoutHistoryElement: historyItem, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
             }
             .onChange(of: showToast) { exit in
                 if exit {
@@ -136,8 +137,9 @@ struct HistoryOptionsDialog: View {
     }
     
     func deleteHistory() {
-        workoutHistoryDatabaseHelper.deleteFromHistory(date: history[position].rawDate)
-        history.remove(at: position)
+        workoutHistoryDatabaseHelper.deleteFromHistory(date: historyItem.rawDate)
+        history.removeAll(where: { $0.rawDate == historyItem.rawDate && $0.planName == historyItem.planName && $0.routineName == historyItem.routineName})
+        noFilteredHistory.removeAll(where: { $0.rawDate == historyItem.rawDate && $0.planName == historyItem.planName && $0.routineName == historyItem.routineName})
     }
 }
 
@@ -147,7 +149,7 @@ struct HistoryOptionsDialog_Previews: PreviewProvider {
     @State static var showToast = true
     @State static var toastMessage: String = ""
     static var previews: some View {
-        HistoryOptionsDialog(history: $history, position: 0, showToast: $showToast, toastMessage: $toastMessage)
+        HistoryOptionsDialog(history: $history, noFilteredHistory: $history, historyItem: WorkoutHistoryElement(planName: "Plan", routineName: "Routine", formattedDate: "17.09.2024", rawDate: "17.09.2024 22:52:12"), showToast: $showToast, toastMessage: $toastMessage)
     }
 }
 

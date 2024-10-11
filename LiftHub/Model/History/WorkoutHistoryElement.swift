@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WorkoutHistoryElement {
+struct WorkoutHistoryElement: Hashable {
     let planName: String
     let routineName: String
     let formattedDate: String

@@ -9,13 +9,14 @@ import SwiftUI
 
 struct HistoryListView: View {
     @Binding var history: [WorkoutHistoryElement]
+    @Binding var noFilteredHistory: [WorkoutHistoryElement]
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     var body: some View {
         ScrollView {
-            ForEach(history.indices, id: \.self) {
-                index in
-                HistoryListElementView(history: $history, position: index, showToast: $showToast, toastMessage: $toastMessage)
+            ForEach(Array(history.enumerated()), id: \.element) {
+                (index, element) in
+                HistoryListElementView(history: $history, noFilteredHistory: $noFilteredHistory, historyItem: element, position: index, showToast: $showToast, toastMessage: $toastMessage)
                 
             }
             .padding(.top, 5)
@@ -25,10 +26,11 @@ struct HistoryListView: View {
 
 struct HistoryListElementView: View {
     @Binding var history: [WorkoutHistoryElement]
+    @Binding var noFilteredHistory: [WorkoutHistoryElement]
+    let historyItem: WorkoutHistoryElement
     let position: Int
     @State private var showOptionsDialog = false
     @State private var openHistoryDetails = false
-    @State private var historyElement: WorkoutHistoryElement = WorkoutHistoryElement(planName: "", routineName: "", formattedDate: "", rawDate: "")
     
     @Binding var showToast: Bool
     @Binding var toastMessage: String
@@ -37,7 +39,7 @@ struct HistoryListElementView: View {
         VStack {
             ZStack(alignment: .trailing) {
                 VStack {
-                    Text(historyElement.planName)
+                    Text(historyItem.planName)
                         .font(.system(size: 18))
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
@@ -45,12 +47,12 @@ struct HistoryListElementView: View {
                         .padding(.vertical, 1)
                     
                     HStack {
-                        Text(historyElement.formattedDate)
+                        Text(historyItem.formattedDate)
                             .font(.system(size: 23, weight: .bold))
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.leading, 10)
                         
-                        Text(historyElement.routineName)
+                        Text(historyItem.routineName)
                             .font(.system(size: 23))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.trailing, 10)
@@ -80,13 +82,10 @@ struct HistoryListElementView: View {
             openHistoryDetails = true
         }
         .fullScreenCover(isPresented: $openHistoryDetails){
-            HistoryDetailsView(rawDate: historyElement.rawDate, date: historyElement.formattedDate, planName: historyElement.planName, routineName: historyElement.routineName)
-        }
-        .onAppear() {
-            historyElement = history[position]
+            HistoryDetailsView(rawDate: historyItem.rawDate, date: historyItem.formattedDate, planName: historyItem.planName, routineName: history[position].routineName)
         }
         .sheet(isPresented: $showOptionsDialog) {
-            HistoryOptionsDialog(history: $history, position: position, showToast: $showToast, toastMessage: $toastMessage)
+            HistoryOptionsDialog(history: $history, noFilteredHistory: $noFilteredHistory, historyItem: historyItem, showToast: $showToast, toastMessage: $toastMessage)
         }
     }
 }
@@ -98,6 +97,6 @@ struct HistoryListView_Previews: PreviewProvider {
     @State static var showToast = false
     @State static var toastMessage = ""
     static var previews: some View {
-        HistoryListView(history: $history, showToast: $showToast, toastMessage: $toastMessage)
+        HistoryListView(history: $history, noFilteredHistory: $history, showToast: $showToast, toastMessage: $toastMessage)
     }
 }
