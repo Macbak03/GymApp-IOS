@@ -287,14 +287,14 @@ private struct WorkoutListSeriesView: View {
                 
                 if seriesCount > 1 {
                     Button(action: {
-                        addSet()
+                        removeSet()
                     }) {
                         Image(systemName: "minus.circle")
                             .resizable()  // Enable image resizing
                             .frame(width: 20, height: 20)
                     }
                     .frame(width: 20, height: 40)
-                    .padding(.leading, position > 0 ? 0 : 25)
+                    .padding(.leading, position < seriesCount - 1 ? 25 : 0)
                 }
                 
                 if seriesCount == position + 1 {
@@ -318,6 +318,10 @@ private struct WorkoutListSeriesView: View {
     private func addSet() {
         let setDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
         sets.append(setDraft)
+    }
+    
+    private func removeSet() {
+        sets.remove(at: position)
     }
     
     private func setToast(errorMessage: String) {
