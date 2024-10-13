@@ -36,4 +36,5 @@ class UserDefaultsUtils {
     func setWeight(unit: String) {
         UserDefaults.standard.set(unit, forKey: weightUnitKey)
     }
+    
 }

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import LiftHub
+@testable import Lift_Hub
 
 final class LiftHubTests: XCTestCase {
 

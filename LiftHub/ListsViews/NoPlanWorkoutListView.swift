@@ -67,7 +67,7 @@ private struct WorkoutListExerciseView: View {
                 .overlay(Rectangle() // Add underline
                     .frame(height: 1) // Thickness of underline
                     .foregroundColor(showNameError ? .red : Color.TextUnderline) // Color of underline
-                    .padding(.trailing, exerciseCount == (position + 1) ? 20 : 75)
+                    .padding(.trailing, exerciseCount == 1 ? 65 : 20)
                     .padding(.leading, 10)
                     .padding(.top, 40),
                          alignment: .bottom
@@ -78,6 +78,20 @@ private struct WorkoutListExerciseView: View {
                 }
             
             
+            if exerciseCount > 1 {
+                Button(action: {
+                    removeExercise()
+                }) {
+                    Image(systemName: "minus.circle")
+                        .resizable()  // Enable image resizing
+                        .frame(width: 23, height: 23)
+                        .padding(.trailing, 15)
+                }
+                .frame(width: 30, height: 40)
+                .padding(.trailing, exerciseCount != position + 1 ? 10:0)
+                .padding(.leading, exerciseCount != position + 1 ? 45: 0)
+            }
+            
             if exerciseCount == position + 1 {
                 Button(action: {
                     addExercise()
@@ -87,8 +101,8 @@ private struct WorkoutListExerciseView: View {
                         .frame(width: 23, height: 23)
                         .padding(.trailing, 15)
                 }
-                .frame(width: 40, height: 40)
-                .padding(.trailing, 7)
+                .frame(width: 30, height: 40)
+                .padding(.trailing, 10)
             }
 
         }
@@ -141,6 +155,9 @@ private struct WorkoutListExerciseView: View {
         let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "0", pauseUnit: TimeUnit.min, series: "0", reps: "0", intensity: "0", intensityIndex: intensityIndex, pace: "0000", note: "")
         let exerciseSetDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
         workout.append((workoutExerciseDraft: exerciseDraft, workoutSeriesDraftList: [exerciseSetDraft]))
+    }
+    private func removeExercise() {
+        workout.remove(at: position)
     }
 }
 
@@ -244,7 +261,42 @@ private struct WorkoutListSeriesView: View {
                     .onChange(of: isIntensityFocused) { focused in
                         validateIntensity(focused: focused)
                     }
-                    .padding(.trailing, seriesCount == (position + 1) ? 5 : 48)
+//                    .toolbar {
+//                        ToolbarItemGroup(placement: .keyboard) {
+//                            Button(action: {
+//                                // Add '-' to the input if not already present
+//                                if !set.actualIntensity.contains("-") {
+//                                    set.actualIntensity = "-" + set.actualIntensity
+//                                }
+//                            }) {
+//                                Text("-")
+//                            }
+//                            
+//                            Button(action: {
+//                                // Add '.' to the input if not already present
+//                                if !set.actualIntensity.contains(".") {
+//                                    set.actualIntensity += "."
+//                                }
+//                            }) {
+//                                Text(".")
+//                            }
+//                            
+//                            Spacer()
+//                        }
+//                    }
+                
+                if seriesCount > 1 {
+                    Button(action: {
+                        addSet()
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .resizable()  // Enable image resizing
+                            .frame(width: 20, height: 20)
+                    }
+                    .frame(width: 20, height: 40)
+                    .padding(.leading, position > 0 ? 0 : 25)
+                }
+                
                 if seriesCount == position + 1 {
                     Button(action: {
                         addSet()
@@ -252,9 +304,9 @@ private struct WorkoutListSeriesView: View {
                         Image(systemName: "plus.circle")
                             .resizable()  // Enable image resizing
                             .frame(width: 20, height: 20)
-                            .padding(.trailing, 5)
                     }
-                    .frame(width: 40, height: 40)
+                    .frame(width: 20, height: 40)
+                    .padding(.leading, position > 0 ? 0 : 25)
                 }
                 
             }
@@ -326,7 +378,7 @@ struct NoPlanWorkoutListView_previews: PreviewProvider {
     @State static var wholeExercise1 = (workoutExerciseDraft: exercise1, workoutSeriesDraftList: [series1_1])
     
     @State static var exercise2 = WorkoutExerciseDraft(name: "Exercise2", pause: "2", pauseUnit: TimeUnit.s, series: "2", reps: "2", intensity: "2", intensityIndex: IntensityIndex.RIR, pace: "2222", note: "note2")
-    @State static var series2_1 = WorkoutSeriesDraft(actualReps: "21", actualLoad: "21", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "2")
+    @State static var series2_1 = WorkoutSeriesDraft(actualReps: "21", actualLoad: "150.25", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "2")
     @State static var series2_2 = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "")
     
     @State static var wholeExercise2 = (workoutExerciseDraft: exercise2, workoutSeriesDraftList: [series2_1, series2_2])

@@ -41,7 +41,7 @@ struct BottomBar: View {
                     .renderingMode(.template)
                     .resizable()
                     .foregroundColor(Color.BottomBarColor)
-                    .frame(width: 400.0, height: 115.0)
+                    .frame(width: 700.0, height: 115.0)
                     
             )
             .shadow(radius: 5)

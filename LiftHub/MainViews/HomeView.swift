@@ -221,6 +221,7 @@ struct HomeView: View {
     
     private func initPickerChoice() {
         guard let selectedPlan = UserDefaults.standard.string(forKey: Constants.SELECTED_PLAN_NAME) else {
+            self.selectedPlan = Constants.NO_PLAN_NAME
             return
         }
         self.selectedPlan = selectedPlan
@@ -234,6 +235,8 @@ struct HomeView: View {
         let historyDatabaseHelper = WorkoutHistoryDataBaseHelper()
         if historyDatabaseHelper.isTableNotEmpty() {
             showLastWorkout = true
+        } else {
+            showLastWorkout = false
         }
         let lastWorkout = historyDatabaseHelper.getLastWorkout()
         guard let workoutPlanName = lastWorkout[0] else {

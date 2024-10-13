@@ -8,6 +8,7 @@ struct ContentView: View {
             BottomBar(selectedTab: $selectedTab)
         }
         .onAppear(){
+            UserDefaults.standard.register(defaults: [Constants.IS_WORKOUT_SAVED_KEY: true])
             SettingsView.applyTheme(theme: UserDefaultsUtils.shared.getTheme())
         }
         

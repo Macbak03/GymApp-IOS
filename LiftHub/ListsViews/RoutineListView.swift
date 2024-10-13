@@ -124,7 +124,7 @@ struct ExerciseView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 70, alignment: .trailing)
+                            .frame(width: 75, alignment: .trailing)
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
@@ -157,7 +157,7 @@ struct ExerciseView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 70, alignment: .trailing)
+                            .frame(width: 75, alignment: .trailing)
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
