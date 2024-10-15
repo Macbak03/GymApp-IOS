@@ -232,11 +232,19 @@ struct WorkoutView: View {
             return
         }
         for (index, exercise) in recoveredWorkout.enumerated() {
-            workoutDraft[index].workoutExerciseDraft.note = exercise.workoutExerciseDraft.note
+            if index < workoutDraft.endIndex {
+                workoutDraft[index].workoutExerciseDraft.note = exercise.workoutExerciseDraft.note
+            } else {
+                break
+            }
             for (setIndex, set) in exercise.workoutSeriesDraftList.enumerated() {
-                workoutDraft[index].workoutSeriesDraftList[setIndex].actualReps = set.actualReps
-                workoutDraft[index].workoutSeriesDraftList[setIndex].actualLoad = set.actualLoad
-                workoutDraft[index].workoutSeriesDraftList[setIndex].actualIntensity = set.actualIntensity
+                if setIndex < workoutDraft[index].workoutSeriesDraftList.endIndex {
+                    workoutDraft[index].workoutSeriesDraftList[setIndex].actualReps = set.actualReps
+                    workoutDraft[index].workoutSeriesDraftList[setIndex].actualLoad = set.actualLoad
+                    workoutDraft[index].workoutSeriesDraftList[setIndex].actualIntensity = set.actualIntensity
+                } else {
+                    break
+                }
             }
         }
     }

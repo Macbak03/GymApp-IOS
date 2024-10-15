@@ -24,7 +24,7 @@ struct RoutineListView: View {
 }
 
 struct ExerciseView: View {
-    @State private var isDetailsVisible: Bool = true
+    @State private var isDetailsVisible: Bool = false
     @Binding var exercise: ExerciseDraft
     let labelWidth: CGFloat = 50
     
@@ -55,6 +55,13 @@ struct ExerciseView: View {
     private let textFieldStrokeLineWidth: CGFloat = 0.5
     
     private let descriptionImageFrameDimentions: CGFloat = 30
+    
+    @State private var showPauseToolbar = false
+    @State private var showLoadToolbar = false
+    @State private var showRepsToolbar = false
+    @State private var showSeriesToolbar = false
+    @State private var showIntensityToolbar = false
+    @State private var showPaceToolbar = false
     
     var body: some View {
         ZStack {
@@ -115,7 +122,15 @@ struct ExerciseView: View {
                                 .frame(maxWidth: .infinity)
                                 .focused($isPauseFocused)
                                 .onChange(of: isPauseFocused) { focused in
-                                        validatePause(focused: focused)
+                                    validatePause(focused: focused)
+                                    showPauseToolbar = focused
+                                }
+                                .toolbar {
+                                    if showPauseToolbar {
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            CustomKeyboardToolbar(textFieldValue: $exercise.pause)
+                                        }
+                                    }
                                 }
                             
                             Picker("Rest", selection: $exercise.pauseUnit) {
@@ -148,7 +163,15 @@ struct ExerciseView: View {
                                 .frame(maxWidth: .infinity)
                                 .focused($isLoadFocused)
                                 .onChange(of: isLoadFocused) { focused in
-                                        validateLoad(focused: focused)
+                                    validateLoad(focused: focused)
+                                    showLoadToolbar = focused
+                                }
+                                .toolbar {
+                                    if showLoadToolbar {
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            CustomKeyboardToolbar(textFieldValue: $exercise.load)
+                                        }
+                                    }
                                 }
                             
                             Picker("Load", selection: $exercise.loadUnit) {
@@ -182,7 +205,15 @@ struct ExerciseView: View {
                                 .frame(maxWidth: .infinity)
                                 .focused($isRepsFocused)
                                 .onChange(of: isRepsFocused) { focused in
-                                        validateReps(focused: focused)
+                                    validateReps(focused: focused)
+                                    showRepsToolbar = focused
+                                }
+                                .toolbar {
+                                    if showRepsToolbar {
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            CustomKeyboardToolbar(textFieldValue: $exercise.reps)
+                                        }
+                                    }
                                 }
                             
                             Image(systemName: "info.circle")
@@ -208,7 +239,15 @@ struct ExerciseView: View {
                                 .frame(maxWidth: .infinity)
                                 .focused($isSeriesFocused)
                                 .onChange(of: isSeriesFocused) { focused in
-                                        validateSeries(focused: focused)
+                                    validateSeries(focused: focused)
+                                    showSeriesToolbar = focused
+                                }
+                                .toolbar {
+                                    if showSeriesToolbar {
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            CustomKeyboardToolbar(textFieldValue: $exercise.series)
+                                        }
+                                    }
                                 }
                             
                             Image(systemName: "info.circle")
@@ -235,7 +274,15 @@ struct ExerciseView: View {
                                 .frame(maxWidth: .infinity)
                                 .focused($isIntensityFocused)
                                 .onChange(of: isIntensityFocused) { focused in
-                                        validateIntensity(focused: focused)
+                                    validateIntensity(focused: focused)
+                                    showIntensityToolbar = focused
+                                }
+                                .toolbar {
+                                    if showIntensityToolbar {
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            CustomKeyboardToolbar(textFieldValue: $exercise.intensity)
+                                        }
+                                    }
                                 }
                             
                             Image(systemName: "info.circle")
@@ -261,7 +308,15 @@ struct ExerciseView: View {
                                 .frame(maxWidth: .infinity)
                                 .focused($isPaceFocused)
                                 .onChange(of: isPaceFocused) { focused in
-                                        validatePace(focused: focused)
+                                    validatePace(focused: focused)
+                                    showPaceToolbar = focused
+                                }
+                                .toolbar {
+                                    if showPaceToolbar {
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            CustomKeyboardToolbar(textFieldValue: $exercise.pace)
+                                        }
+                                    }
                                 }
                             
                             Image(systemName: "info.circle")

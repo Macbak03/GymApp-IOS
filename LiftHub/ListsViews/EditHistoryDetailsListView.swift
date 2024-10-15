@@ -166,6 +166,10 @@ private struct HistoryDetailsListSeriesView: View {
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldStrokeLineWidth: CGFloat = 0.5
     
+    @State private var showLoadToolbar = false
+    @State private var showRepsToolbar = false
+    @State private var showIntensityToolbar = false
+    
     var body: some View {
         VStack(alignment: .leading) {
             // First Horizontal Layout for Series Count, Reps, Weight
@@ -188,6 +192,14 @@ private struct HistoryDetailsListSeriesView: View {
                     .focused($isRepsFocused)
                     .onChange(of: isRepsFocused) { focused in
                         validateReps(focused: focused)
+                        showRepsToolbar = focused
+                    }
+                    .toolbar {
+                        if showRepsToolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                CustomKeyboardToolbar(textFieldValue: $series.actualReps)
+                            }
+                        }
                     }
                 
                 // Multiplication Sign
@@ -209,6 +221,14 @@ private struct HistoryDetailsListSeriesView: View {
                     .focused($isLoadFocused)
                     .onChange(of: isLoadFocused) { focused in
                         validateLoad(focused: focused)
+                        showLoadToolbar = focused
+                    }
+                    .toolbar {
+                        if showLoadToolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                CustomKeyboardToolbar(textFieldValue: $series.actualLoad)
+                            }
+                        }
                     }
                 
                 // Weight Unit Value
@@ -235,6 +255,14 @@ private struct HistoryDetailsListSeriesView: View {
                     .focused($isIntensityFocused)
                     .onChange(of: isIntensityFocused) { focused in
                         validateIntensity(focused: focused)
+                        showIntensityToolbar = focused
+                    }
+                    .toolbar {
+                        if showIntensityToolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                CustomKeyboardToolbar(textFieldValue: $series.actualIntensity)
+                            }
+                        }
                     }
                     .padding(.trailing, 5)
                 

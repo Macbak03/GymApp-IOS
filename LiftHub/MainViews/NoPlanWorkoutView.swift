@@ -174,7 +174,7 @@ struct NoPlanWorkoutView: View {
     }
     
     private func loadRoutine() {
-        if !isWorkoutSaved {
+        if !isWorkoutSaved && !isWorkoutEnded {
             initRecoveredWorkoutData()
         } else {
             workoutDraft.append((workoutExerciseDraft: WorkoutExerciseDraft(

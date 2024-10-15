@@ -26,7 +26,7 @@ private struct HistoryDetailsListExerciseView: View {
     @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
     let planName: String
     
-    @State private var isDetailsVisible = true
+    @State private var isDetailsVisible = false
     @State private var displayNote = false
     
     var body: some View {

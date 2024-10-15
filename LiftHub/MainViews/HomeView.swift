@@ -207,6 +207,7 @@ struct HomeView: View {
                 Alert(title: Text("Warning"),
                       message: Text("You have unsaved workout. Are you sure you want to start a new one?"),
                       primaryButton: .destructive(Text("YES")) {
+                        isWorkoutEnded = true
                         if selectedPlan == Constants.NO_PLAN_NAME {
                             startNoPlanWorkout = true
                         } else {

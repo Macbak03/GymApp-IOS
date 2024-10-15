@@ -39,7 +39,7 @@ private struct WorkoutListExerciseView: View {
     let intensityIndex: IntensityIndex
     let weightUnit: WeightUnit
     
-    @State private var isDetailsVisible = true
+    @State private var isDetailsVisible = false
     @State private var displayNote = false
     @State private var showNameError = false
     
@@ -186,6 +186,10 @@ private struct WorkoutListSeriesView: View {
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
     @FocusState private var isIntensityFocused: Bool
+    
+    @State private var showLoadToolbar = false
+    @State private var showRepsToolbar = false
+    @State private var showIntensityToolbar = false
 
 
     private let textFieldCornerRadius: CGFloat = 5
@@ -213,6 +217,14 @@ private struct WorkoutListSeriesView: View {
                     .focused($isRepsFocused)
                     .onChange(of: isRepsFocused) { focused in
                         validateReps(focused: focused)
+                        showRepsToolbar = focused
+                    }
+                    .toolbar {
+                        if showRepsToolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                CustomKeyboardToolbar(textFieldValue: $set.actualReps)
+                            }
+                        }
                     }
                 
                 // Multiplication Sign
@@ -234,6 +246,14 @@ private struct WorkoutListSeriesView: View {
                     .focused($isLoadFocused)
                     .onChange(of: isLoadFocused) { focused in
                         validateLoad(focused: focused)
+                        showLoadToolbar = focused
+                    }
+                    .toolbar {
+                        if showLoadToolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                CustomKeyboardToolbar(textFieldValue: $set.actualLoad)
+                            }
+                        }
                     }
                 
                 // Weight Unit Value
@@ -260,30 +280,16 @@ private struct WorkoutListSeriesView: View {
                     .focused($isIntensityFocused)
                     .onChange(of: isIntensityFocused) { focused in
                         validateIntensity(focused: focused)
+                        showIntensityToolbar = focused
                     }
-//                    .toolbar {
-//                        ToolbarItemGroup(placement: .keyboard) {
-//                            Button(action: {
-//                                // Add '-' to the input if not already present
-//                                if !set.actualIntensity.contains("-") {
-//                                    set.actualIntensity = "-" + set.actualIntensity
-//                                }
-//                            }) {
-//                                Text("-")
-//                            }
-//                            
-//                            Button(action: {
-//                                // Add '.' to the input if not already present
-//                                if !set.actualIntensity.contains(".") {
-//                                    set.actualIntensity += "."
-//                                }
-//                            }) {
-//                                Text(".")
-//                            }
-//                            
-//                            Spacer()
-//                        }
-//                    }
+                    .toolbar {
+                        if showIntensityToolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                CustomKeyboardToolbar(textFieldValue: $set.actualIntensity)
+                            }
+                        }
+                    }
+
                 
                 if seriesCount > 1 {
                     Button(action: {
