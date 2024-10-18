@@ -185,7 +185,7 @@ struct HomeView: View {
                 if startWorkout {
                     WorkoutView(planName: selectedPlan,
                                 routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error routine name",
-                                date: UserDefaults.standard.string(forKey: Constants.DATE) ?? "Error date",
+                                date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getDate(),
                                 closeStartWorkoutSheet: $closeStartWorkoutSheet,
                                 isWorkoutEnded: $isWorkoutEnded,
                                 showWorkoutSavedToast: $showToast,
@@ -194,8 +194,8 @@ struct HomeView: View {
                     HistoryDetailsView(rawDate: lastWorkoutRawDate, date: lastWorkoutDate, planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName)
                 } else if startNoPlanWorkout {
                     NoPlanWorkoutView(planName: selectedPlan,
-                                      date: UserDefaults.standard.string(forKey: Constants.DATE) ?? "Error date",
-                                      isWorkoutEnded: $isWorkoutEnded, 
+                                      date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getDate(),
+                                      isWorkoutEnded: $isWorkoutEnded,
                                       showWorkoutSavedToast: $showToast,
                                       savedWorkoutToastMessage: $toastMessage,
                                       intensityIndex: intensityIndex,

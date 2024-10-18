@@ -299,6 +299,7 @@ struct NoPlanWorkoutView: View {
             }
         }
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
+        UserDefaults.standard.setValue(nil, forKey: Constants.DATE)
         UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
         isWorkoutEnded = true
         isWorkoutFinished = true
