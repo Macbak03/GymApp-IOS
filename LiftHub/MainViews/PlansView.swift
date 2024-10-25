@@ -10,6 +10,8 @@ import Foundation
 
 struct PlansView: View {
     @State private var trainingPlans: [TrainingPlan] = []
+    @State private var showCreatePlanDialog = false
+
     private let plansDatabaseHelper = PlansDataBaseHelper()
     
     var body: some View {
@@ -23,14 +25,27 @@ struct PlansView: View {
                             loadPlans()
                         }
                     
-                    Spacer()
-                    
-                    AddButton(geometry: geometry, trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
-                    
-                    Spacer()
+//                    Spacer()
+//                    
+//                    AddButton(geometry: geometry, trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
+//                    
+//                    Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action : {
+                    showCreatePlanDialog = true
+                }) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showCreatePlanDialog) {
+            @State var name = ""
+            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", position: nil)
         }
     }
     

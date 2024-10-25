@@ -96,7 +96,9 @@ struct SettingsView: View {
                     .disabled(!MFMailComposeViewController.canSendMail())
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(false)
             .sheet(isPresented: $showMailComposer) {
                 MailView(isShowing: $showMailComposer, result: $result)
             }

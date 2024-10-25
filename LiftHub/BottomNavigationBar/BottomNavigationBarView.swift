@@ -14,43 +14,45 @@ struct BottomBar: View {
     @Binding var selectedTab: BottomBarSelectedTab
     
     var body: some View {
-        GeometryReader { geometry in
-            TabView(selection: $selectedTab) {
-                //            StatsView()
-                //                .tag(BottomBarSelectedTab.stats)
-                HomeView()
-                    .tag(BottomBarSelectedTab.workout)
-                PlansView()
-                    .tag(BottomBarSelectedTab.plans)
-                HistoryView()
-                    .tag(BottomBarSelectedTab.history)
-                SettingsView()
-                    .tag(BottomBarSelectedTab.settings)
-            }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .overlay(
-                HStack(spacing:50) { //35 for 5 elements, change position of workout and plans
-                    //                BottomBarButton(selectedTab: $selectedTab, tab: .stats, image: "stats_icon", text: "Stats")
-                    BottomBarButton(selectedTab: $selectedTab, tab: .workout, image: "workout_icon", text: "Workout")
-                    BottomBarButton(selectedTab: $selectedTab, tab: .plans, image: "plans_icon", text: "Plans")
-                    BottomBarButton(selectedTab: $selectedTab, tab: .history, image: "history_icon", text: "History")
-                    BottomBarButton(selectedTab: $selectedTab, tab: .settings, image: "settings_icon", text: "Settings")
+        NavigationStack {
+            GeometryReader { geometry in
+                TabView(selection: $selectedTab) {
+                    //            StatsView()
+                    //                .tag(BottomBarSelectedTab.stats)
+                    HomeView()
+                        .tag(BottomBarSelectedTab.workout)
+                    PlansView()
+                        .tag(BottomBarSelectedTab.plans)
+                    HistoryView()
+                        .tag(BottomBarSelectedTab.history)
+                    SettingsView()
+                        .tag(BottomBarSelectedTab.settings)
                 }
-                    .padding(.top, 10)
-
-                    .frame(height: 20)
-                    .background(
-                        Image("navigation_bar_background")
-                            .renderingMode(.template)
-                            .resizable()
-                            .foregroundColor(Color.BottomBarColor)
-                            .frame(width: geometry.size.width, height: 70)
-                        
-                    )
-                    .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: -3)
-                , alignment: .bottom
-            )
-            .padding(.bottom, getBottomPadding()) // Add padding to stay above the home indicator
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .overlay(
+                    HStack(spacing:50) { //35 for 5 elements, change position of workout and plans
+                        //                BottomBarButton(selectedTab: $selectedTab, tab: .stats, image: "stats_icon", text: "Stats")
+                        BottomBarButton(selectedTab: $selectedTab, tab: .workout, image: "workout_icon", text: "Workout")
+                        BottomBarButton(selectedTab: $selectedTab, tab: .plans, image: "plans_icon", text: "Plans")
+                        BottomBarButton(selectedTab: $selectedTab, tab: .history, image: "history_icon", text: "History")
+                        BottomBarButton(selectedTab: $selectedTab, tab: .settings, image: "settings_icon", text: "Settings")
+                    }
+                        .padding(.top, 10)
+                    
+                        .frame(height: 20)
+                        .background(
+                            Image("navigation_bar_background")
+                                .renderingMode(.template)
+                                .resizable()
+                                .foregroundColor(Color.BottomBarColor)
+                                .frame(width: geometry.size.width, height: 70)
+                            
+                        )
+                        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: -3)
+                    , alignment: .bottom
+                )
+                .padding(.bottom, getBottomPadding()) // Add padding to stay above the home indicator
+            }
         }
     }
     

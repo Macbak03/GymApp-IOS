@@ -69,7 +69,7 @@ struct HomeView: View {
                         VStack(alignment: .center, spacing: 10) {
                             Text("Last workout:")
                                 .foregroundStyle(Color.TextColorPrimary)
-                                .font(.system(size: 25, weight: .bold))
+                                .font(.system(size: 20, weight: .bold))
                                 .multilineTextAlignment(.center)
                             
                             VStack {
@@ -84,13 +84,13 @@ struct HomeView: View {
                                 HStack {
                                     Text(lastWorkoutDate)
                                         .foregroundStyle(Color.TextColorPrimary)
-                                        .font(.system(size: 23, weight: .bold))
+                                        .font(.system(size: 18, weight: .bold))
                                         .frame(maxWidth: .infinity, alignment: .trailing)
                                         .padding(.leading, 10)
                                     
                                     Text(lastWorkoutRoutineName)
                                         .foregroundStyle(Color.TextColorPrimary)
-                                        .font(.system(size: 23))
+                                        .font(.system(size: 18))
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.trailing, 10)
                                 }
@@ -100,7 +100,7 @@ struct HomeView: View {
                             .background(Color.BackgroundColorList)
                             .cornerRadius(8)
                             .shadow(radius: 2)
-                            .padding(.horizontal, 10)
+                            .padding(.horizontal, 20)
                             .frame(maxWidth: .infinity)
                             .onTapGesture {
                                 openLastWorkout = true
@@ -217,6 +217,9 @@ struct HomeView: View {
                       secondaryButton: .cancel()
                 )
             }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(false)
         }
     }
     

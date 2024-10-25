@@ -13,13 +13,22 @@ struct HistoryListView: View {
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     var body: some View {
-        ScrollView {
+        List {
             ForEach(Array(history.enumerated()), id: \.element) {
                 (index, element) in
-                HistoryListElementView(history: $history, noFilteredHistory: $noFilteredHistory, historyItem: element, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                NavigationLink(
+                    destination: HistoryDetailsView(
+                        rawDate: element.rawDate,
+                        date: element.formattedDate,
+                        planName: element.planName,
+                        routineName: element.routineName),
+                    label: {
+                        HistoryListElementView(history: $history, noFilteredHistory: $noFilteredHistory, historyItem: element, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                    }
+                )
+                
                 
             }
-            .padding(.top, 5)
         }
     }
 }
@@ -41,45 +50,49 @@ struct HistoryListElementView: View {
                 VStack {
                     Text(historyItem.planName)
                         .font(.system(size: 18))
-                        .frame(maxWidth: .infinity)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 10)
                         .padding(.vertical, 1)
+                        .allowsHitTesting(false)
                     
                     HStack {
                         Text(historyItem.formattedDate)
-                            .font(.system(size: 23, weight: .bold))
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .font(.system(size: 18, weight: .bold))
+                            .frame(maxWidth: 100, alignment: .leading)
                             .padding(.leading, 10)
+                            .allowsHitTesting(false)
+
                         
                         Text(historyItem.routineName)
-                            .font(.system(size: 23))
+                            .font(.system(size: 18))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.trailing, 10)
+                            .allowsHitTesting(false)
+
                     }
-                    .padding(.bottom, 5)
-                    .padding(.horizontal, 25)
+//                    .padding(.bottom, 5)
+//                    .padding(.horizontal, 25)
                 }
                 Button(action: {
                     showOptionsDialog = true
                 }) {
                     Image(systemName: "ellipsis")
                         .resizable()
-                        .frame(width: 20, height: 5)
+                        .frame(width: 15, height: 3)
                         .padding()
                         .rotationEffect(.degrees(90))
                 }
-                .frame(width: 30, height: 50, alignment: .trailing)
+                .frame(width: 30, height: 20, alignment: .trailing)
                 .background(Color.clear) // You can modify this to fit the background style
             }
         }
-        .background(Color.BackgroundColorList)
-        .cornerRadius(8)
-        .shadow(radius: 3)
-        .padding(.horizontal, 10)
-        .frame(maxWidth: .infinity)
+//        .background(Color.BackgroundColorList)
+//        .cornerRadius(8)
+//        .shadow(radius: 3)
+//        .padding(.horizontal, 10)
+//        .frame(maxWidth: .infinity)
         .onTapGesture {
-            openHistoryDetails = true
+            showOptionsDialog = true
         }
         .fullScreenCover(isPresented: $openHistoryDetails){
             HistoryDetailsView(rawDate: historyItem.rawDate, date: historyItem.formattedDate, planName: historyItem.planName, routineName: history[position].routineName)

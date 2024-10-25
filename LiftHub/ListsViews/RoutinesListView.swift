@@ -19,9 +19,14 @@ struct RoutinesListView: View {
     @Binding var performDelete: Bool
     
     var body: some View {
-        ScrollView {
+        List {
             ForEach(routines.indices, id: \.self) { index in
-                RoutinesElementView(routines: $routines, position: index, routine: $routines[index], planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
+            NavigationLink(
+                destination: RoutineView(originalRoutineName: routines[index].name, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage),
+                label: {
+                    RoutinesElementView(routines: $routines, position: index, routine: $routines[index], planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
+                }
+                )
             }
             .padding(.top, 5)
         }
@@ -51,9 +56,9 @@ struct RoutinesElementView: View {
         ZStack (alignment: .leading) {
             HStack {
                 Text(routineName)
-                    .font(.system(size: 25, weight: .medium))
+                    .font(.system(size: 18, weight: .medium))
                     .foregroundColor(Color.TextColorPrimary)
-                    .padding(.leading, 5)
+                    //.padding(.leading, 5)
                     .onChange(of: refreshRoutines) { refreshNeeded in
                         if refreshNeeded {
                             routineName = routine.name
@@ -62,6 +67,8 @@ struct RoutinesElementView: View {
                     .onAppear() {
                         routineName = routine.name
                     }
+                    .allowsHitTesting(false)
+
                 
                 Spacer()
                 
@@ -70,22 +77,22 @@ struct RoutinesElementView: View {
                 }) {
                     Image(systemName: "ellipsis")
                         .resizable()
-                        .frame(width: 20, height: 5)
+                        .frame(width: 15, height: 3)
                         .padding()
                         .rotationEffect(.degrees(90))
                 }
-                .frame(width: 30, height: 50)
+                .frame(width: 30, height: 20)
                 .background(Color.clear) // You can modify this to fit the background style
                 
             }
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .padding(5)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.BackgroundColorList)
-                    .shadow(radius: 3)
-            )
-            .padding(.horizontal, 8) // Card marginHorizontal
+            //.frame(maxWidth: .infinity, minHeight: 50)
+            //.padding(5)
+//            .background(
+//                RoundedRectangle(cornerRadius: 8)
+//                    .fill(Color.BackgroundColorList)
+//                    .shadow(radius: 3)
+//            )
+//            .padding(.horizontal, 8) // Card marginHorizontal
             .actionSheet(isPresented: $showOptionsDialog) {
                 ActionSheet(
                     title: Text("Warning"),
@@ -100,11 +107,11 @@ struct RoutinesElementView: View {
                 )
             }
             .onTapGesture {
-                openRoutine = true
+                showOptionsDialog = true
             }
-            .fullScreenCover(isPresented: $openRoutine) {
-                RoutineView(originalRoutineName: routineName, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage)
-            }
+//            .fullScreenCover(isPresented: $openRoutine) {
+//                RoutineView(originalRoutineName: routineName, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage)
+//            }
         }
     }
     

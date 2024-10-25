@@ -34,37 +34,39 @@ struct RoutineView: View {
             ZStack {
                 VStack {
                     // HStack for Back Button at the top-left corner
-                    HStack {
-                        ZStack {
-                            // HStack to position the back button on the left
-                            HStack {
-                                Button(action: {
-                                    // Dismiss the current view to go back
-                                    alertType = .navigation
-                                }) {
-                                    Image(systemName: "arrow.left")
-                                        .font(.system(size: 20, weight: .bold))
-                                }
-                                .padding(.leading, 30) // Padding to keep the button away from the edge
-                                
-                                Spacer() // Pushes the button to the left
-                            }
+                    //HStack {
+                        //ZStack {
+//                            // HStack to position the back button on the left
+//                            HStack {
+//                                Button(action: {
+//                                    // Dismiss the current view to go back
+//                                    alertType = .navigation
+//                                }) {
+//                                    Image(systemName: "arrow.left")
+//                                        .font(.system(size: 20, weight: .bold))
+//                                }
+//                                .padding(.leading, 30) // Padding to keep the button away from the edge
+//                                
+//                                Spacer() // Pushes the button to the left
+//                            }
                             
                             // Centered TextField
                             HStack {
                                 Spacer() // Push the TextField to the center
                                 
                                 TextField("Enter routine name", text: $routineName)
-                                    .padding()
+                                    .font(.system(size: 18))
+                                    .frame(height: 40)
                                     .background(Color.ShadowColor)
                                     .cornerRadius(10)
-                                    .frame(maxWidth: 250)
+                                    .padding(.horizontal, 50)
+                                    
                                     .multilineTextAlignment(.center)
                                 
                                 Spacer() // Push the TextField to the center
                             }
-                        }
-                    }
+                        //}
+                    //}
                     
                     RoutineListView(routine: $routineDraft, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
                         .onAppear() {
@@ -73,9 +75,9 @@ struct RoutineView: View {
                     
                     Spacer()
                     ZStack{
-                        HStack{
-                            AddButton(routine: $routineDraft, geometry: geometry)
-                        }
+//                        HStack{
+//                            AddButton(routine: $routineDraft, geometry: geometry)
+//                        }
                         HStack{
                             Button(action: {
                                 do {
@@ -138,7 +140,32 @@ struct RoutineView: View {
             }
             
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    alertType = .navigation
+                }) {
+                    HStack {
+                        Image (systemName: "chevron.left")
+                        Text("Back")
+                    }
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                   addExercise()
+                }) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
         .toast(isShowing: $showToast, message: toastMessage)
+    }
+    
+    private func addExercise() {
+        let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
+        routineDraft.append(newExercise)
     }
     
     private func showDescriptionDialog(title: String, message: String) -> Alert {
