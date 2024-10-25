@@ -13,20 +13,40 @@ struct RoutineListView: View {
     @Binding var toastMessage: String
     @Binding var descriptionType: DescriptionType?
     @Binding var alertType: AlertType?
+    
+    @Environment(\.editMode) var editMode
+    
+    
     var body: some View {
-        ScrollView {
+        List {
             ForEach(routine.indices, id: \.self) {
                 index in
                 ExerciseView(exercise: $routine[index], descriptionType: $descriptionType, alertType: $alertType, showToast: $showToast, toastMessage: $toastMessage)
+                
             }
+            .onDelete(perform: { indexSet in
+                deleteItem(atOffsets: indexSet)
+            })
+            .onMove(perform: { from, to in
+                moveItem(from: from, to: to)
+            })
         }
+        .listStyle(PlainListStyle())
+    }
+    
+    func deleteItem(atOffsets: IndexSet) {
+        routine.remove(atOffsets: atOffsets)
+    }
+    
+    func moveItem(from source: IndexSet, to destination: Int) {
+        routine.move(fromOffsets: source, toOffset: destination)
     }
 }
 
 struct ExerciseView: View {
     @State private var isDetailsVisible: Bool = false
     @Binding var exercise: ExerciseDraft
-    let labelWidth: CGFloat = 50
+    private let labelWidth: CGFloat = 50
     
     @FocusState private var isExerciseNameFocused: Bool
     @FocusState private var isPauseFocused: Bool
@@ -35,7 +55,7 @@ struct ExerciseView: View {
     @FocusState private var isSeriesFocused: Bool
     @FocusState private var isIntensityFocused: Bool
     @FocusState private var isPaceFocused: Bool
-
+    
     @State private var showNameError = false
     @State private var showPauseError = false
     @State private var showLoadError = false
@@ -56,6 +76,8 @@ struct ExerciseView: View {
     
     private let descriptionImageFrameDimentions: CGFloat = 30
     
+    private let textSize: CGFloat = 15
+    
     @State private var showPauseToolbar = false
     @State private var showLoadToolbar = false
     @State private var showRepsToolbar = false
@@ -70,7 +92,7 @@ struct ExerciseView: View {
                 HStack {
                     Image(systemName: "chevron.down")
                         .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
-                        .frame(width: 40, height: 40)
+                        .frame(width: 25, height: 25)
                         .onTapGesture {
                             withAnimation {
                                 isDetailsVisible.toggle()
@@ -78,8 +100,8 @@ struct ExerciseView: View {
                         }
                     
                     TextField("Exercise name", text: $exercise.name)
-                        .font(.system(size: 22, weight: .bold))
-                        .frame(height: 40)
+                        .font(.system(size: 18, weight: .bold))
+                        .frame(height: 30)
                         .padding(.leading, 10)
                         .padding(.trailing, 20)
                         .lineLimit(1)
@@ -98,8 +120,8 @@ struct ExerciseView: View {
                             validateExerciseName(focused: focused)
                         }
                     
-//                    Image(systemName: "arrow.up.arrow.down")
-//                        .frame(width: 50, height: 50)
+                    //                    Image(systemName: "arrow.up.arrow.down")
+                    //                        .frame(width: 50, height: 50)
                 }
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
@@ -112,8 +134,10 @@ struct ExerciseView: View {
                             Text("Rest")
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .multilineTextAlignment(.trailing)
+                                .font(.system(size: textSize))
                             TextField("eg. 3 or 3-5", text: $exercise.pause)
                                 .keyboardType(.decimalPad)
+                                .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -138,8 +162,9 @@ struct ExerciseView: View {
                                     Text(unit.descritpion).tag(unit)
                                 }
                             }
+                            .labelsHidden()
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 75, alignment: .trailing)
+                            .frame(width: 60, alignment: .trailing)
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
@@ -153,8 +178,11 @@ struct ExerciseView: View {
                         HStack {
                             Text("Load")
                                 .frame(width: labelWidth, alignment: .trailing)
+                                .font(.system(size: textSize))
+
                             TextField("eg. 30", text: $exercise.load)
                                 .keyboardType(.decimalPad)
+                                .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -179,24 +207,27 @@ struct ExerciseView: View {
                                     Text(unit.descritpion).tag(unit)
                                 }
                             }
+                            .labelsHidden()
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 75, alignment: .trailing)
+                            .frame(width: 60, alignment: .trailing)
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
                                     descriptionType = .load
                                     alertType = .description(DescriptionType.load)
-
-                            }
+                                    
+                                }
                         }
                         
                         // Reps Section
                         HStack {
                             Text("Reps")
                                 .frame(width: labelWidth, alignment: .trailing)
+                                .font(.system(size: textSize))
                             TextField("eg. 6 or 6-8", text: $exercise.reps)
                                 .keyboardType(.decimalPad)
+                                .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -221,16 +252,19 @@ struct ExerciseView: View {
                                 .onTapGesture {
                                     descriptionType = .reps
                                     alertType = .description(DescriptionType.reps)
-
-                            }
+                                    
+                                }
                         }
                         
                         // Series Section
                         HStack {
                             Text("Series")
                                 .frame(width: labelWidth, alignment: .trailing)
+                                .font(.system(size: textSize))
+
                             TextField("eg. 3", text: $exercise.series)
                                 .keyboardType(.decimalPad)
+                                .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -255,17 +289,20 @@ struct ExerciseView: View {
                                 .onTapGesture {
                                     descriptionType = .series
                                     alertType = .description(DescriptionType.series)
-
-                            }
-                                
+                                    
+                                }
+                            
                         }
                         
                         // Intensity Section
                         HStack {
                             Text(exercise.intensityIndex.descritpion)
                                 .frame(width: labelWidth, alignment: .trailing)
+                                .font(.system(size: textSize))
+
                             TextField("eg. 5 or 5-6", text: $exercise.intensity)
                                 .keyboardType(.decimalPad)
+                                .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -290,16 +327,19 @@ struct ExerciseView: View {
                                 .onTapGesture {
                                     descriptionType = .intensity
                                     alertType = .description(DescriptionType.intensity)
-
-                            }
+                                    
+                                }
                         }
                         
                         // Pace Section
                         HStack {
                             Text("Pace")
                                 .frame(width: labelWidth, alignment: .trailing)
+                                .font(.system(size: textSize))
+                            
                             TextField("eg. 2110 or 21x0", text: $exercise.pace)
                                 .keyboardType(.decimalPad)
+                                .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -324,14 +364,14 @@ struct ExerciseView: View {
                                 .onTapGesture {
                                     descriptionType = .pace
                                     alertType = .description(DescriptionType.pace)
-
-                            }
+                                    
+                                }
                         }
                     }
                     .transition(.opacity)
                 }
             }
-            .padding(.horizontal)
+            //.padding(.horizontal)
             .animation(.easeInOut, value: isDetailsVisible)
         }
     }

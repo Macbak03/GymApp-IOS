@@ -50,18 +50,21 @@ private struct WorkoutListExerciseView: View {
     
     @State private var noteHint: String = "Note"
     
+    private let textSize: CGFloat = 15
+    private let outllineFrameHeight: CGFloat = 30
+    
     var body: some View {
         HStack {
             Image(systemName: "chevron.down")
                 .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
                 .frame(width: 20, height: 20)
                 .padding(.leading, 15)
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 3) {
                 // First Horizontal Layout (Exercise Name)
                 HStack {
                     Text(exerciseName)
-                        .font(.system(size: 24, weight: .bold))  // Equivalent to bold and textSize 24sp
-                        .frame(height: 20)  // Equivalent to layout_height="30dp"
+                        .font(.system(size: 18, weight: .bold))  // Equivalent to bold and textSize 24sp
+                        .frame(height: 15)  // Equivalent to layout_height="30dp"
                     //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
                     Spacer()  // To take up the remaining space
                 }
@@ -69,15 +72,18 @@ private struct WorkoutListExerciseView: View {
                 
                 // Second Horizontal Layout (Rest, Series, Intensity, Pace)
                 HStack(alignment: .center) {
-                    let VSpacing: CGFloat = 3
+                    let VSpacing: CGFloat = 2
                     // Rest Layout
                     VStack(spacing: VSpacing) {
                         Text("Rest:")
+                            .font(.system(size: textSize))
                         HStack(spacing: 1) {
                             Text(restValue)
+                                .font(.system(size: textSize))
                                 .frame(alignment: .trailing)
                             
                             Text(restUnit)
+                                .font(.system(size: textSize))
                                 .frame(alignment: .leading)
                         }
                     }
@@ -85,21 +91,27 @@ private struct WorkoutListExerciseView: View {
                     // Series Layout
                     VStack(spacing: VSpacing) {
                         Text("Series:")
+                            .font(.system(size: textSize))
                         Text(seriesValue)
+                            .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                     }
                     Spacer()
                     // Intensity Layout
                     VStack(spacing: VSpacing) {
-                        Text(intensityIndexText)
+                        Text("\(intensityIndexText):")
+                            .font(.system(size: textSize))
                         Text(intensityValue)
+                            .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                     }
                     Spacer()
                     // Pace Layout
                     VStack(spacing: VSpacing) {
                         Text("Pace:")
+                            .font(.system(size: textSize))
                         Text(paceValue)
+                            .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                     }
                 }
@@ -126,10 +138,14 @@ private struct WorkoutListExerciseView: View {
             }
             // Note Input
             TextField(noteHint, text: $exercise.workoutExerciseDraft.note)
-                .font(.system(size: 21))
-                .padding(.horizontal, 10) // Equivalent to layout_marginStart and layout_marginEnd
-                .padding(.bottom, 10)  // Equivalent to layout_marginBottom
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .font(.system(size: textSize))
+                .frame(height: outllineFrameHeight)
+                .padding(.horizontal, 10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color.textFieldOutline, lineWidth: 0.5)
+                )
+                .padding(.horizontal, 15)
             Divider()
                 .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
                 .background(Color(.systemGray6)) // Set color for the line
@@ -177,6 +193,9 @@ private struct WorkoutListSeriesView: View {
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldStrokeLineWidth: CGFloat = 0.5
     
+    private let textSize: CGFloat = 15
+    private let outllineFrameHeight: CGFloat = 25
+    
     @State private var showLoadToolbar = false
     @State private var showRepsToolbar = false
     @State private var showIntensityToolbar = false
@@ -188,13 +207,14 @@ private struct WorkoutListSeriesView: View {
             HStack(spacing: 5) {
                 // Series Count
                 Text("\(position + 1).")
-                    .font(.system(size: 18))
+                    .font(.system(size: textSize))
                     .padding(.leading, 4) // Equivalent to layout_marginStart="10dp"
                 
                 // Reps Input
                 TextField(repsHint, text: $series.actualReps)
                     .keyboardType(.decimalPad)
-                    .frame(height: 30)
+                    .font(.system(size: textSize))
+                    .frame(height: outllineFrameHeight)
                     .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
                     .padding(.horizontal, 10)
                     .overlay(
@@ -216,14 +236,15 @@ private struct WorkoutListSeriesView: View {
                 
                 // Multiplication Sign
                 Text("x")
-                    .font(.system(size: 18))
-                    .frame(width: 20)
+                    .font(.system(size: textSize))
+                    .frame(width: 10)
                     .multilineTextAlignment(.center)
                 
                 // Weight Input
                 TextField(weightHint, text: $series.actualLoad)
                     .keyboardType(.decimalPad)
-                    .frame(height: 30)
+                    .font(.system(size: textSize))
+                    .frame(height: outllineFrameHeight)
                     .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
                     .padding(.horizontal, 10)
                     .overlay(
@@ -245,19 +266,20 @@ private struct WorkoutListSeriesView: View {
                 
                 // Weight Unit Value
                 Text(weightUnitText)  // Assuming the weight unit is kilograms
-                    .font(.system(size: 18))
+                    .font(.system(size: textSize))
                 
                 Divider()
-                    .frame(width: 2, height: 35)  // Vertical line, adjust height as needed
+                    .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
                     .background(Color(.systemGray6)) // Set color for the line
                 
                 // Intensity Value
                 Text("\(intensityIndexText):")
-                    .font(.system(size: 18))
+                    .font(.system(size: textSize))
                 // Intensity Input
                 TextField(intensityHint, text: $series.actualIntensity)
                     .keyboardType(.decimalPad)
-                    .frame(width: 40,height: 30)
+                    .font(.system(size: textSize))
+                    .frame(width: 40, height: outllineFrameHeight)
                     .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
                     .padding(.horizontal, 10)
                     .overlay(
@@ -279,7 +301,7 @@ private struct WorkoutListSeriesView: View {
                     .padding(.trailing, 5)
                 
             }
-            .padding(.top, 5)  // Equivalent to layout_marginTop="5dp"
+            .padding(.top, 2)  // Equivalent to layout_marginTop="5dp"
             .padding(.horizontal, 10)
         }
         .onAppear() {

@@ -29,18 +29,20 @@ private struct HistoryDetailsListExerciseView: View {
     @State private var isDetailsVisible = false
     @State private var displayNote = false
     
+    private let textSize: CGFloat = 15
+    
     var body: some View {
         HStack {
             Image(systemName: "chevron.down")
                 .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
                 .frame(width: 20, height: 20)
                 .padding(.leading, 15)
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 3) {
                 // First Horizontal Layout (Exercise Name)
                 HStack {
                     Text(exercise.workoutExerciseDraft.name)
-                        .font(.system(size: 24, weight: .bold))  // Equivalent to bold and textSize 24sp
-                        .frame(height: 20)  // Equivalent to layout_height="30dp"
+                        .font(.system(size: 18, weight: .bold))  // Equivalent to bold and textSize 24sp
+                        .frame(height: 15)  // Equivalent to layout_height="30dp"
                     //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
                     Spacer()  // To take up the remaining space
                 }
@@ -55,11 +57,14 @@ private struct HistoryDetailsListExerciseView: View {
                         // Rest Layout
                         VStack(spacing: VSpacing) {
                             Text("Rest:")
+                                .font(.system(size: textSize))
                             HStack(spacing: 1) {
                                 Text(exercise.workoutExerciseDraft.pause)
+                                    .font(.system(size: textSize))
                                     .frame(alignment: .trailing)
                                 
                                 Text(exercise.workoutExerciseDraft.pauseUnit.rawValue)
+                                    .font(.system(size: textSize))
                                     .frame(alignment: .leading)
                             }
                         }
@@ -68,7 +73,9 @@ private struct HistoryDetailsListExerciseView: View {
                         // Series Layout
                         VStack(spacing: VSpacing) {
                             Text("Series:")
+                                .font(.system(size: textSize))
                             Text(exercise.workoutExerciseDraft.series)
+                                .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
                         Spacer()
@@ -76,7 +83,9 @@ private struct HistoryDetailsListExerciseView: View {
                         // Intensity Layout
                         VStack(spacing: VSpacing) {
                             Text(exercise.workoutExerciseDraft.intensityIndex.rawValue)
+                                .font(.system(size: textSize))
                             Text(exercise.workoutExerciseDraft.intensity)
+                                .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
                         Spacer()
@@ -84,15 +93,17 @@ private struct HistoryDetailsListExerciseView: View {
                         // Pace Layout
                         VStack(spacing: VSpacing) {
                             Text("Pace:")
+                                .font(.system(size: textSize))
                             Text(exercise.workoutExerciseDraft.pace)
+                                .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
                     }
-                    .frame(maxWidth: .infinity, idealHeight: 100)
+                    .frame(maxWidth: .infinity, idealHeight: 50)
                     .padding(.horizontal, 15)
                 }
             }
-            .frame(height: (planName != Constants.NO_PLAN_NAME) ? 70 : 35)
+            .frame(height: (planName != Constants.NO_PLAN_NAME) ? 55 : 35)
             .padding(.horizontal, 15)  // General padding for the whole view
         }
         .onTapGesture {
@@ -111,10 +122,10 @@ private struct HistoryDetailsListExerciseView: View {
             // Note Input
             if(!exercise.workoutExerciseDraft.note.isEmpty){
                 Text(exercise.workoutExerciseDraft.note)
-                    .font(.system(size: 21))
+                    .font(.system(size: textSize))
                     .padding(.leading, 15)
                     .padding(.trailing, 10)
-                    .padding(.bottom, 10)// Equivalent to layout_marginBottom
+                    .padding(.bottom, 3)// Equivalent to layout_marginBottom
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -129,6 +140,8 @@ private struct HistoryDetailsListExerciseView: View {
 private struct HistoryDetailsListSeriesView: View {
     @Binding var series: WorkoutSeriesDraft
     let position: Int
+    private let textSize: CGFloat = 15
+
     
     var body: some View {
         // First Horizontal Layout for Series Count, Reps, Weight
@@ -136,7 +149,7 @@ private struct HistoryDetailsListSeriesView: View {
             // First HStack for Series Count on the left
             HStack {
                 Text("\(position + 1).")
-                    .font(.system(size: 18))
+                    .font(.system(size: textSize))
                     .padding(.leading, 4)
                 Spacer() // Pushes the text to the left
             }
@@ -145,22 +158,24 @@ private struct HistoryDetailsListSeriesView: View {
             // Second HStack for Reps, x, Weight, and LoadUnit in the center
             HStack(spacing: 2) {
                 Text(series.actualReps)
-                    .frame(height: 30)
+                    .font(.system(size: textSize))
+                    .frame(height: 25)
                     .multilineTextAlignment(.trailing)
                     .padding(.horizontal, 2)
                 
                 Text("x")
-                    .font(.system(size: 18))
+                    .font(.system(size: textSize))
                     .frame(width: 10)
                     .multilineTextAlignment(.center)
                 
                 Text(series.actualLoad)
-                    .frame(height: 30)
+                    .font(.system(size: textSize))
+                    .frame(height: 25)
                     .multilineTextAlignment(.leading)
                     .padding(.horizontal, 2)
                 
                 Text(series.loadUnit.rawValue)
-                    .font(.system(size: 18))
+                    .font(.system(size: textSize))
             }
             .frame(maxWidth: .infinity, alignment: .center) // Center the HStack
             .padding(.horizontal, 85)
@@ -168,21 +183,21 @@ private struct HistoryDetailsListSeriesView: View {
             // Third HStack for Intensity Value on the right
             HStack {
                 Divider()
-                    .frame(width: 2, height: 35)  // Vertical line, adjust height as needed
+                    .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
                     .background(Color(.systemGray6)) // Set color for the line
                     .padding(.trailing, 5)
                 
                 Text("\(series.intensityIndex.rawValue):")
-                    .font(.system(size: 18))
-                
+                    .font(.system(size: textSize))
+
                 Text(series.actualIntensity)
-                    .frame(width: 25, height: 30)
+                    .frame(width: 25, height: 25)
                     .multilineTextAlignment(.leading)
                     .padding(.trailing, 5)
             }
             .frame(maxWidth: .infinity, alignment: .trailing) // Align the HStack to the right
         }
-        .padding(.top, 5)  // Equivalent to layout_marginTop="5dp"
+        .padding(.top, 2)  // Equivalent to layout_marginTop="5dp"
         .padding(.horizontal, 10)
     }
 }
@@ -209,7 +224,7 @@ struct HistoryDetailsListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        HistoryDetailsListView(workout: $workout, planName: Constants.NO_PLAN_NAME)
+        HistoryDetailsListView(workout: $workout, planName: "Constants.NO_PLAN_NAME")
     }
 }
 

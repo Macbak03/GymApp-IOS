@@ -46,7 +46,7 @@ struct EditHistoryDetailsView: View {
                     }
                 }
                 
-                EditHistoryDetailsListView(workout: $workoutDraft, showToast: $showToast, toastMessage: $toastMessage)
+                EditHistoryDetailsListView(workout: $workoutDraft, planName: workoutHistoryElement.planName, showToast: $showToast, toastMessage: $toastMessage)
                 
                 
                 // Horizontal layout for buttons

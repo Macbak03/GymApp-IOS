@@ -49,7 +49,8 @@ private struct WorkoutListExerciseView: View {
         HStack {
             Image(systemName: "chevron.down")
                 .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
-                .frame(width: 40, height: 40)
+                .frame(width: 20, height: 20)
+                .padding(.leading, 10)
                 .onTapGesture {
                     withAnimation {
                         isDetailsVisible.toggle()
@@ -57,9 +58,9 @@ private struct WorkoutListExerciseView: View {
                 }
             
             TextField("Exercise name", text: $exercise.workoutExerciseDraft.name)
-                .font(.system(size: 22, weight: .bold))
-                .frame(height: 40)
-                .padding(.leading, 10)
+                .font(.system(size: 18, weight: .bold))
+                .frame(height: 30)
+                .padding(.leading, 3)
                 .padding(.trailing, 20)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -67,8 +68,8 @@ private struct WorkoutListExerciseView: View {
                 .overlay(Rectangle() // Add underline
                     .frame(height: 1) // Thickness of underline
                     .foregroundColor(showNameError ? .red : Color.TextUnderline) // Color of underline
-                    .padding(.trailing, exerciseCount == 1 ? 65 : 20)
-                    .padding(.leading, 10)
+                    .padding(.trailing, 20)
+                    .padding(.leading, 1)
                     .padding(.top, 40),
                          alignment: .bottom
                 )// Adjust underline position
@@ -85,10 +86,10 @@ private struct WorkoutListExerciseView: View {
                     Image(systemName: "minus.circle")
                         .resizable()  // Enable image resizing
                         .frame(width: 23, height: 23)
-                        .padding(.trailing, 15)
+                        .padding(.trailing, exerciseCount != position + 1 ? 95:10)
                 }
-                .frame(width: 30, height: 40)
-                .padding(.trailing, exerciseCount != position + 1 ? 10:0)
+                .frame(width: 30, height: 30)
+                .padding(.trailing, exerciseCount != position + 1 ? 5:0)
                 .padding(.leading, exerciseCount != position + 1 ? 45: 0)
             }
             
@@ -101,7 +102,7 @@ private struct WorkoutListExerciseView: View {
                         .frame(width: 23, height: 23)
                         .padding(.trailing, 15)
                 }
-                .frame(width: 30, height: 40)
+                .frame(width: 30, height: 30)
                 .padding(.trailing, 10)
             }
 
@@ -118,10 +119,15 @@ private struct WorkoutListExerciseView: View {
             }
             // Note Input
             TextField("Note", text: $exercise.workoutExerciseDraft.note)
-                .font(.system(size: 21))
-                .padding(.horizontal, 10) // Equivalent to layout_marginStart and layout_marginEnd
-                .padding(.bottom, 10)  // Equivalent to layout_marginBottom
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .font(.system(size: 15))
+                .frame(height: 30)
+                .padding(.horizontal, 10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color.textFieldOutline, lineWidth: 0.5)
+                )
+                .padding(.horizontal, 15)
+                .padding(.top, 5)
             Divider()
                 .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
                 .background(Color(.systemGray6)) // Set color for the line
@@ -195,131 +201,157 @@ private struct WorkoutListSeriesView: View {
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldStrokeLineWidth: CGFloat = 0.5
     
+    private let textSize: CGFloat = 15
+    private let outllineFrameHeight: CGFloat = 25
+
+    
     var body: some View {
+        GeometryReader { geometry in
+            let screenWidth = geometry.size.width
         VStack(alignment: .leading) {
             // First Horizontal Layout for Series Count, Reps, Weight
-            HStack(spacing: 5) {
-                // Series Count
-                Text("\(position + 1).")
-                    .font(.system(size: 18))
-                    .padding(.leading, 4) // Equivalent to layout_marginStart="10dp"
-                
-                // Reps Input
-                TextField(repsHint, text: $set.actualReps)
-                    .keyboardType(.decimalPad)
-                    .frame(width: 40, height: 30)
-                    .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
-                    .padding(.horizontal, 10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
-                    )
-                    .focused($isRepsFocused)
-                    .onChange(of: isRepsFocused) { focused in
-                        validateReps(focused: focused)
-                        showRepsToolbar = focused
-                    }
-                    .toolbar {
-                        if showRepsToolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                CustomKeyboardToolbar(textFieldValue: $set.actualReps)
+            
+            HStack(spacing: getSpacing(for: screenWidth)) {
+                    // Series Count
+                    Text("\(position + 1).")
+                        .font(.system(size: textSize))
+                        .padding(.leading, 10)
+                        .frame(width: 30)
+                    // Reps Input
+                    TextField(repsHint, text: $set.actualReps)
+                        .keyboardType(.decimalPad)
+                        .font(.system(size: textSize))
+                        .frame(width: 40, height: outllineFrameHeight)
+                        .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
+                        .padding(.horizontal, 10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                                .stroke((showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                        )
+                        .focused($isRepsFocused)
+                        .onChange(of: isRepsFocused) { focused in
+                            validateReps(focused: focused)
+                            showRepsToolbar = focused
+                        }
+                        .toolbar {
+                            if showRepsToolbar {
+                                ToolbarItemGroup(placement: .keyboard) {
+                                    CustomKeyboardToolbar(textFieldValue: $set.actualReps)
+                                }
                             }
                         }
-                    }
-                
-                // Multiplication Sign
-                Text("x")
-                    .font(.system(size: 18))
-                    .frame(width: 20)
-                    .multilineTextAlignment(.center)
-                
-                // Weight Input
-                TextField(weightHint, text: $set.actualLoad)
-                    .keyboardType(.decimalPad)
-                    .frame(width: 55, height: 30)
-                    .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
-                    .padding(.horizontal, 10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
-                    )
-                    .focused($isLoadFocused)
-                    .onChange(of: isLoadFocused) { focused in
-                        validateLoad(focused: focused)
-                        showLoadToolbar = focused
-                    }
-                    .toolbar {
-                        if showLoadToolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                CustomKeyboardToolbar(textFieldValue: $set.actualLoad)
+                    
+                    // Multiplication Sign
+                    Text("x")
+                        .font(.system(size: textSize))
+                        .frame(width: 10)
+                        .multilineTextAlignment(.center)
+                    
+                    // Weight Input
+                    TextField(weightHint, text: $set.actualLoad)
+                        .keyboardType(.decimalPad)
+                        .font(.system(size: textSize))
+                        .frame(width: 55, height: outllineFrameHeight)
+                        .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                        .padding(.horizontal, 10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                                .stroke((showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                        )
+                        .focused($isLoadFocused)
+                        .onChange(of: isLoadFocused) { focused in
+                            validateLoad(focused: focused)
+                            showLoadToolbar = focused
+                        }
+                        .toolbar {
+                            if showLoadToolbar {
+                                ToolbarItemGroup(placement: .keyboard) {
+                                    CustomKeyboardToolbar(textFieldValue: $set.actualLoad)
+                                }
                             }
                         }
-                    }
-                
-                // Weight Unit Value
-                Text(weightUnitText)  // Assuming the weight unit is kilograms
-                    .font(.system(size: 18))
-                
-                Divider()
-                    .frame(width: 2, height: 35)  // Vertical line, adjust height as needed
-                    .background(Color(.systemGray6)) // Set color for the line
-                
-                // Intensity Value
-                Text("\(intensityIndexText):")
-                    .font(.system(size: 18))
-                // Intensity Input
-                TextField(intensityHint, text: $set.actualIntensity)
-                    .keyboardType(.decimalPad)
-                    .frame(width: 35,height: 30)
-                    .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
-                    .padding(.horizontal, 10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
-                    )
-                    .focused($isIntensityFocused)
-                    .onChange(of: isIntensityFocused) { focused in
-                        validateIntensity(focused: focused)
-                        showIntensityToolbar = focused
-                    }
-                    .toolbar {
-                        if showIntensityToolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                CustomKeyboardToolbar(textFieldValue: $set.actualIntensity)
+                    
+                    // Weight Unit Value
+                    Text(weightUnitText)  // Assuming the weight unit is kilograms
+                        .font(.system(size: textSize))
+                    
+                    Divider()
+                        .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
+                        .background(Color(.systemGray6)) // Set color for the line
+                    
+                    // Intensity Value
+                    Text("\(intensityIndexText):")
+                        .font(.system(size: textSize))
+                    // Intensity Input
+                    TextField(intensityHint, text: $set.actualIntensity)
+                        .keyboardType(.decimalPad)
+                        .font(.system(size: textSize))
+                        .frame(width: 35, height: outllineFrameHeight)
+                        .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                        .padding(.horizontal, 10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                                .stroke((showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                        )
+                        .focused($isIntensityFocused)
+                        .onChange(of: isIntensityFocused) { focused in
+                            validateIntensity(focused: focused)
+                            showIntensityToolbar = focused
+                        }
+                        .toolbar {
+                            if showIntensityToolbar {
+                                ToolbarItemGroup(placement: .keyboard) {
+                                    CustomKeyboardToolbar(textFieldValue: $set.actualIntensity)
+                                }
                             }
                         }
+                    
+                    
+                    if seriesCount > 1 {
+                        Button(action: {
+                            removeSet()
+                        }) {
+                            Image(systemName: "minus.circle")
+                                .resizable()  // Enable image resizing
+                                .frame(width: 20, height: 20)
+                        }
+                        .frame(width: 20, height: 40)
+                        .padding(.leading, position < seriesCount - 1 ? 3 : 3)
                     }
-
-                
-                if seriesCount > 1 {
-                    Button(action: {
-                        removeSet()
-                    }) {
-                        Image(systemName: "minus.circle")
-                            .resizable()  // Enable image resizing
-                            .frame(width: 20, height: 20)
+                    
+                    if seriesCount == position + 1 {
+                        Button(action: {
+                            addSet()
+                        }) {
+                            Image(systemName: "plus.circle")
+                                .resizable()  // Enable image resizing
+                                .frame(width: 20, height: 20)
+                        }
+                        .frame(width: 20, height: 40)
+                        .padding(.leading, position > 0 ? 0 : 28)
                     }
-                    .frame(width: 20, height: 40)
-                    .padding(.leading, position < seriesCount - 1 ? 25 : 0)
+                    
                 }
-                
-                if seriesCount == position + 1 {
-                    Button(action: {
-                        addSet()
-                    }) {
-                        Image(systemName: "plus.circle")
-                            .resizable()  // Enable image resizing
-                            .frame(width: 20, height: 20)
-                    }
-                    .frame(width: 20, height: 40)
-                    .padding(.leading, position > 0 ? 0 : 25)
-                }
-                
             }
-            .padding(.top, 5)  // Equivalent to layout_marginTop="5dp"
-            .padding(.horizontal, 10)
+
+            
         }
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .padding(.top, 2)  // Equivalent to layout_marginTop="5dp"
+        .padding(.horizontal, 5)
+        .padding(.bottom, 20)
     }
+    
+    private func getSpacing(for screenWidth: CGFloat) -> CGFloat {
+            // Adjust spacing to be smaller for smaller screen sizes
+            if screenWidth < 380 {
+                return 3  // iPhone SE size or smaller
+            } else if screenWidth < 400 {
+                return 5 // Mid-sized phones (e.g., iPhone 11, XR)
+            } else {
+                return 10 // Larger devices (e.g., iPhone Pro Max, iPads)
+            }
+        }
     
     private func addSet() {
         let setDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
