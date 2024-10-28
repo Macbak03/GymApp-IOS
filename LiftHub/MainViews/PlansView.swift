@@ -19,17 +19,10 @@ struct PlansView: View {
             ZStack {
                 Backgroundimage(geometry: geometry, imageName: "plans_icon")
                 VStack {
-                    // RecyclerView equivalent (could be a ScrollView or List in SwiftUI)
                     TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
                         .onAppear() {
                             loadPlans()
                         }
-                    
-//                    Spacer()
-//                    
-//                    AddButton(geometry: geometry, trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
-//                    
-//                    Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }

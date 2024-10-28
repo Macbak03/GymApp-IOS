@@ -23,75 +23,33 @@ struct EditHistoryDetailsView: View {
     @State private var toastMessage = ""
     
     var body: some View {
-        GeometryReader { geometry  in
+        NavigationStack {
             VStack {
-                // Back button as ZStack
-                HStack {
-                    ZStack{
-                        HStack{
-                            Button(action: {
-                                // Dismiss the current view to go back
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Image(systemName: "arrow.left")
-                                    .font(.system(size: 20, weight: .bold))
-                            }
-                            Spacer()
-                        }
-                        .padding(.leading, 30) // Add some padding to keep it away from the edge
-                        
-                        Text(workoutHistoryElement.routineName)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color.TextColorPrimary)
-                    }
-                }
-                
                 EditHistoryDetailsListView(workout: $workoutDraft, planName: workoutHistoryElement.planName, showToast: $showToast, toastMessage: $toastMessage)
-                
-                
-                // Horizontal layout for buttons
-                HStack(spacing: 10) {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(Color.TextColorSecondary)
-                            .frame(alignment: .center)
-                    }
-                    .frame(width: 100, height: 45)
-                    .background(Color.ColorSecondary)
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
-                    .shadow(radius: 2)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        editHistoryDetails()
-                    }) {
-                        Text("Save")
-                            .foregroundColor(Color.TextColorButton)
-
-                    }
-                    .frame(width: 100, height: 45)
-                    .background(Color.colorPrimary)
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
-                    .shadow(radius: 5)
-                }
-                .padding(.top, 32)
-                .padding(.horizontal, 50)
-                
-                Spacer() // To push content up
-                
-                // Guideline equivalent (use a Spacer with fixed height)
-                Spacer()
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
             .onAppear(){
                 loadRoutine()
             }
             .toast(isShowing: $showToast, message: toastMessage)
+            .navigationTitle(workoutHistoryElement.routineName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack {
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            Text("Cancel")
+                                .foregroundStyle(Color.red)
+                        }
+                        Button(action: {
+                            editHistoryDetails()
+                        }) {
+                            Text("Save")
+                        }
+                    }
+                }
+            }
         }
     }
     

@@ -52,7 +52,6 @@ struct TrainingPlansElementView: View {
             Spacer()
             
             Button(action: {
-                showOptionsDialog = true
             }) {
                 Image(systemName: "ellipsis")
                     .resizable()
@@ -63,14 +62,6 @@ struct TrainingPlansElementView: View {
             .frame(width: 30, height: 20)
             .background(Color.clear) // You can modify this to fit the background style
         }
-        //.frame(maxWidth: .infinity, minHeight: 50)
-        //.padding(5)
-//        .background(
-//            RoundedRectangle(cornerRadius: 8)
-//                .fill(Color.BackgroundColorList)
-//                .shadow(radius: 3)
-//        )
-        //.padding(.horizontal, 10) // Card marginHorizontal
         .sheet(isPresented: $showOptionsDialog, onDismiss: {
             if position < trainingPlans.count {
                 planName = trainingPlans[position].name
@@ -81,9 +72,6 @@ struct TrainingPlansElementView: View {
         .onTapGesture {
             showOptionsDialog = true
         }
-//        .fullScreenCover(isPresented: $openRoutines) {
-//            RoutinesView(planName: planName, plansDatabaseHelper: plansDatabaseHelper)
-//        }
         
     }
 }

@@ -47,4 +47,7 @@ extension Color {
     static var BottomBarColor: Color {
         return Color("BottomBarColor")
     }
+    static var CustomRed: Color {
+        return Color("CustomRed")
+    }
 }
