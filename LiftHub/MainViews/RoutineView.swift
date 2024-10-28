@@ -33,37 +33,20 @@ struct RoutineView: View {
         GeometryReader { geometry in
             ZStack {
                 VStack {
-                    // HStack for Back Button at the top-left corner
+                    // Centered TextField
                     HStack {
-                        ZStack {
-                            // HStack to position the back button on the left
-                            HStack {
-                                Button(action: {
-                                    // Dismiss the current view to go back
-                                    alertType = .navigation
-                                }) {
-                                    Image(systemName: "arrow.left")
-                                        .font(.system(size: 20, weight: .bold))
-                                }
-                                .padding(.leading, 30) // Padding to keep the button away from the edge
-                                
-                                Spacer() // Pushes the button to the left
-                            }
-                            
-                            // Centered TextField
-                            HStack {
-                                Spacer() // Push the TextField to the center
-                                
-                                TextField("Enter routine name", text: $routineName)
-                                    .padding()
-                                    .background(Color.ShadowColor)
-                                    .cornerRadius(10)
-                                    .frame(maxWidth: 250)
-                                    .multilineTextAlignment(.center)
-                                
-                                Spacer() // Push the TextField to the center
-                            }
-                        }
+                        Spacer() // Push the TextField to the center
+                        
+                        TextField("Enter routine name", text: $routineName)
+                            .font(.system(size: 18))
+                            .frame(height: 40)
+                            .background(Color.ShadowColor)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 50)
+                        
+                            .multilineTextAlignment(.center)
+                        
+                        Spacer() // Push the TextField to the center
                     }
                     
                     RoutineListView(routine: $routineDraft, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
@@ -72,39 +55,33 @@ struct RoutineView: View {
                         }
                     
                     Spacer()
-                    ZStack{
-                        HStack{
-                            AddButton(routine: $routineDraft, geometry: geometry)
+                    
+                    Button(action: {
+                        do {
+                            try saveRoutineIntoDB()
+                        } catch let error as ValidationException {
+                            showToast = true
+                            toastMessage = error.message
+                        } catch {
+                            showToast = true
+                            toastMessage = "Unexpected error occured: \(error)"
                         }
-                        HStack{
-                            Button(action: {
-                                do {
-                                    try saveRoutineIntoDB()
-                                } catch let error as ValidationException {
-                                    showToast = true
-                                    toastMessage = error.message
-                                } catch {
-                                    showToast = true
-                                    toastMessage = "Unexpected error occured: \(error)"
-                                }
-                                
-                            }) {
-                                Text("Save")
-                                    .foregroundColor(Color.TextColorButton)
-                                    .font(.system(size: 18))
-                                    .foregroundColor(Color.white)
-                                    .padding()
-                                    .frame(maxWidth: 125, maxHeight: 45)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .fill(Color.accentColor)
-                                            .shadow(radius: 3)
-                                    )
-                            }
-                            .padding(.horizontal, 30)
-                            .padding(.top, 50)
-                        }
+                        
+                    }) {
+                        Text("Save")
+                            .foregroundColor(Color.TextColorButton)
+                            .font(.system(size: 18))
+                            .foregroundColor(Color.white)
+                            .padding()
+                            .frame(maxWidth: 125, maxHeight: 45)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.accentColor)
+                                    .shadow(radius: 3)
+                            )
                     }
+                    .padding(.horizontal, 30)
+                    .padding(.top, 50)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
@@ -138,11 +115,36 @@ struct RoutineView: View {
             }
             
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    alertType = .navigation
+                }) {
+                    HStack {
+                        Image (systemName: "chevron.left")
+                        Text("Back")
+                    }
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    addExercise()
+                }) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
         .toast(isShowing: $showToast, message: toastMessage)
     }
     
+    private func addExercise() {
+        let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
+        routineDraft.append(newExercise)
+    }
+    
     private func showDescriptionDialog(title: String, message: String) -> Alert {
-         return Alert(
+        return Alert(
             title: Text(title),
             message: Text(message),
             primaryButton: .destructive(Text("OK")),
@@ -153,7 +155,7 @@ struct RoutineView: View {
     private func getRoutine() throws -> [Exercise] {
         var routine = [Exercise]()
         var routineNames = [String]()
-
+        
         for exerciseDraft in routineDraft {
             let exercise = try exerciseDraft.toExercise()
             
@@ -174,7 +176,7 @@ struct RoutineView: View {
         routineName = checkedOriginalRoutineName
         routineDraft = exercisesDatabaseHelper.getRoutine(routineName: checkedOriginalRoutineName, planId: String(planId))
     }
-
+    
     
     private func saveRoutineIntoDB() throws {
         // Check if routine draft is empty
@@ -200,7 +202,7 @@ struct RoutineView: View {
             toastMessage = error.message
         }
     }
-
+    
 }
 
 enum AlertType: Identifiable {

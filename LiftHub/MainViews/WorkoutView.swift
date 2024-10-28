@@ -40,90 +40,11 @@ struct WorkoutView: View {
     @State private var isSaveClicked = false
     
     var body: some View {
-        GeometryReader { geometry  in
+        NavigationStack {
             VStack {
-                // Back button as ZStack
-                HStack {
-                    ZStack{
-                        HStack{
-                            Button(action: {
-                                // Dismiss the current view to go back
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Image(systemName: "arrow.left")
-                                    .font(.system(size: 20, weight: .bold))
-                            }
-                            Spacer()
-                        }
-                        .padding(.leading, 30) // Add some padding to keep it away from the edge
-                        
-                        Text(routineName)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color.TextColorPrimary)
-                    }
-                }
-                
                 WorkoutListView(workout: $workoutDraft, workoutHints: $workoutHints, showToast: $showToast, toastMessage: $toastMessage, isSavedClicked: $isSaveClicked)
                 
-                // Horizontal layout for buttons
-                HStack(spacing: 90) {
-                    Button(action: {
-                        showCancelAlert = true
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(Color.TextColorSecondary)
-                            .frame(alignment: .center)
-                    }
-                    .frame(width: 100, height: 45)
-                    .background(Color.ColorSecondary)
-                    .cornerRadius(20)
-                    .shadow(radius: 3)
-                    
-                    //                // Timer button with ZStack for the icon
-                    //                ZStack {
-                    //                    Button(action: {
-                    //                        // Timer action
-                    //                    }) {
-                    //                        Image(systemName: "timer")
-                    //                            .resizable()
-                    //                            .frame(width: 35, height: 35)
-                    //                    }
-                    //                    .frame(width: 60, height: 54)
-                    //                    .background(Color.black.opacity(0.7))
-                    //                    .cornerRadius(8)
-                    //                }
-                    
-
-                    
-                    Button(action: {
-                        isSaveClicked = true
-                        if isSaveClicked {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                saveWorkoutToHistory(date: date)
-                            }
-                        } else {
-                            saveWorkoutToHistory(date: date)
-                        }
-                        
-                    }) {
-                        Text("Save")
-                            .foregroundColor(Color.TextColorButton)
-
-                    }
-                    .frame(width: 100, height: 45)
-                    .background(Color.ColorPrimary)
-                    .cornerRadius(20)
-                    .shadow(radius: 3)
-                }
-                .padding(.top, 32)
-                .padding(.horizontal, 50)
-                
-                Spacer() // To push content up
-                
-                // Guideline equivalent (use a Spacer with fixed height)
-                Spacer()
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
             .onAppear(){
                 loadRoutine()
             }
@@ -153,6 +74,40 @@ struct WorkoutView: View {
                 )
             }
             .toast(isShowing: $showToast, message: toastMessage)
+            .navigationTitle(routineName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack {
+                        Button(action: {
+                            showCancelAlert = true
+                        }) {
+                            Text("Cancel")
+                                .foregroundStyle(Color.red)
+                        }
+                        Button(action: {
+                            isSaveClicked = true
+                            if isSaveClicked {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    saveWorkoutToHistory(date: date)
+                                }
+                            } else {
+                                saveWorkoutToHistory(date: date)
+                            }
+                        }) {
+                            Text("Save")
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image (systemName: "chevron.left")
+                        Text("Back")
+                    }
+                }
+            }
         }
     }
     

@@ -26,7 +26,7 @@ struct NoPlanWorkoutView: View {
     private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
     
     private let isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
-
+    
     @State private var isWorkoutFinished = false
     
     @State private var showCancelAlert = false
@@ -36,112 +36,46 @@ struct NoPlanWorkoutView: View {
     
     @FocusState private var isWorkoutNameFocused: Bool
     @State private var showNameError = false
-
+    
     
     var body: some View {
-        GeometryReader { geometry  in
+        NavigationStack {
             VStack {
                 // Back button as ZStack
                 HStack {
-                    ZStack {
-                        // HStack to position the back button on the left
-                        HStack {
-                            Button(action: {
-                                // Dismiss the current view to go back
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Image(systemName: "arrow.left")
-                                    .font(.system(size: 20, weight: .bold))
-                            }
-                            .padding(.leading, 30) // Padding to keep the button away from the edge
-                            
-                            Spacer() // Pushes the button to the left
-                        }
+                    HStack {
+                        Spacer() // Push the TextField to the center
                         
-                        // Centered TextField
-                        HStack {
-                            Spacer() // Push the TextField to the center
-                            
-                            TextField("Enter workout name", text: $routineName)
-                                .padding()
-                                .background(Color.ShadowColor)
-                                .cornerRadius(10)
-                                .frame(maxWidth: 250)
-                                .multilineTextAlignment(.center)
-                                .focused($isWorkoutNameFocused)
-                                .onChange(of: isWorkoutNameFocused) { focused in
-                                    validateWorkoutName(focused: focused)
-                                }
-                            
-                            Spacer() // Push the TextField to the center
-                        }
-                        if showNameError {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "exclamationmark.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(.red)
-                                    .frame(width: 25, height: 25)
+                        TextField("Enter workout name", text: $routineName)
+                            .font(.system(size: 18))
+                            .frame(height: 40)
+                            .background(Color.ShadowColor)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 35)
+                            .multilineTextAlignment(.center)
+                            .focused($isWorkoutNameFocused)
+                            .onChange(of: isWorkoutNameFocused) { focused in
+                                validateWorkoutName(focused: focused)
                             }
-                            .padding(.trailing, 80)
+                        
+                        Spacer() // Push the TextField to the center
+                    }
+                    if showNameError {
+                        HStack {
+                            Spacer()
+                            Image(systemName: "exclamationmark.circle.fill")
+                                .resizable()
+                                .foregroundColor(.red)
+                                .frame(width: 25, height: 25)
                         }
+                        .padding(.trailing, 80)
                     }
                 }
                 .padding(.bottom, 10)
                 
                 NoPlanWorkoutListView(workout: $workoutDraft, showToast: $showToast, toastMessage: $toastMessage, intensityIndex: intensityIndex, weightUnit: weightUnit)
                 
-                // Horizontal layout for buttons
-                HStack(spacing: 90) {
-                    Button(action: {
-                        showCancelAlert = true
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(Color.TextColorSecondary)
-                            .frame(alignment: .center)
-                    }
-                    .frame(width: 100, height: 45)
-                    .background(Color.ColorSecondary)
-                    .cornerRadius(20)
-                    .shadow(radius: 3)
-                    
-                    //                // Timer button with ZStack for the icon
-                    //                ZStack {
-                    //                    Button(action: {
-                    //                        // Timer action
-                    //                    }) {
-                    //                        Image(systemName: "timer")
-                    //                            .resizable()
-                    //                            .frame(width: 35, height: 35)
-                    //                    }
-                    //                    .frame(width: 60, height: 54)
-                    //                    .background(Color.black.opacity(0.7))
-                    //                    .cornerRadius(8)
-                    //                }
-                    
-
-                    
-                    Button(action: {
-                        saveWorkoutToHistory(date: date)
-                    }) {
-                        Text("Save")
-                            .foregroundColor(Color.TextColorButton)
-
-                    }
-                    .frame(width: 100, height: 45)
-                    .background(Color.ColorPrimary)
-                    .cornerRadius(20)
-                    .shadow(radius: 3)
-                }
-                .padding(.top, 32)
-                .padding(.horizontal, 50)
-                
-                Spacer() // To push content up
-                
-                // Guideline equivalent (use a Spacer with fixed height)
-                Spacer()
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
             .onAppear(){
                 loadRoutine()
             }
@@ -170,6 +104,31 @@ struct NoPlanWorkoutView: View {
                 )
             }
             .toast(isShowing: $showToast, message: toastMessage)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack {
+                        Button(action: {
+                            showCancelAlert = true
+                        }) {
+                            Text("Cancel")
+                                .foregroundStyle(Color.red)
+                        }
+                        Button(action: {
+                            saveWorkoutToHistory(date: date)
+                        }) {
+                            Text("Save")
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image (systemName: "chevron.left")
+                        Text("Back")
+                    }
+                }
+            }
         }
     }
     
@@ -187,12 +146,12 @@ struct NoPlanWorkoutView: View {
                 intensityIndex: intensityIndex,
                 pace: "0000",
                 note: ""),
-              workoutSeriesDraftList: [WorkoutSeriesDraft(
-                actualReps: "",
-                actualLoad: "",
-                loadUnit: weightUnit,
-                intensityIndex: intensityIndex,
-                actualIntensity: "")]
+                                 workoutSeriesDraftList: [WorkoutSeriesDraft(
+                                    actualReps: "",
+                                    actualLoad: "",
+                                    loadUnit: weightUnit,
+                                    intensityIndex: intensityIndex,
+                                    actualIntensity: "")]
             ))
         }
     }

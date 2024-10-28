@@ -81,14 +81,14 @@ private struct SheetListElement: View {
     var body: some View {
         HStack {
             Text(routine.name)
-                .font(.system(size: 25, weight: .medium))
+                .font(.system(size: 18, weight: .medium))
                 .foregroundColor(Color.TextColorPrimary)
                 .padding(.leading, 5)
             
             Spacer()
             
         }
-        .frame(maxWidth: .infinity, minHeight: 50)
+        .frame(maxWidth: .infinity, minHeight: 35)
         .padding(5)
         .background(
             RoundedRectangle(cornerRadius: 8)

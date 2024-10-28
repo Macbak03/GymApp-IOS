@@ -17,7 +17,7 @@ struct HistoryView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Backgroundimage(geometry: geometry, imageName: "history_icon")
+                //Backgroundimage(geometry: geometry, imageName: "history_icon")
                 VStack {
                      //Search bar
                     HStack {
@@ -27,7 +27,7 @@ struct HistoryView: View {
 
                         TextField("Search in history...", text: $searchText)
                             .padding(10) // Padding inside the text field
-                            .frame(height: 50)
+                            .frame(height: 35)
                             .onChange(of: searchText) { newText in
                                 filterSearchResults()
                             }
@@ -36,7 +36,7 @@ struct HistoryView: View {
                     
                     .background(Color.ShadowColor) // Background color similar to Android search view
                     .cornerRadius(10)
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 20)
                     
                     // Workout history list (Equivalent to RecyclerView)
                     HistoryListView(history: $searchList, noFilteredHistory: $history, showToast: $showToast, toastMessage: $toastMessage)
@@ -47,6 +47,9 @@ struct HistoryView: View {
             .onAppear() {
                 loadHistory()
             }
+            .navigationTitle("")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationBarHidden(false)
             .toast(isShowing: $showToast, message: toastMessage)
         }
     }

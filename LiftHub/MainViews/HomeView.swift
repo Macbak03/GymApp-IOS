@@ -43,10 +43,10 @@ struct HomeView: View {
                 Backgroundimage(geometry: geometry, imageName: "workout_icon")
                 VStack {
                     VStack(alignment: .center) {
-                        Text("Current plan:")
-                            .foregroundStyle(Color.TextColorPrimary)
-                            .font(.system(size: 25, weight: .bold))
-                            .multilineTextAlignment(.center)
+//                        Text("Current plan:")
+//                            .foregroundStyle(Color.TextColorPrimary)
+//                            .font(.system(size: 25, weight: .bold))
+//                            .multilineTextAlignment(.center)
                         // This Spinner is custom, so let's just place a placeholder
                         Picker("Training Plans", selection: $selectedPlan) {
                             ForEach(plans, id: \.self) { plan in
@@ -66,47 +66,56 @@ struct HomeView: View {
                     .padding(.horizontal, 12)
                     
                     if showLastWorkout {
-                        VStack(alignment: .center, spacing: 10) {
-                            Text("Last workout:")
-                                .foregroundStyle(Color.TextColorPrimary)
-                                .font(.system(size: 25, weight: .bold))
-                                .multilineTextAlignment(.center)
-                            
-                            VStack {
-                                Text(lastWorkoutPlanName)
+                        NavigationLink(
+                            destination: HistoryDetailsView(rawDate: lastWorkoutRawDate, date: lastWorkoutDate, planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName),
+                            label: { VStack(alignment: .center, spacing: 10) {
+                                Text("Last workout:")
                                     .foregroundStyle(Color.TextColorPrimary)
-                                    .font(.system(size: 18))
-                                    .frame(maxWidth: .infinity)
+                                    .font(.system(size: 20, weight: .bold))
                                     .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 1)
                                 
-                                HStack {
-                                    Text(lastWorkoutDate)
+                                VStack {
+                                    Text(lastWorkoutPlanName)
                                         .foregroundStyle(Color.TextColorPrimary)
-                                        .font(.system(size: 23, weight: .bold))
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                        .padding(.leading, 10)
+                                        .font(.system(size: 18))
+                                        .frame(maxWidth: .infinity)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 1)
                                     
-                                    Text(lastWorkoutRoutineName)
-                                        .foregroundStyle(Color.TextColorPrimary)
-                                        .font(.system(size: 23))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.trailing, 10)
+                                    HStack {
+                                        Text(lastWorkoutDate)
+                                            .foregroundStyle(Color.TextColorPrimary)
+                                            .font(.system(size: 18, weight: .bold))
+                                            .frame(maxWidth: .infinity, alignment: .trailing)
+                                            .padding(.leading, 10)
+                                        
+                                        Text(lastWorkoutRoutineName)
+                                            .foregroundStyle(Color.TextColorPrimary)
+                                            .font(.system(size: 18))
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.trailing, 10)
+                                    }
+                                    .padding(.bottom, 5)
+                                    .padding(.horizontal, 25)
                                 }
-                                .padding(.bottom, 5)
-                                .padding(.horizontal, 25)
+                                //.background(Color.BackgroundColorList)
+                                .cornerRadius(8)
+                                .shadow(radius: 2)
+                                .padding(.horizontal, 20)
+                                .frame(maxWidth: .infinity)
+//                                .onTapGesture {
+//                                    openLastWorkout = true
+//                                }
+                                
+                                Divider()
+                                    .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
+                                    .background(Color(.systemGray6)) // Set color for the line
                             }
-                            .background(Color.BackgroundColorList)
-                            .cornerRadius(8)
-                            .shadow(radius: 2)
-                            .padding(.horizontal, 10)
+                                
                             .frame(maxWidth: .infinity)
-                            .onTapGesture {
-                                openLastWorkout = true
                             }
-                        }
-                        .frame(maxWidth: .infinity)
+                        )
                     }
                     
                     Spacer()
@@ -217,6 +226,9 @@ struct HomeView: View {
                       secondaryButton: .cancel()
                 )
             }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(false)
         }
     }
     

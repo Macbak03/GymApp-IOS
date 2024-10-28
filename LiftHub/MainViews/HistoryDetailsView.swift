@@ -17,39 +17,41 @@ struct HistoryDetailsView: View {
 
     var body: some View {
         VStack{
-            ZStack {
-                // Centered text on top of the screen
-                VStack {
-                    VStack {
-                        Text(routineName)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(Color.TextColorPrimary)
-                        Text(date)
-                            .font(.system(size: 25, weight: .bold))
-                            .foregroundColor(Color.TextColorPrimary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                
-                // Back button aligned to top-left
-                HStack {
-                    Button(action: {
-                        // Dismiss the current view to go back
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Image(systemName: "arrow.left")
-                            .font(.system(size: 20, weight: .bold))
-                    }
-                    .padding(.leading, 30)
-                    .padding(.top, 10) // Adjust top padding as needed
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            }
-            .frame(height: 70)
+//            ZStack {
+//                // Centered text on top of the screen
+//                VStack {
+//                    VStack {
+//                        Text(routineName)
+//                            .font(.system(size: 32, weight: .bold))
+//                            .foregroundColor(Color.TextColorPrimary)
+//                        Text(date)
+//                            .font(.system(size: 25, weight: .bold))
+//                            .foregroundColor(Color.TextColorPrimary)
+//                    }
+//                    .frame(maxWidth: .infinity, alignment: .center)
+//                    
+//                }
+//                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+//                
+//                // Back button aligned to top-left
+//                HStack {
+//                    Button(action: {
+//                        // Dismiss the current view to go back
+//                        presentationMode.wrappedValue.dismiss()
+//                    }) {
+//                        Image(systemName: "arrow.left")
+//                            .font(.system(size: 20, weight: .bold))
+//                    }
+//                    .padding(.leading, 30)
+//                    .padding(.top, 10) // Adjust top padding as needed
+//                }
+//                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//            }
+//            .frame(height: 70)
             HistoryDetailsListView(workout: $workout, planName: planName)
         }
+        .navigationTitle("\(date)  \(routineName)")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear() {
             loadHistoryDetails()
         }
