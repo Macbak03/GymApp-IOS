@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum IntensityIndex: String {
+enum IntensityIndex: String, Codable {
     case RPE = "RPE"
     case RIR = "RIR"
     

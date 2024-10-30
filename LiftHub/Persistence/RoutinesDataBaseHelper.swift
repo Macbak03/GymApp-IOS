@@ -20,7 +20,7 @@ class RoutinesDataBaseHelper: Repository {
     private let routineId = Expression<Int64>(ROUTINE_ID_COLUMN)
     private let routineName = Expression<String>(ROUTINE_NAME_COLUMN)
     
-    private let plansTableName = Table(PlansDataBaseHelper.TABLE_NAME)
+    private let plansTable = Table(PlansDataBaseHelper.TABLE_NAME)
     private let plansTableId = Expression<Int64>(PlansDataBaseHelper.ID_COLUMN)
     
     
@@ -31,7 +31,7 @@ class RoutinesDataBaseHelper: Repository {
                 table.column(planId)
                 table.column(routineId, primaryKey: .autoincrement)
                 table.column(routineName)
-                table.foreignKey(planId, references: plansTableName, plansTableId, update: .cascade, delete: .cascade)
+                table.foreignKey(planId, references: plansTable, plansTableId, update: .cascade, delete: .cascade)
             })
         } catch {
             print("Error creating table: \(error)")

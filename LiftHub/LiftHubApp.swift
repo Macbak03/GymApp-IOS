@@ -26,6 +26,7 @@ struct BottomBarApp: App {
                 
                 ContentView()
                     .environment(\.safeAreaInsets, safeAreaInsets)
+                    .accentColor(.Accent)
             }
         }
     }

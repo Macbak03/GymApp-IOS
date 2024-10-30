@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TimeUnit : String, CaseIterable {
+enum TimeUnit : String, CaseIterable, Codable {
     case min = "min"
     case s = "s"
     

@@ -27,6 +27,7 @@ class Repository {
             db = try Connection(dbPath)
             try onConfigure()
             try createTableIfNotExists()
+            //print(dbPath)
         } catch {
             print("Error initializing database: \(error)")
         }
@@ -40,4 +41,5 @@ class Repository {
     open func createTableIfNotExists() throws {
         fatalError("Subclasses must override createTableIfNotExists")
     }
+    
 }

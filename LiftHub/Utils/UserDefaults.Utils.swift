@@ -8,13 +8,33 @@
 import Foundation
 
 class UserDefaultsUtils {
-    static var shared = UserDefaultsUtils()
-    func setDarkMode(enable: Bool) {
-        let defaults = UserDefaults.standard
-        defaults.set(enable, forKey: Constants.DARK_MODE)
+    static let shared = UserDefaultsUtils()
+    private let themeKey = "theme"
+    private let intensityKey = "intensity"
+    private let weightUnitKey = "weightUnit"
+
+    func getTheme() -> String {
+        return UserDefaults.standard.string(forKey: themeKey) ?? "Light"
     }
-    func getDarkMode() -> Bool {
-        let defaults = UserDefaults.standard
-        return defaults.bool(forKey: Constants.DARK_MODE)
+
+    func setTheme(theme: String) {
+        UserDefaults.standard.set(theme, forKey: themeKey)
     }
+    
+    func getIntensity() -> String {
+        return UserDefaults.standard.string(forKey: intensityKey) ?? "RPE"
+    }
+
+    func setIntensity(intensity: String) {
+        UserDefaults.standard.set(intensity, forKey: intensityKey)
+    }
+    
+    func getWeight() -> String {
+        return UserDefaults.standard.string(forKey: weightUnitKey) ?? "kg"
+    }
+
+    func setWeight(unit: String) {
+        UserDefaults.standard.set(unit, forKey: weightUnitKey)
+    }
+    
 }

@@ -37,7 +37,7 @@ struct IntensityFactory {
     // Helper function for Intensity creation
     static func fromString(_ intensity: String?, index: IntensityIndex) throws -> Intensity {
         guard let intensity = intensity else {
-            throw ValidationException(message: "RPE cannot be empty")
+            throw ValidationException(message: "Intensity cannot be empty")
         }
         
         // Regex to match single values or ranges
@@ -66,6 +66,22 @@ struct IntensityFactory {
             let exactValue = (intensity as NSString).substring(with: match.range(at: 1))
             return ExactIntensity(value: Int(exactValue)!, index: index)
         }
+    }
+    
+    static func fromStringForWorkout(_ intensity: String?, index: IntensityIndex) throws -> Intensity {
+        guard let intensity = intensity else {
+            throw ValidationException(message: "Intensity cannot be empty")
+        }
+        
+        let regex = try! NSRegularExpression(pattern: "^([0-9]|10)$")
+        let range = NSRange(location: 0, length: intensity.utf16.count)
+        
+        guard let match = regex.firstMatch(in: intensity, options: [], range: range) else {
+            throw ValidationException(message: "Intensity must be a number (e.g., 7) number must be from 0 to 10")
+        }
+        
+        let exactValue = (intensity as NSString).substring(with: match.range(at: 1))
+        return ExactIntensity(value: Int(exactValue)!, index: index)
     }
 }
 

@@ -38,7 +38,7 @@ struct ExerciseDraft {
     func toExercise() throws -> Exercise {
         // Validate name
         if name.isEmpty {
-            throw ValidationException(message: "Name cannot be empty")
+            throw ValidationException(message: "Exercise name cannot be empty")
         }
 
         // Convert pause, weight, reps, intensity, and pace with appropriate error handling
