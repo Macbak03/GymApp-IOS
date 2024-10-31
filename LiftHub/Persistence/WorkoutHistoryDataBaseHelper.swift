@@ -431,28 +431,25 @@ class WorkoutHistoryDataBaseHelper: Repository {
     }
     
     
-    //    // MARK: - Get Exercises for Chart
-    //    func getExercisesToChart(exerciseName: String) -> (exerciseIds: [Int64], dates: [String]) {
-    //        var exerciseIds: [Int64] = []
-    //        var dates: [String] = []
-    //        let customDate = CustomDate()
-    //
-    //        do {
-    //            let query = workoutHistoryTable
-    //                .select(exerciseId, self.date)
-    //                .filter(self.exerciseName.lowercaseString == exerciseName.lowercased())
-    //
-    //            for row in try db!.prepare(query) {
-    //                exerciseIds.append(row[exerciseId])
-    //                let formattedDate = customDate.getChartFormattedDate(row[self.date])
-    //                dates.append(formattedDate)
-    //            }
-    //        } catch {
-    //            print("Error fetching exercises for chart: \(error)")
-    //        }
-    //
-    //        return (exerciseIds, dates)
-    //    }
+        // MARK: - Get Exercises for Chart
+    func getExercisesToChart(exerciseName: String) -> [(exerciseId: Int64, date: Date)] {
+        var exercises: [(Int64, Date)] = []
+            do {
+                let query = workoutHistoryTable
+                    .select(exerciseId, self.date)
+                    .filter(self.exerciseName.lowercaseString == exerciseName.lowercased())
+    
+                for row in try db!.prepare(query) {
+                    if let date = CustomDate.stringToDate(row[self.date]) {
+                        exercises.append((row[exerciseId], date))
+                    }
+                }
+            } catch {
+                print("Error fetching exercises for chart: \(error)")
+            }
+    
+            return exercises
+        }
     
     // MARK: - Get Load Unit
     func getLoadUnit(exerciseId: Int64) -> String? {

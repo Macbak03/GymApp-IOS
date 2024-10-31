@@ -17,7 +17,7 @@ struct Weight {
     }
 
     // Private initializer to enforce validation
-    private init(weight: Double, unit: WeightUnit) {
+    init(weight: Double, unit: WeightUnit) {
         self.weight = weight
         self.unit = unit
     }

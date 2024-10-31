@@ -55,33 +55,6 @@ struct RoutineView: View {
                         }
                     
                     Spacer()
-                    
-                    Button(action: {
-                        do {
-                            try saveRoutineIntoDB()
-                        } catch let error as ValidationException {
-                            showToast = true
-                            toastMessage = error.message
-                        } catch {
-                            showToast = true
-                            toastMessage = "Unexpected error occured: \(error)"
-                        }
-                        
-                    }) {
-                        Text("Save")
-                            .foregroundColor(Color.TextColorButton)
-                            .font(.system(size: 18))
-                            .foregroundColor(Color.white)
-                            .padding()
-                            .frame(maxWidth: 125, maxHeight: 45)
-                            .background(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.accentColor)
-                                    .shadow(radius: 3)
-                            )
-                    }
-                    .padding(.horizontal, 30)
-                    .padding(.top, 50)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
@@ -128,10 +101,26 @@ struct RoutineView: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    addExercise()
-                }) {
-                    Image(systemName: "plus")
+                HStack {
+                    Button(action: {
+                        addExercise()
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                    
+                    Button(action: {
+                        do {
+                            try saveRoutineIntoDB()
+                        } catch let error as ValidationException {
+                            showToast = true
+                            toastMessage = error.message
+                        } catch {
+                            showToast = true
+                            toastMessage = "Unexpected error occured: \(error)"
+                        }
+                    }) {
+                        Text("Save")
+                    }
                 }
             }
         }

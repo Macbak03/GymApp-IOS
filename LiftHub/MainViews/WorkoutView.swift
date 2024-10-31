@@ -55,7 +55,7 @@ struct WorkoutView: View {
                 }
                 closeStartWorkoutSheet = true
             }
-            .onChange(of: scenePhase) { newPhase in
+            .onChange(of: scenePhase) { oldPhase, newPhase in
                 if newPhase == .inactive {
                     saveWorkoutToFile()
                 }

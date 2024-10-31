@@ -30,28 +30,6 @@ struct RoutinesView: View {
         GeometryReader { geometry in
             ZStack {
                 VStack {
-                    // HStack for Back Button at the top-left corner
-//                    HStack {
-//                        ZStack{
-//                            HStack{
-//                                Button(action: {
-//                                    // Dismiss the current view to go back
-//                                    presentationMode.wrappedValue.dismiss()
-//                                }) {
-//                                    Image(systemName: "arrow.left")
-//                                        .font(.system(size: 20, weight: .bold))
-//                                }
-//                                Spacer()
-//                            }
-//                            .padding(.leading, 30) // Add some padding to keep it away from the edge
-//                            
-//                            Text(planName)
-//                                .frame(maxWidth: 250, maxHeight: 100)
-//                                .font(.system(size: 32, weight: .medium))
-//                                .foregroundColor(Color.TextColorPrimary)
-//                                .multilineTextAlignment(.center)
-//                        }
-//                    }
                     
                     RoutinesListView(routines: $routines, planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
                         .onChange(of: refreshRoutines) { refreshNeeded in
@@ -65,11 +43,6 @@ struct RoutinesView: View {
                             loadRoutines()
                         }
                     
-//                    Spacer()
-//                    
-//                    AddButton(openRoutine: $openRoutine ,geometry: geometry, planName: planName)
-//                    
-//                    Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .fullScreenCover(isPresented: $openRoutine) {
@@ -79,11 +52,12 @@ struct RoutinesView: View {
             .navigationTitle(planName)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action : {
-                        openRoutine.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                    }
+                    NavigationLink(
+                        destination: RoutineView(originalRoutineName: nil, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage),
+                        label: {
+                            Image(systemName: "plus")
+                        }
+                    )
                 }
             }
             .toast(isShowing: $showToast, message: toastMessage)

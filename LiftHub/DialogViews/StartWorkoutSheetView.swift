@@ -77,7 +77,7 @@ private struct SheetListElement: View {
     @Binding var isWorkoutEnded: Bool
     @Binding var showWorkoutSavedToast: Bool
     @Binding var savedWorkoutToastMessage: String
-    @State private var date: String = CustomDate.getDate()
+    @State private var date: String = CustomDate.getCurrentDate()
     var body: some View {
         HStack {
             Text(routine.name)

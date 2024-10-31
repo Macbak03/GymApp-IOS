@@ -132,24 +132,37 @@ class WorkoutSeriesDataBaseHelper : Repository{
     }
 
     // MARK: - Get Chart Data
-//    func getChartData(exerciseId: Int64) -> (Float, Float) {
-//        var actualReps: Float = 0
-//        var loadValue: Float = 0
-//
-//        do {
-//            let query = workoutSeriesTable
-//                .select(self.actualReps, self.loadValue)
-//                .filter(self.exerciseId == exerciseId && self.loadValue == workoutSeriesTable.select(self.loadValue.max))
-//                .order(self.loadValue.desc)
-//
-//            if let row = try db?.pluck(query) {
-//                actualReps = Float(row[self.actualReps])
-//                loadValue = Float(row[self.loadValue])
-//            }
-//        } catch {
-//            print("Error fetching chart data: \(error)")
-//        }
-//
-//        return (actualReps, loadValue)
-//    }
+    func getChartData(exerciseId: Int64) -> (reps: Double, weight: Double) {
+        var actualReps: Double = 0
+        var loadValue: Double = 0
+
+        do {
+            // First, get the maximum value for loadValue for the given exerciseId
+            let maxLoadQuery = workoutSeriesTable
+                .select(self.loadValue.max)
+                .filter(self.exerciseId == exerciseId)
+            
+            // Execute the query to get the maximum load value
+            if let maxRow = try db?.pluck(maxLoadQuery),
+               let maxLoadValue = maxRow[self.loadValue.max] {
+                
+                // Now that we have the max load value, proceed with the main query
+                let query = workoutSeriesTable
+                    .select(self.actualReps, self.loadValue)
+                    .filter(self.exerciseId == exerciseId && self.loadValue == maxLoadValue)
+                    .order(self.loadValue.desc)
+                
+                if let row = try db?.pluck(query) {
+                    actualReps = row[self.actualReps]
+                    loadValue = row[self.loadValue]
+                }
+            } else {
+                print("No max load value found.")
+            }
+        } catch {
+            print("Error fetching chart data: \(error)")
+        }
+
+        return (actualReps, loadValue)
+    }
 }
