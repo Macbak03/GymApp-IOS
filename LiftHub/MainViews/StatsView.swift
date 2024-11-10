@@ -6,6 +6,7 @@ struct StatsView: View {
     @State private var exercises: [String] = []
     @State private var filteredExercises: [String] = []
     @State private var selectedExercise: String? = nil
+    @State private var selectedRange: RangeType = .last5
     @FocusState private var isSearchFieldFocused: Bool
     
     var body: some View {
@@ -51,12 +52,31 @@ struct StatsView: View {
                 }
             }
             
+            if !isSearchFieldFocused {
+                if let selectedExercise = selectedExercise {
+                    Picker("Range", selection: $selectedRange) {
+                        ForEach(RangeType.allCases, id: \.self) { range in
+                            Text(range.rawValue).tag(range)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding()
+                }
+            }
+            
             Spacer()
             
             ZStack {
-                if let selectedExercise = selectedExercise {
-                    ChartView(exerciseName: selectedExercise)
-                        .id(selectedExercise)
+                VStack {
+                    if let selectedExercise = selectedExercise {
+                        ChartView(exerciseName: selectedExercise, selectedRange: $selectedRange)
+                            .id(selectedExercise)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundStyle(Color.BackgroundColorList)
+                            }
+                            .padding()
+                    }
                 }
                 
                 
@@ -119,21 +139,37 @@ struct StatsView: View {
 
 struct ChartView: View {
     var exerciseName: String
+    @Binding var selectedRange: RangeType
     @Environment(\.calendar) var calendar
     @State private var chartData: [ChartData] = []
     @State private var chartSelection: Int?
     @State private var maxWeight: Double?
+    @State private var animatedProgress: Double = 0.0
     private var areaBackground: Gradient {
-        return Gradient(colors: [Color.accentColor, Color.accentColor.opacity(0.1)])
+        return Gradient(colors: [Color.accentColor.opacity(0.4), Color.accentColor.opacity(0.1)])
     }
     
+    private var filteredChartData: [ChartData] {
+        switch selectedRange {
+        case .last5:
+            return Array(chartData.suffix(5))
+        case .last15:
+            return Array(chartData.suffix(15))
+        case .last30:
+            return Array(chartData.suffix(30))
+        case .all:
+            return chartData
+        }
+    }
+
+    
     var body: some View {
-        Chart(chartData.indices, id: \.self) { index in
-            let dataPoint = chartData[index]
+        Chart(filteredChartData.indices, id: \.self) { index in
+            let dataPoint = filteredChartData[index]
             
             LineMark(
                 x: .value("Index", index),
-                y: .value("Weight", dataPoint.weight.weight)
+                y: .value("Weight", animatedProgress * dataPoint.weight.weight)
             )
             .symbol(.circle)
             .interpolationMethod(.linear)
@@ -144,15 +180,15 @@ struct ChartView: View {
             
             AreaMark(
                 x: .value("Index", index),
-                y: .value("Weight", dataPoint.weight.weight)
+                y: .value("Weight", animatedProgress * dataPoint.weight.weight)
             )
             .interpolationMethod(.linear)
-            .foregroundStyle(Color.clear)
+            .foregroundStyle(areaBackground)
         }
         .chartXAxis {
-            AxisMarks(values: Array(chartData.indices)) { index in
-                if let index = index.as(Int.self), index < chartData.count {
-                    let date = chartData[index].date
+            AxisMarks(values: Array(filteredChartData.indices)) { index in
+                if let index = index.as(Int.self), index < filteredChartData.count {
+                    let date = filteredChartData[index].date
                     AxisValueLabel {
                         Text(date, format: .dateTime.month(.abbreviated).day(.twoDigits)) // Display formatted date as label
                     }
@@ -171,7 +207,14 @@ struct ChartView: View {
         }
         .onAppear() {
             loadSelectedExercise()
-            
+            withAnimation(.easeOut(duration: 1)) {
+                animatedProgress = 1.0
+            }
+        }
+        .onChange(of: filteredChartData) { _, _ in
+            withAnimation(.easeOut(duration: 1)) {
+                animatedProgress = 1.0
+            }
         }
     }
     
@@ -216,6 +259,21 @@ struct ChartView: View {
             }
     }
     
+    private func getAxisValues(chartData: [ChartData], range: RangeType) -> [Int] {
+        let totalCount = chartData.count
+
+        switch range {
+        case .last5:
+            return Array(max(totalCount - 5, 0)..<totalCount)
+        case .last15:
+            return Array(max(totalCount - 15, 0)..<totalCount)
+        case .last30:
+            return Array(max(totalCount - 30, 0)..<totalCount)
+        case .all:
+            return Array(chartData.indices)
+        }
+    }
+    
     private func formatText(marker: ChartData) -> String {
         let date = marker.date
         let formattedDate = CustomDate.getChartFormattedDate(savedDate: date)
@@ -257,6 +315,13 @@ private extension ChartView {
         }
         return min(max(index, 0), chartData.count - 1)
     }
+}
+
+enum RangeType: String, CaseIterable {
+    case all = "All"
+    case last30 = "last30"
+    case last15 = "last 15"
+    case last5 = "last 5"
 }
 
 struct StatsView_Previews: PreviewProvider {

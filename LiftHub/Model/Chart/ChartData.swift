@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ChartData: Identifiable {
+struct ChartData: Identifiable, Equatable {
     let id = UUID()
     let exerciseId: Int64
     let date: Date

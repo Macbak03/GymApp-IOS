@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Weight {
+struct Weight: Equatable {
     let weight: Double
     let unit: WeightUnit
 
