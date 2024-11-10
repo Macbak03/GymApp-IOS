@@ -49,15 +49,9 @@ class CustomDate {
     // Converts the savedDate string into the formatted string using CHART_PATTERN
     static func getChartFormattedDate(savedDate: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = CustomDate.CHART_PATTERN
+        formatter.dateFormat = CustomDate.PATTERN
         formatter.timeZone = TimeZone.current
         return formatter.string(from: savedDate)
     }
-    
-//    static func getChartFormattedDate(date: Date) -> String {
-//        let formatter = DateFormatter()
-//        formatter.dateStyle = .medium
-//        return formatter.string(from: date)
-//    }
 }
 

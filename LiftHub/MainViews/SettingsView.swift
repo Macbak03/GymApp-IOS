@@ -56,7 +56,7 @@ struct SettingsView: View {
                         Text(SettingsView.lightTheme).tag(SettingsView.lightTheme)
                         //Text("Dark Blue").tag("DarkBlue")
                     }
-                    .onChange(of: selectedTheme) { theme in
+                    .onChange(of: selectedTheme) { _, theme in
                         SettingsView.applyTheme(theme: theme)  // Apply theme when the user selects a new option
                         UserDefaultsUtils.shared.setTheme(theme: theme)
                     }
@@ -67,7 +67,7 @@ struct SettingsView: View {
                         Text("Kilograms").tag(SettingsView.kilograms)
                         Text("Pounds").tag(SettingsView.pounds)
                     }
-                    .onChange(of: selectedUnit) { unit in
+                    .onChange(of: selectedUnit) { _, unit in
                         UserDefaultsUtils.shared.setWeight(unit: unit)
                     }
                     .pickerStyle(MenuPickerStyle())
@@ -77,7 +77,7 @@ struct SettingsView: View {
                         Text(SettingsView.rpe).tag(SettingsView.rpe)
                         Text(SettingsView.rir).tag(SettingsView.rir)
                     }
-                    .onChange(of: selectedIntensity) { intensity in
+                    .onChange(of: selectedIntensity) { _, intensity in
                         UserDefaultsUtils.shared.setIntensity(intensity: intensity)
                     }
                     .pickerStyle(MenuPickerStyle())

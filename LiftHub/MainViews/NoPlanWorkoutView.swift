@@ -54,7 +54,7 @@ struct NoPlanWorkoutView: View {
                             .padding(.horizontal, 35)
                             .multilineTextAlignment(.center)
                             .focused($isWorkoutNameFocused)
-                            .onChange(of: isWorkoutNameFocused) { focused in
+                            .onChange(of: isWorkoutNameFocused) { _, focused in
                                 validateWorkoutName(focused: focused)
                             }
                         
@@ -85,7 +85,7 @@ struct NoPlanWorkoutView: View {
                     saveWorkoutToFile()
                 }
             }
-            .onChange(of: scenePhase) { newPhase in
+            .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .inactive {
                     saveWorkoutToFile()
                 }

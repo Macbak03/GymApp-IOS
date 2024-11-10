@@ -128,7 +128,7 @@ struct HistoryOptionsDialog: View {
             .fullScreenCover(isPresented: $openEditHistory) {
                 EditHistoryDetailsView(workoutHistoryElement: historyItem, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
             }
-            .onChange(of: showToast) { exit in
+            .onChange(of: showToast) { _, exit in
                 if exit {
                     presentationMode.wrappedValue.dismiss()
                 }

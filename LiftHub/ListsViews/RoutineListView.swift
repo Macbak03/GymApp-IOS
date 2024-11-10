@@ -116,7 +116,7 @@ struct ExerciseView: View {
                                  alignment: .bottom
                         )// Adjust underline position
                         .focused($isExerciseNameFocused)
-                        .onChange(of: isExerciseNameFocused) { focused in
+                        .onChange(of: isExerciseNameFocused) { _, focused in
                             validateExerciseName(focused: focused)
                         }
                     
@@ -145,7 +145,7 @@ struct ExerciseView: View {
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isPauseFocused)
-                                .onChange(of: isPauseFocused) { focused in
+                                .onChange(of: isPauseFocused) { _, focused in
                                     validatePause(focused: focused)
                                     showPauseToolbar = focused
                                 }
@@ -190,7 +190,7 @@ struct ExerciseView: View {
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isLoadFocused)
-                                .onChange(of: isLoadFocused) { focused in
+                                .onChange(of: isLoadFocused) { _, focused in
                                     validateLoad(focused: focused)
                                     showLoadToolbar = focused
                                 }
@@ -235,7 +235,7 @@ struct ExerciseView: View {
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isRepsFocused)
-                                .onChange(of: isRepsFocused) { focused in
+                                .onChange(of: isRepsFocused) {_,  focused in
                                     validateReps(focused: focused)
                                     showRepsToolbar = focused
                                 }
@@ -272,7 +272,7 @@ struct ExerciseView: View {
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isSeriesFocused)
-                                .onChange(of: isSeriesFocused) { focused in
+                                .onChange(of: isSeriesFocused) { _, focused in
                                     validateSeries(focused: focused)
                                     showSeriesToolbar = focused
                                 }
@@ -310,7 +310,7 @@ struct ExerciseView: View {
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isIntensityFocused)
-                                .onChange(of: isIntensityFocused) { focused in
+                                .onChange(of: isIntensityFocused) { _, focused in
                                     validateIntensity(focused: focused)
                                     showIntensityToolbar = focused
                                 }
@@ -347,7 +347,7 @@ struct ExerciseView: View {
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isPaceFocused)
-                                .onChange(of: isPaceFocused) { focused in
+                                .onChange(of: isPaceFocused) { _, focused in
                                     validatePace(focused: focused)
                                     showPaceToolbar = focused
                                 }

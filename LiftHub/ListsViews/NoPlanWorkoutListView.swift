@@ -74,7 +74,7 @@ private struct WorkoutListExerciseView: View {
                          alignment: .bottom
                 )// Adjust underline position
                 .focused($isExerciseNameFocused)
-                .onChange(of: isExerciseNameFocused) { focused in
+                .onChange(of: isExerciseNameFocused) { _, focused in
                     validateExerciseName(focused: focused)
                 }
             
@@ -229,7 +229,7 @@ private struct WorkoutListSeriesView: View {
                                 .stroke((showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                         )
                         .focused($isRepsFocused)
-                        .onChange(of: isRepsFocused) { focused in
+                        .onChange(of: isRepsFocused) { _, focused in
                             validateReps(focused: focused)
                             showRepsToolbar = focused
                         }
@@ -259,7 +259,7 @@ private struct WorkoutListSeriesView: View {
                                 .stroke((showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                         )
                         .focused($isLoadFocused)
-                        .onChange(of: isLoadFocused) { focused in
+                        .onChange(of: isLoadFocused) { _, focused in
                             validateLoad(focused: focused)
                             showLoadToolbar = focused
                         }
@@ -294,7 +294,7 @@ private struct WorkoutListSeriesView: View {
                                 .stroke((showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                         )
                         .focused($isIntensityFocused)
-                        .onChange(of: isIntensityFocused) { focused in
+                        .onChange(of: isIntensityFocused) { _, focused in
                             validateIntensity(focused: focused)
                             showIntensityToolbar = focused
                         }

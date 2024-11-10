@@ -28,7 +28,7 @@ struct HistoryView: View {
                         TextField("Search in history...", text: $searchText)
                             .padding(10) // Padding inside the text field
                             .frame(height: 35)
-                            .onChange(of: searchText) { newText in
+                            .onChange(of: searchText) { _, newText in
                                 filterSearchResults()
                             }
                         

@@ -56,7 +56,7 @@ struct HomeView: View {
                         .frame(minWidth: 100, minHeight: 30)
                         .clipped()
                         .pickerStyle(MenuPickerStyle())
-                        .onChange(of: selectedPlan) { plan in
+                        .onChange(of: selectedPlan) { _, plan in
                             UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
                         }
                         .disabled(!isWorkoutEnded)

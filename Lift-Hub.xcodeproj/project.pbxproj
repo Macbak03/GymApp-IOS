@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5F88E9742CBF100B002C345C /* CustomKeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F88E9732CBF100B002C345C /* CustomKeyboardToolbar.swift */; };
+		5FCCD1F52CE03DC100385BCB /* MessageBubbleShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD1F42CE03DC100385BCB /* MessageBubbleShape.swift */; };
 		5FE53E272C8C727C00FB6400 /* LiftHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E262C8C727C00FB6400 /* LiftHubApp.swift */; };
 		5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E282C8C727C00FB6400 /* ContentView.swift */; };
 		5FE53E2B2C8C727D00FB6400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FE53E2A2C8C727D00FB6400 /* Assets.xcassets */; };
@@ -73,7 +74,6 @@
 		5FE53ED82C99B41500FB6400 /* EditHistoryDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED72C99B41500FB6400 /* EditHistoryDetailsView.swift */; };
 		5FE53EDA2C99BF7B00FB6400 /* EditHistoryDetailsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53ED92C99BF7B00FB6400 /* EditHistoryDetailsListView.swift */; };
 		5FE53EDC2C9B53C400FB6400 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EDB2C9B53C400FB6400 /* StatsView.swift */; };
-		5FE53EDF2C9BC33500FB6400 /* HistoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EDE2C9BC33500FB6400 /* HistoryListViewModel.swift */; };
 		5FE53EE12C9C8C6F00FB6400 /* NoPlanWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EE02C9C8C6F00FB6400 /* NoPlanWorkoutView.swift */; };
 		5FE53EE32C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53EE22C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift */; };
 		5FFC39582CD1C758009DBB02 /* ChartData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FFC39572CD1C758009DBB02 /* ChartData.swift */; };
@@ -98,6 +98,7 @@
 
 /* Begin PBXFileReference section */
 		5F88E9732CBF100B002C345C /* CustomKeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKeyboardToolbar.swift; sourceTree = "<group>"; };
+		5FCCD1F42CE03DC100385BCB /* MessageBubbleShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleShape.swift; sourceTree = "<group>"; };
 		5FE53E232C8C727C00FB6400 /* Lift-Hub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lift-Hub.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FE53E262C8C727C00FB6400 /* LiftHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftHubApp.swift; sourceTree = "<group>"; };
 		5FE53E282C8C727C00FB6400 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -166,7 +167,6 @@
 		5FE53ED72C99B41500FB6400 /* EditHistoryDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsView.swift; sourceTree = "<group>"; };
 		5FE53ED92C99BF7B00FB6400 /* EditHistoryDetailsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsListView.swift; sourceTree = "<group>"; };
 		5FE53EDB2C9B53C400FB6400 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
-		5FE53EDE2C9BC33500FB6400 /* HistoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListViewModel.swift; sourceTree = "<group>"; };
 		5FE53EE02C9C8C6F00FB6400 /* NoPlanWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutView.swift; sourceTree = "<group>"; };
 		5FE53EE22C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutListView.swift; sourceTree = "<group>"; };
 		5FFC39572CD1C758009DBB02 /* ChartData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartData.swift; sourceTree = "<group>"; };
@@ -222,7 +222,6 @@
 		5FE53E252C8C727C00FB6400 /* LiftHub */ = {
 			isa = PBXGroup;
 			children = (
-				5FE53EDD2C9BC31300FB6400 /* ViewModel */,
 				5FE53EAC2C935D3000FB6400 /* UtilViews */,
 				5FE53E992C909A5200FB6400 /* Toast */,
 				5FE53E882C908D5C00FB6400 /* Exception */,
@@ -411,6 +410,7 @@
 				5FE53EAA2C93342F00FB6400 /* DeleteBackgroundView.swift */,
 				5FE53EAD2C935D4F00FB6400 /* BackgroundImage.swift */,
 				5F88E9732CBF100B002C345C /* CustomKeyboardToolbar.swift */,
+				5FCCD1F42CE03DC100385BCB /* MessageBubbleShape.swift */,
 			);
 			path = UtilViews;
 			sourceTree = "<group>";
@@ -435,14 +435,6 @@
 				5FE53ECF2C98BB0100FB6400 /* WorkoutHistoryElement.swift */,
 			);
 			path = History;
-			sourceTree = "<group>";
-		};
-		5FE53EDD2C9BC31300FB6400 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				5FE53EDE2C9BC33500FB6400 /* HistoryListViewModel.swift */,
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		5FFC39542CD1C5F1009DBB02 /* Chart */ = {
@@ -592,7 +584,6 @@
 				5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */,
 				5FE53E8E2C90917200FB6400 /* Intensity.swift in Sources */,
 				5FE53E9B2C909A6000FB6400 /* ToastView.swift in Sources */,
-				5FE53EDF2C9BC33500FB6400 /* HistoryListViewModel.swift in Sources */,
 				5FE53EC32C9723F200FB6400 /* WorkoutHistoryDataBaseHelper.swift in Sources */,
 				5FE53EB92C94B8ED00FB6400 /* WorkoutSeries.swift in Sources */,
 				5FE53E8A2C908D7300FB6400 /* ValidationException.swift in Sources */,
@@ -643,6 +634,7 @@
 				5F88E9742CBF100B002C345C /* CustomKeyboardToolbar.swift in Sources */,
 				5FE53EE12C9C8C6F00FB6400 /* NoPlanWorkoutView.swift in Sources */,
 				5FE53EB22C94ADD700FB6400 /* WorkoutView.swift in Sources */,
+				5FCCD1F52CE03DC100385BCB /* MessageBubbleShape.swift in Sources */,
 				5FE53EB52C94B78200FB6400 /* WorkoutExerciseDraft.swift in Sources */,
 				5FE53EBB2C94BC7000FB6400 /* WorkoutListView.swift in Sources */,
 				5FE53E5F2C8CB48C00FB6400 /* Constants.swift in Sources */,

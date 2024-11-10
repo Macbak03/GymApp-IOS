@@ -51,7 +51,7 @@ struct StartWorkoutSheetView: View {
         .onAppear(){
             initRoutines()
         }
-        .onChange(of: closeWorkoutSheetView) { close in
+        .onChange(of: closeWorkoutSheetView) { _, close in
             if close {
                 presentationMode.wrappedValue.dismiss()
             }

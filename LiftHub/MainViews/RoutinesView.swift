@@ -32,7 +32,7 @@ struct RoutinesView: View {
                 VStack {
                     
                     RoutinesListView(routines: $routines, planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
-                        .onChange(of: refreshRoutines) { refreshNeeded in
+                        .onChange(of: refreshRoutines) { _, refreshNeeded in
                             if refreshNeeded {
                                 loadRoutines()
                                 refreshRoutines = false

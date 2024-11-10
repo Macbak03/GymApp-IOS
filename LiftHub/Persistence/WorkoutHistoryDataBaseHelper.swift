@@ -417,10 +417,10 @@ class WorkoutHistoryDataBaseHelper: Repository {
     func getExerciseNames() -> [String] {
         var exerciseNames: [String] = []
         do {
-            let selectQuery = "SELECT DISTINCT LOWER\(self.exerciseName) AS exercise_name FROM \(self.workoutHistoryTable) ORDER BY exercise_name"
+            let selectQuery = "SELECT DISTINCT LOWER(\(exerciseName)) AS exerciseName FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME) ORDER BY exerciseName"
             let cursor = try db!.prepare(selectQuery)
             for row in cursor {
-                if let exerciseName = row[5] as? String {
+                if let exerciseName = row[0] as? String {
                     exerciseNames.append(exerciseName)
                 }
             }

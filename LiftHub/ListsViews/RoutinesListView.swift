@@ -59,7 +59,7 @@ struct RoutinesElementView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundColor(Color.TextColorPrimary)
                     //.padding(.leading, 5)
-                    .onChange(of: refreshRoutines) { refreshNeeded in
+                    .onChange(of: refreshRoutines) { _, refreshNeeded in
                         if refreshNeeded {
                             routineName = routine.name
                         }
