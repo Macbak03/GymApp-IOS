@@ -430,24 +430,50 @@ class WorkoutHistoryDataBaseHelper: Repository {
         return exerciseNames
     }
     
+    func getDistinctYears(forExercise exerciseName: String) -> [Int] {
+        var years: [Int] = []
+        do {
+            // Query to extract distinct years from the date column
+            let selectQuery = """
+                    SELECT DISTINCT strftime('%Y', date) AS year
+                    FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME)
+                    WHERE LOWER(\(self.exerciseName)) = ?
+                    ORDER BY year DESC
+                    """
+            
+            let cursor = try db!.prepare(selectQuery, exerciseName.lowercased())
+            for row in cursor {
+                if let yearString = row[0] as? String, let year = Int(yearString) {
+                    years.append(year)
+                }
+            }
+        } catch {
+            print("Error fetching distinct years: \(error)")
+        }
+        return years
+    }
+    
     
         // MARK: - Get Exercises for Chart
-    func getExercisesToChart(exerciseName: String) -> [(exerciseId: Int64, date: Date)] {
+    func getExercisesToChart(year: Int, exerciseName: String) -> [(exerciseId: Int64, date: Date)] {
         var exercises: [(Int64, Date)] = []
             do {
-                let query = workoutHistoryTable
-                    .select(exerciseId, self.date)
-                    .filter(self.exerciseName.lowercaseString == exerciseName.lowercased())
-    
-                for row in try db!.prepare(query) {
-                    if let date = CustomDate.stringToDate(row[self.date]) {
-                        exercises.append((row[exerciseId], date))
+                // Query to select exercises based on the exercise name and year
+                let selectQuery = """
+                SELECT exerciseId, date FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME)
+                WHERE LOWER(\(self.exerciseName)) = ? AND strftime('%Y', date) = ?
+                ORDER BY date
+                """
+                
+                let cursor = try db!.prepare(selectQuery, exerciseName.lowercased(), String(year))
+                for row in cursor {
+                    if let dateString = row[1] as? String, let date = CustomDate.stringToDate(dateString) {
+                        exercises.append((row[0] as! Int64, date))
                     }
                 }
             } catch {
-                print("Error fetching exercises for chart: \(error)")
+                print("Error fetching exercises by year and name: \(error)")
             }
-    
             return exercises
         }
     

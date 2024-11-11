@@ -6,7 +6,7 @@ struct StatsView: View {
     @State private var exercises: [String] = []
     @State private var filteredExercises: [String] = []
     @State private var selectedExercise: String? = nil
-    @State private var selectedRange: RangeType = .last5
+    
     @FocusState private var isSearchFieldFocused: Bool
     
     var body: some View {
@@ -52,30 +52,12 @@ struct StatsView: View {
                 }
             }
             
-            if !isSearchFieldFocused {
-                if let selectedExercise = selectedExercise {
-                    Picker("Range", selection: $selectedRange) {
-                        ForEach(RangeType.allCases, id: \.self) { range in
-                            Text(range.rawValue).tag(range)
-                        }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding()
-                }
-            }
-            
             Spacer()
             
             ZStack {
                 VStack {
                     if let selectedExercise = selectedExercise {
-                        ChartView(exerciseName: selectedExercise, selectedRange: $selectedRange)
-                            .id(selectedExercise)
-                            .background {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .foregroundStyle(Color.BackgroundColorList)
-                            }
-                            .padding()
+                        ChartSettingsView(exerciseName: selectedExercise)
                     }
                 }
                 
@@ -104,6 +86,7 @@ struct StatsView: View {
             loadExercises()
         }
     }
+    
     
     private func clearSearching() {
         searchExercise.removeAll()
@@ -137,9 +120,62 @@ struct StatsView: View {
     }
 }
 
+struct ChartSettingsView: View {
+    let exerciseName: String
+    @State private var selectedRange: RangeType = .last5
+    @State private var selectedYear: Int = 0
+    @State private var years: [Int] = [2022, 2023, 2024]
+    @State private var loadChart = false
+    var body: some View {
+        VStack {
+            Picker("Years", selection: $selectedYear) {
+                ForEach(years, id: \.self) { year in
+                    Text(year.description).tag(year)
+                }
+            }
+            .pickerStyle(MenuPickerStyle())
+            .padding(.horizontal)
+            .onAppear() {
+                selectedYear = years[1]
+                //loadYears(selectedExercise: exerciseName)
+                loadChart = true
+            }
+            
+            Picker("Range", selection: $selectedRange) {
+                ForEach(RangeType.allCases, id: \.self) { range in
+                    Text(range.rawValue).tag(range)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal)
+            
+            Spacer()
+            
+            if loadChart {
+                ChartView(exerciseName: exerciseName, selectedRange: $selectedRange, selectedYear: $selectedYear)
+                    .id("\(exerciseName)-\(selectedYear)")
+                    .background {
+                        RoundedRectangle(cornerRadius: 10)
+                            .foregroundStyle(Color.BackgroundColorList)
+                    }
+                    .padding()
+            }
+            
+            Spacer()
+        }
+    }
+    
+    private func loadYears(selectedExercise: String) {
+        let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
+        years = workoutHistoryDatabaseHelper.getDistinctYears(forExercise: selectedExercise)
+        selectedYear = years[0]
+    }
+}
+
 struct ChartView: View {
-    var exerciseName: String
+    let exerciseName: String
     @Binding var selectedRange: RangeType
+    @Binding var selectedYear: Int
     @Environment(\.calendar) var calendar
     @State private var chartData: [ChartData] = []
     @State private var chartSelection: Int?
@@ -164,58 +200,82 @@ struct ChartView: View {
 
     
     var body: some View {
-        Chart(filteredChartData.indices, id: \.self) { index in
-            let dataPoint = filteredChartData[index]
-            
-            LineMark(
-                x: .value("Index", index),
-                y: .value("Weight", animatedProgress * dataPoint.weight.weight)
-            )
-            .symbol(.circle)
-            .interpolationMethod(.linear)
-            
-            if let chartSelection {
-                ruleMarkSection(chartSelection)
+        VStack {
+            Chart(filteredChartData.indices, id: \.self) { index in
+                let dataPoint = filteredChartData[index]
+                
+                LineMark(
+                    x: .value("Index", index),
+                    y: .value("Weight", animatedProgress * dataPoint.weight.weight)
+                )
+                .symbol(.circle)
+                .interpolationMethod(.linear)
+                
+                if let chartSelection {
+                    ruleMarkSection(chartSelection)
+                }
+                
+                AreaMark(
+                    x: .value("Index", index),
+                    y: .value("Weight", animatedProgress * dataPoint.weight.weight)
+                )
+                .interpolationMethod(.linear)
+                .foregroundStyle(areaBackground)
             }
-            
-            AreaMark(
-                x: .value("Index", index),
-                y: .value("Weight", animatedProgress * dataPoint.weight.weight)
-            )
-            .interpolationMethod(.linear)
-            .foregroundStyle(areaBackground)
-        }
-        .chartXAxis {
-            AxisMarks(values: Array(filteredChartData.indices)) { index in
-                if let index = index.as(Int.self), index < filteredChartData.count {
-                    let date = filteredChartData[index].date
-                    AxisValueLabel {
-                        Text(date, format: .dateTime.month(.abbreviated).day(.twoDigits)) // Display formatted date as label
+            .chartXAxis {
+                //let indicesToShow = getLabelsToShow()
+                AxisMarks(values: filterLabelsToShow()) { index in
+                    if let index = index.as(Int.self), index < filteredChartData.count {
+                        let date = filteredChartData[index].date
+                        AxisValueLabel {
+                            Text(date, format: .dateTime.month(.abbreviated).day(.twoDigits)) // Display formatted date as label
+                        }
                     }
                 }
             }
-        }
-        .chartYScale(domain: 0 ... (getMaxWeight(from: chartData) ?? 0) + 25)
-        .frame(height: 300)
-        .padding()
-        //.chartScrollableAxes(.horizontal)
-        .chartXSelection(value: $chartSelection)
-        .onChange(of: chartSelection) { oldVlue, newValue in
-            if let newValue = newValue {
-                chartSelection = closestDataPoint(to: newValue)
+            .chartYScale(domain: 0 ... (getMaxWeight(from: chartData) ?? 0) + 25)
+            .frame(height: 300)
+            .padding()
+            //.chartScrollableAxes(.horizontal)
+            .chartXSelection(value: $chartSelection)
+            .onChange(of: chartSelection) { oldVlue, newValue in
+                if let newValue = newValue {
+                    chartSelection = closestDataPoint(to: newValue)
+                }
             }
-        }
-        .onAppear() {
-            loadSelectedExercise()
-            withAnimation(.easeOut(duration: 1)) {
-                animatedProgress = 1.0
+            .onAppear() {
+                loadSelectedExercise()
+                withAnimation(.easeOut(duration: 1)) {
+                    animatedProgress = 1.0
+                }
             }
-        }
-        .onChange(of: filteredChartData) { _, _ in
-            withAnimation(.easeOut(duration: 1)) {
-                animatedProgress = 1.0
+            .onChange(of: filteredChartData) { _, _ in
+                withAnimation(.easeOut(duration: 1)) {
+                    animatedProgress = 1.0
+                }
             }
+            BottomStatsView(filteredChartData: filteredChartData)
+                .id(filteredChartData.count)
         }
+    }
+    
+    // if there is too much labels, it shows only 5, evenly spaced
+    private func filterLabelsToShow() -> [Int] {
+        let numberOfLabels = 5
+        var indicesToShow: [Int]
+        if filteredChartData.count >= 15 {
+            let step = max(1, filteredChartData.count / (numberOfLabels - 1))
+            indicesToShow = stride(from: 0, to: filteredChartData.count, by: step).map { $0 }
+            
+            // Ensure that the last index is always included if it’s not already in the list
+            if let lastIndex = filteredChartData.indices.last, !indicesToShow.contains(lastIndex) {
+                indicesToShow.append(lastIndex)
+            }
+        } else {
+            // Show all indices if the count is less than 15
+            indicesToShow = Array(filteredChartData.indices)
+        }
+        return indicesToShow
     }
     
     private func getMaxWeight(from chartData: [ChartData]) -> Double? {
@@ -223,14 +283,14 @@ struct ChartView: View {
     }
     
     private func ruleMarkSection(_ chartSelection: Int) -> some ChartContent {
-        let marker = chartData[chartSelection]
+        let marker = filteredChartData[chartSelection]
         let formattedText = formatText(marker: marker)
         
         let bubbleWidth: CGFloat = 150 // Adjust as needed to fit the text comfortably
         let chartWidth = UIScreen.main.bounds.width - 40 // Assuming padding of 20 on each side
         
         // Calculate the position of the marker in the chart
-        let relativeMarkerPosition = CGFloat(chartSelection) / CGFloat(chartData.count - 1)
+        let relativeMarkerPosition = CGFloat(chartSelection) / CGFloat(filteredChartData.count - 1)
         let markerPositionX = relativeMarkerPosition * chartWidth
         
         // Calculate the bubble's horizontal position to keep it as centered as possible
@@ -299,14 +359,15 @@ struct ChartView: View {
     }
     
     private func loadSelectedExercise() {
-        chartData = ChartData.mockData(exerciseName: exerciseName, weightUnit: WeightUnit.kg)
+       // chartData = ChartData.mockData(year: selectedYear, exerciseName: exerciseName, weightUnit: WeightUnit.kg)
+        chartData = ChartData.generateTestData(year: selectedYear)
     }
     
 }
 
 private extension ChartView {
     func getMarker(for date: Date) -> ChartData {
-        return chartData.first(where: { calendar.isDate($0.date, equalTo: date, toGranularity: .day) }) ?? ChartData(exerciseId: 0, date: Date(), reps: 0, weight: Weight(weight: 0, unit: WeightUnit.kg))
+        return filteredChartData.first(where: { calendar.isDate($0.date, equalTo: date, toGranularity: .day) }) ?? ChartData(exerciseId: 0, date: Date(), reps: 0, weight: Weight(weight: 0, unit: WeightUnit.kg))
     }
     
     func closestDataPoint(to index: Int) -> Int {
@@ -314,6 +375,54 @@ private extension ChartView {
             return index
         }
         return min(max(index, 0), chartData.count - 1)
+    }
+    
+}
+
+struct BottomStatsView: View {
+    @State private var maxWeight: Double = 0.0
+    @State private var minWeight: Double = 0.0
+    @State private var sumWeight: Double = 0.0
+    var filteredChartData: [ChartData]
+    var body: some View {
+        HStack {
+            VStack {
+                Text("min:")
+                Text(minWeight.description)
+            }
+            
+            VStack {
+                Text("max:")
+                Text(maxWeight.description)
+            }
+            
+            VStack {
+                Text("sum:")
+                Text(sumWeight.description)
+            }
+        }
+        .onAppear() {
+            getWeightData()
+        }
+    }
+    private func getWeightSum() -> Double {
+        return filteredChartData.reduce(0.0) { sum, data in
+            sum + data.weight.weight
+        }
+    }
+    
+    private func getMinWeight() -> Double {
+        return filteredChartData.min(by: { $0.weight.weight < $1.weight.weight })?.weight.weight ?? 0
+    }
+    
+    private func getMaxWeight() -> Double {
+        return filteredChartData.max(by: { $0.weight.weight < $1.weight.weight })?.weight.weight ?? 0
+    }
+    
+    private func getWeightData() {
+        maxWeight = getMaxWeight()
+        minWeight = getMinWeight()
+        sumWeight = getWeightSum()
     }
 }
 
