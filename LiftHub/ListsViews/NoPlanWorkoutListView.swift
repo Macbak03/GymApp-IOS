@@ -183,7 +183,7 @@ private struct WorkoutListSeriesView: View {
     @State private var intensityHint: String = UserDefaultsUtils.shared.getIntensity()
     
     @State private var intensityIndexText: String = UserDefaultsUtils.shared.getIntensity()
-    @State private var weightUnitText: String = UserDefaultsUtils.shared.getWeight()
+    @State private var weightUnitText: String = UserDefaultsUtils.shared.getWeightUnit()
     
     @State private var showLoadError = false
     @State private var showRepsError = false

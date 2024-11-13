@@ -16,7 +16,7 @@ struct MessageBubbleShape: Shape {
         // Draw the rounded rectangle for the main part of the bubble
         let cornerRadius: CGFloat = 30
         let arrowHeight: CGFloat = 20
-        let bubbleHeight = rect.height - arrowHeight
+        let bubbleHeight: CGFloat = 50
 
         path.addRoundedRect(
             in: CGRect(x: 0, y: 0, width: rect.width, height: bubbleHeight),
@@ -38,6 +38,7 @@ struct MessageBubbleShape: Shape {
         return path
     }
 }
+
 
 
 

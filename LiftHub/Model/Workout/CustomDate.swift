@@ -11,7 +11,7 @@ class CustomDate {
     // Define date format patterns
     static let RAW_PATTERN = "yyyy-MM-dd HH:mm:ss"
     static let PATTERN = "dd.MM.yyyy"
-    static let CHART_PATTERN = "yyyy-MM-dd"
+    static let CHART_PATTERN = "dd MMM"
     
     // Returns the current date as a string formatted with RAW_PATTERN
     static func getCurrentDate() -> String {
@@ -49,7 +49,7 @@ class CustomDate {
     // Converts the savedDate string into the formatted string using CHART_PATTERN
     static func getChartFormattedDate(savedDate: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = CustomDate.PATTERN
+        formatter.dateFormat = CustomDate.CHART_PATTERN
         formatter.timeZone = TimeZone.current
         return formatter.string(from: savedDate)
     }

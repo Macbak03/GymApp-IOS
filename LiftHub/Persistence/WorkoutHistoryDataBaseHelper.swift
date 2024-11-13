@@ -478,19 +478,19 @@ class WorkoutHistoryDataBaseHelper: Repository {
         }
     
     // MARK: - Get Load Unit
-    func getLoadUnit(exerciseId: Int64) -> String? {
+    func getWeightUnit(exerciseId: Int64) -> WeightUnit {
         do {
             let query = workoutHistoryTable
                 .select(loadUnit)
                 .filter(self.exerciseId == exerciseId)
             
             if let row = try db?.pluck(query) {
-                return row[loadUnit]
+                return WeightUnit(rawValue:row[loadUnit]) ?? WeightUnit.kg
             }
         } catch {
             print("Error fetching load unit: \(error)")
         }
-        return nil
+        return WeightUnit.kg
     }
     
     // MARK: - Update Plan Names

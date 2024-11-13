@@ -10,7 +10,7 @@ import MessageUI
 
 struct SettingsView: View {
     @State private var selectedTheme: String = UserDefaultsUtils.shared.getTheme() // Use AppStorage to persist theme selection
-    @State private var selectedUnit: String = UserDefaultsUtils.shared.getWeight()
+    @State private var selectedUnit: String = UserDefaultsUtils.shared.getWeightUnit()
     @State private var selectedIntensity: String = UserDefaultsUtils.shared.getIntensity()
     
     @State private var showMailComposer = false

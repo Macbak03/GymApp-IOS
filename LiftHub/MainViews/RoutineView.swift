@@ -128,7 +128,7 @@ struct RoutineView: View {
     }
     
     private func addExercise() {
-        let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
+        let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
         routineDraft.append(newExercise)
     }
     
@@ -226,7 +226,7 @@ private struct AddButton: View {
     var buttonOffsetX = 0.4
     var buttonOffsetY = 0.1
     
-    private let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
+    private let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
     var body: some View {
         Button(action: {
             routine.append(newExercise)

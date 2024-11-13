@@ -29,7 +29,7 @@ class UserDefaultsUtils {
         UserDefaults.standard.set(intensity, forKey: intensityKey)
     }
     
-    func getWeight() -> String {
+    func getWeightUnit() -> String {
         return UserDefaults.standard.string(forKey: weightUnitKey) ?? "kg"
     }
 

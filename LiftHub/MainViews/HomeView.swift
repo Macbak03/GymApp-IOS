@@ -31,7 +31,7 @@ struct HomeView: View {
     @State private var openLastWorkout = false
     
     @State private var intensityIndex = IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity())!
-    @State private var weightUnit = WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight())!
+    @State private var weightUnit = WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit())!
     
     @State private var showNewWorkoutAlert = false
 
@@ -43,23 +43,30 @@ struct HomeView: View {
                 Backgroundimage(geometry: geometry, imageName: "workout_icon")
                 VStack {
                     VStack(alignment: .center) {
-//                        Text("Current plan:")
-//                            .foregroundStyle(Color.TextColorPrimary)
-//                            .font(.system(size: 25, weight: .bold))
-//                            .multilineTextAlignment(.center)
+                        //                        Text("Current plan:")
+                        //                            .foregroundStyle(Color.TextColorPrimary)
+                        //                            .font(.system(size: 25, weight: .bold))
+                        //                            .multilineTextAlignment(.center)
                         // This Spinner is custom, so let's just place a placeholder
-                        Picker("Training Plans", selection: $selectedPlan) {
-                            ForEach(plans, id: \.self) { plan in
-                                Text(plan.name).tag(plan.description)
+                        Menu {
+                            Picker(selection: $selectedPlan) {
+                                ForEach(plans, id: \.self) { plan in
+                                    Text(plan.name).tag(plan.description)
+                                }
+                            } label: {}
+                            .frame(minWidth: 100, minHeight: 30)
+                            .clipped()
+                            .onChange(of: selectedPlan) { _, plan in
+                                UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
+                            }
+                            .disabled(!isWorkoutEnded)
+                        } label: {
+                            HStack {
+                                Text(selectedPlan)
+                                    .font(.system(size: 20))
+                                Image(systemName: "chevron.up.chevron.down")
                             }
                         }
-                        .frame(minWidth: 100, minHeight: 30)
-                        .clipped()
-                        .pickerStyle(MenuPickerStyle())
-                        .onChange(of: selectedPlan) { _, plan in
-                            UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
-                        }
-                        .disabled(!isWorkoutEnded)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.top, 6)

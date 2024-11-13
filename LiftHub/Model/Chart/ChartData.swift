@@ -23,7 +23,16 @@ struct ChartData: Identifiable, Equatable {
         
         for exercise in exercises {
             let exerciseId = exercise.exerciseId
-            let series = workoutSeriesDatabaseHelper.getChartData(exerciseId: exerciseId)
+            var series = workoutSeriesDatabaseHelper.getChartData(exerciseId: exerciseId)
+            //set weight value to selected weight unit
+            let actualWeightUnit = workoutHistoryDatabaseHelper.getWeightUnit(exerciseId: exerciseId)
+            let multiplier = 2.205
+            if weightUnit == WeightUnit.kg && actualWeightUnit == WeightUnit.lbs{
+                series.weight /= multiplier
+            } else if weightUnit == WeightUnit.lbs && actualWeightUnit == WeightUnit.kg {
+                series.weight *= multiplier
+            }
+            
             data.append(ChartData(exerciseId: exerciseId, date: exercise.date, reps: series.reps, weight: Weight(weight: series.weight, unit: weightUnit)))
         }
         
