@@ -192,21 +192,21 @@ class WorkoutHistoryDataBaseHelper: Repository {
             """
             
             let rows = try db!.prepare(query)
-                for row in rows {
-                    if let savedDate = row[1] as? String,
-                       let planName = row[0] as? String,
-                        let routineName = row[2] as? String {
-                        let formattedDate = CustomDate.getFormattedDate(savedDate: savedDate)
-                        
-                        let workoutHistoryElement = WorkoutHistoryElement(
-                            planName: planName,
-                            routineName: routineName,
-                            formattedDate: formattedDate,
-                            rawDate: savedDate
-                        )
-                        workoutHistory.append(workoutHistoryElement)
-                    }
+            for row in rows {
+                if let savedDate = row[1] as? String,
+                   let planName = row[0] as? String,
+                   let routineName = row[2] as? String {
+                    let formattedDate = CustomDate.getFormattedDate(savedDate: savedDate)
+                    
+                    let workoutHistoryElement = WorkoutHistoryElement(
+                        planName: planName,
+                        routineName: routineName,
+                        formattedDate: formattedDate,
+                        rawDate: savedDate
+                    )
+                    workoutHistory.append(workoutHistoryElement)
                 }
+            }
         } catch {
             print("Error retrieving history: \(error)")
         }
@@ -417,7 +417,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
     func getExerciseNames() -> [String] {
         var exerciseNames: [String] = []
         do {
-            let selectQuery = "SELECT DISTINCT LOWER(\(exerciseName)) AS exerciseName FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME) ORDER BY exerciseName"
+            let selectQuery = "SELECT DISTINCT \(exerciseName) AS exerciseName FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME) ORDER BY exerciseName"
             let cursor = try db!.prepare(selectQuery)
             for row in cursor {
                 if let exerciseName = row[0] as? String {
@@ -434,48 +434,60 @@ class WorkoutHistoryDataBaseHelper: Repository {
         var years: [Int] = []
         do {
             // Query to extract distinct years from the date column
-            let selectQuery = """
-                    SELECT DISTINCT strftime('%Y', date) AS year
-                    FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME)
-                    WHERE LOWER(\(self.exerciseName)) = ?
-                    ORDER BY year DESC
-                    """
+            let query = workoutHistoryTable
+                .select(distinct: date)
+                .filter(self.exerciseName == exerciseName)
+                .order(self.date.desc)
             
-            let cursor = try db!.prepare(selectQuery, exerciseName.lowercased())
+            
+            let cursor = try db!.prepare(query)
             for row in cursor {
-                if let yearString = row[0] as? String, let year = Int(yearString) {
+                let dateString = try row.get(self.date)
+                if let year = extractYear(from: dateString) {
                     years.append(year)
                 }
             }
         } catch {
             print("Error fetching distinct years: \(error)")
         }
-        return years
+        return Array(Set(years)).sorted(by: >) // Remove duplicates and sort in descending order
+    }
+    
+    //Helper function for getDistinctYears and getExercisesToChart
+    private func extractYear(from dateString: String) -> Int? {
+        let components = dateString.split(separator: "-")
+        if components.count > 0 {
+            let yearString = String(components[0])
+            return Int(yearString)
+        }
+        return nil
     }
     
     
-        // MARK: - Get Exercises for Chart
+    // MARK: - Get Exercises for Chart
     func getExercisesToChart(year: Int, exerciseName: String) -> [(exerciseId: Int64, date: Date)] {
         var exercises: [(Int64, Date)] = []
-            do {
-                // Query to select exercises based on the exercise name and year
-                let selectQuery = """
-                SELECT exerciseId, date FROM \(WorkoutHistoryDataBaseHelper.TABLE_NAME)
-                WHERE LOWER(\(self.exerciseName)) = ? AND strftime('%Y', date) = ?
-                ORDER BY date
-                """
-                
-                let cursor = try db!.prepare(selectQuery, exerciseName.lowercased(), String(year))
-                for row in cursor {
-                    if let dateString = row[1] as? String, let date = CustomDate.stringToDate(dateString) {
-                        exercises.append((row[0] as! Int64, date))
+        do {
+            let query = workoutHistoryTable
+                .select(self.exerciseId, self.date)
+                .filter(self.exerciseName == exerciseName)
+                .order(self.date)
+            
+            let cursor = try db!.prepare(query)
+            for row in cursor {
+                let dateString = try row.get(self.date)
+                if let date = CustomDate.stringToDate(dateString) {
+                    if let extractedYear = extractYear(from: dateString), extractedYear == year {
+                        let exerciseId = try row.get(self.exerciseId)
+                        exercises.append((exerciseId, date))
                     }
                 }
-            } catch {
-                print("Error fetching exercises by year and name: \(error)")
             }
-            return exercises
+        } catch {
+            print("Error fetching exercises by year and name: \(error)")
         }
+        return exercises
+    }
     
     // MARK: - Get Load Unit
     func getWeightUnit(exerciseId: Int64) -> WeightUnit {
