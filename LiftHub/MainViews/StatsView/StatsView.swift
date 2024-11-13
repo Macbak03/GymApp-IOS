@@ -176,7 +176,13 @@ struct ChartSettingsView: View {
     private func loadYears(selectedExercise: String) {
         let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
         years = workoutHistoryDatabaseHelper.getDistinctYears(forExercise: selectedExercise)
-        viewModel.selectedYear = years[0]
+        if !years.isEmpty {
+            viewModel.selectedYear = years[0]
+        } else {
+            print("Error getting years in loadYears")
+            let currentYear = Calendar.current.component(.year, from: Date())
+            years.append(currentYear)
+        }
     }
 }
 
