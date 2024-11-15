@@ -58,18 +58,25 @@ struct StatsView: View {
                 VStack {
                     if viewModel.selectedExerciseName != nil {
                         ChartSettingsView(viewModel: viewModel)
+                            .onAppear() {
+                                viewModel.setWeightUnit()
+                            }
                     }
                 }
                 
                 
                 if isSearchFieldFocused {
                     List {
-                        ForEach(filteredExercises, id: \.self) { exercise in
-                            Button(action: {
-                                selectExercise(exercise)
-                            }) {
-                                Text(exercise)
+                        if !filteredExercises.isEmpty {
+                            ForEach(filteredExercises, id: \.self) { exercise in
+                                Button(action: {
+                                    selectExercise(exercise)
+                                }) {
+                                    Text(exercise)
+                                }
                             }
+                        } else {
+                            Text("No exercises avaliable")
                         }
                     }
                 }
@@ -128,48 +135,55 @@ struct ChartSettingsView: View {
     
     
     var body: some View {
-        VStack {
-            Menu {
-                Picker(selection: $viewModel.selectedYear) {
-                    ForEach(years, id: \.self) { year in
-                        Text(year.description).tag(year)
+        GeometryReader { geometry in
+            let screenWidth = geometry.size.width
+            ScrollView {
+                VStack {
+                    Menu {
+                        Picker(selection: $viewModel.selectedYear) {
+                            ForEach(years, id: \.self) { year in
+                                Text(year.description).tag(year)
+                            }
+                        } label: {}
+                    } label: {
+                        Text(viewModel.selectedYear.description)
+                            .font(.system(size: 20))
+                        Image(systemName: "chevron.up.chevron.down")
                     }
-                } label: {}
-            } label: {
-                Text(viewModel.selectedYear.description)
-                    .font(.system(size: 20))
-                Image(systemName: "chevron.up.chevron.down")
-            }
-            .padding()
-            .onAppear() {
-                if let selectedExercise = viewModel.selectedExerciseName {
-                    loadYears(selectedExercise: selectedExercise)
+                    .padding(isSmallScreen(for: screenWidth) ? 0:15)
+                    .onAppear() {
+                        if let selectedExercise = viewModel.selectedExerciseName {
+                            loadYears(selectedExercise: selectedExercise)
+                        }
+                        viewModel.selectedYear = years[0]
+                        loadChart = true
+                    }
+                    
+                    
+                    Picker("Range", selection: $viewModel.selectedRange) {
+                        ForEach(ChartValuesRange.allCases, id: \.self) { range in
+                            Text(range.rawValue).tag(range)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding(.horizontal)
+                    
+                    
+                    Spacer()
+                    
+                    if loadChart {
+                        ChartView(viewModel: viewModel)
+                            .id("\(String(describing: viewModel.selectedExerciseName))-\(viewModel.selectedYear)-\(viewModel.selectedRange)")
+                            .padding(.top, isSmallScreen(for: screenWidth) ? 30 : 50)
+                    }
+                    
+                    BottomStatsView(viewModel: viewModel)
+                        .id("\(viewModel.filteredChartData.count)-\(viewModel.selectedRange)- \(viewModel.weightUnit)")
+                        .padding(.bottom, isSmallScreen(for: screenWidth) ? 50 : 0)
+                    
+                    Spacer()
                 }
-                viewModel.selectedYear = years[0]
-                loadChart = true
             }
-            
-            
-            Picker("Range", selection: $viewModel.selectedRange) {
-                ForEach(ChartValuesRange.allCases, id: \.self) { range in
-                    Text(range.rawValue).tag(range)
-                }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(.horizontal)
-            
-            
-            Spacer()
-            
-            if loadChart {
-                ChartView(viewModel: viewModel)
-                .id("\(String(describing: viewModel.selectedExerciseName))-\(viewModel.selectedYear)-\(viewModel.selectedRange)")
-            }
-            
-            BottomStatsView(viewModel: viewModel)
-                .id("\(viewModel.filteredChartData.count)-\(viewModel.selectedRange)- \(viewModel.weightUnit)")
-            
-            Spacer()
         }
     }
     
@@ -182,6 +196,15 @@ struct ChartSettingsView: View {
             print("Error getting years in loadYears")
             let currentYear = Calendar.current.component(.year, from: Date())
             years.append(currentYear)
+        }
+    }
+    
+    private func isSmallScreen(for screenWidth: CGFloat) -> Bool {
+        // Adjust spacing to be smaller for smaller screen sizes
+        if screenWidth < 380 {
+            return true
+        } else {
+            return false
         }
     }
 }

@@ -32,7 +32,7 @@ struct CreatePlanDialogView: View {
                 VStack {
                     // Title at the top, centered horizontally
                     Text(dialogTitle)
-                        .font(.title)
+                        .font(.system(size: 18))
                         .padding(.top)
                     
                     // TextField for entering plan name

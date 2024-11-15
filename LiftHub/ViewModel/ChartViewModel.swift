@@ -15,6 +15,7 @@ class ChartViewModel: ObservableObject {
     @Published var selectedExerciseName: String? = nil
     @Published var selectedYear: Int = 0
     @Published var weightUnit: WeightUnit
+    @Published var showSecondSection: Bool = true
     
     init() {
         let unitString = UserDefaultsUtils.shared.getWeightUnit()

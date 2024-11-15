@@ -15,8 +15,11 @@ struct RoutinesListView: View {
     @Binding var showToast: Bool
     @Binding var refreshRoutines: Bool
     @Binding var toastMessage: String
-    
     @Binding var performDelete: Bool
+    
+    private let routinesDatabaseHelper = RoutinesDataBaseHelper()
+    @State private var showAlertDialog = false
+    @State private var indexSet: IndexSet = []
     
     var body: some View {
         List {
@@ -28,8 +31,35 @@ struct RoutinesListView: View {
                 }
                 )
             }
+            .onDelete(perform: { indexSet in
+                self.indexSet = indexSet
+                showAlertDialog = true
+            })
             .padding(.top, 5)
         }
+        .alert(isPresented: $showAlertDialog) {
+            var routineName = ""
+            indexSet.forEach { index in
+                routineName = routines[index].name
+            }
+            return Alert(
+                title: Text("Warning"),
+                message: Text("Are you sure you want to delete \(routineName)?"),
+                primaryButton: .destructive(Text("OK")) {
+                    deleteRoutine(atOffsets: indexSet)
+                },
+                secondaryButton: .cancel()
+            )
+        }
+    }
+    
+    
+    private func deleteRoutine(atOffsets indexSet: IndexSet) {
+        indexSet.forEach { index in
+            let routineName = routines[index].name
+            routinesDatabaseHelper.deleteRoutine(planID: planId, routineName: routineName)
+        }
+        routines.remove(atOffsets: indexSet)
     }
 }
 
@@ -85,33 +115,19 @@ struct RoutinesElementView: View {
                 .background(Color.clear) // You can modify this to fit the background style
                 
             }
-            //.frame(maxWidth: .infinity, minHeight: 50)
-            //.padding(5)
-//            .background(
-//                RoundedRectangle(cornerRadius: 8)
-//                    .fill(Color.BackgroundColorList)
-//                    .shadow(radius: 3)
-//            )
-//            .padding(.horizontal, 8) // Card marginHorizontal
-            .actionSheet(isPresented: $showOptionsDialog) {
-                ActionSheet(
+            .alert(isPresented: $showOptionsDialog) {
+                Alert(
                     title: Text("Warning"),
                     message: Text("Are you sure you want to delete \(routineName)?"),
-                    buttons: [
-                        .destructive(Text("Delete"), action: {
-                            performDelete = true
-                            deleteRoutine()
-                        }),
-                        .cancel()
-                    ]
+                    primaryButton: .destructive(Text("OK")) {
+                        deleteRoutine()
+                    },
+                    secondaryButton: .cancel()
                 )
             }
             .onTapGesture {
                 showOptionsDialog = true
             }
-//            .fullScreenCover(isPresented: $openRoutine) {
-//                RoutineView(originalRoutineName: routineName, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage)
-//            }
         }
     }
     

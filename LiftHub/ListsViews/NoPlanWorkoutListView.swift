@@ -343,15 +343,15 @@ private struct WorkoutListSeriesView: View {
     }
     
     private func getSpacing(for screenWidth: CGFloat) -> CGFloat {
-            // Adjust spacing to be smaller for smaller screen sizes
-            if screenWidth < 380 {
-                return 3  // iPhone SE size or smaller
-            } else if screenWidth < 400 {
-                return 5 // Mid-sized phones (e.g., iPhone 11, XR)
-            } else {
-                return 10 // Larger devices (e.g., iPhone Pro Max, iPads)
-            }
+        // Adjust spacing to be smaller for smaller screen sizes
+        if screenWidth < 380 {
+            return 3  // iPhone SE size or smaller
+        } else if screenWidth < 400 {
+            return 5 // Mid-sized phones (e.g., iPhone 11, XR)
+        } else {
+            return 10 // Larger devices (e.g., iPhone Pro Max, iPads)
         }
+    }
     
     private func addSet() {
         let setDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")

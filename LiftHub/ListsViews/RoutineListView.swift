@@ -13,15 +13,13 @@ struct RoutineListView: View {
     @Binding var toastMessage: String
     @Binding var descriptionType: DescriptionType?
     @Binding var alertType: AlertType?
-    
-    @Environment(\.editMode) var editMode
-    
+    @Binding var wasExerciseModified: Bool
     
     var body: some View {
         List {
             ForEach(routine.indices, id: \.self) {
                 index in
-                ExerciseView(exercise: $routine[index], descriptionType: $descriptionType, alertType: $alertType, showToast: $showToast, toastMessage: $toastMessage)
+                ExerciseView(exercise: $routine[index], descriptionType: $descriptionType, alertType: $alertType, showToast: $showToast, toastMessage: $toastMessage, wasExerciseModified: $wasExerciseModified)
                 
             }
             .onDelete(perform: { indexSet in
@@ -34,11 +32,12 @@ struct RoutineListView: View {
         .listStyle(PlainListStyle())
     }
     
-    func deleteItem(atOffsets: IndexSet) {
+    private func deleteItem(atOffsets: IndexSet) {
         routine.remove(atOffsets: atOffsets)
+        wasExerciseModified = true
     }
     
-    func moveItem(from source: IndexSet, to destination: Int) {
+    private func moveItem(from source: IndexSet, to destination: Int) {
         routine.move(fromOffsets: source, toOffset: destination)
     }
 }
@@ -70,6 +69,8 @@ struct ExerciseView: View {
     @Binding var showToast: Bool
     @Binding var toastMessage: String
     
+    @Binding var wasExerciseModified: Bool
+    
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldPadding: CGFloat = 6
     private let textFieldStrokeLineWidth: CGFloat = 0.5
@@ -84,6 +85,8 @@ struct ExerciseView: View {
     @State private var showSeriesToolbar = false
     @State private var showIntensityToolbar = false
     @State private var showPaceToolbar = false
+    
+    @State private var wasRoutineLoaded = false
     
     var body: some View {
         ZStack {
@@ -119,9 +122,12 @@ struct ExerciseView: View {
                         .onChange(of: isExerciseNameFocused) { _, focused in
                             validateExerciseName(focused: focused)
                         }
+                        .onChange(of: exercise.name) { _, _ in
+                            if wasRoutineLoaded {
+                                wasExerciseModified = true
+                            }
+                        }
                     
-                    //                    Image(systemName: "arrow.up.arrow.down")
-                    //                        .frame(width: 50, height: 50)
                 }
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
@@ -149,6 +155,11 @@ struct ExerciseView: View {
                                     validatePause(focused: focused)
                                     showPauseToolbar = focused
                                 }
+                                .onChange(of: exercise.pause) { _, _ in
+                                    if wasRoutineLoaded {
+                                        wasExerciseModified = true
+                                    }
+                                }
                                 .toolbar {
                                     if showPauseToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
@@ -165,6 +176,11 @@ struct ExerciseView: View {
                             .labelsHidden()
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 60, alignment: .trailing)
+                            .onChange(of: exercise.pauseUnit) { _, _ in
+                                if wasRoutineLoaded {
+                                    wasExerciseModified = true
+                                }
+                            }
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
@@ -179,7 +195,7 @@ struct ExerciseView: View {
                             Text("Load")
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
-
+                            
                             TextField("eg. 30", text: $exercise.load)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
@@ -193,6 +209,11 @@ struct ExerciseView: View {
                                 .onChange(of: isLoadFocused) { _, focused in
                                     validateLoad(focused: focused)
                                     showLoadToolbar = focused
+                                }
+                                .onChange(of: exercise.load) { _, _ in
+                                    if wasRoutineLoaded {
+                                        wasExerciseModified = true
+                                    }
                                 }
                                 .toolbar {
                                     if showLoadToolbar {
@@ -210,6 +231,11 @@ struct ExerciseView: View {
                             .labelsHidden()
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 60, alignment: .trailing)
+                            .onChange(of: exercise.loadUnit) { _, _ in
+                                if wasRoutineLoaded {
+                                    wasExerciseModified = true
+                                }
+                            }
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
@@ -239,6 +265,11 @@ struct ExerciseView: View {
                                     validateReps(focused: focused)
                                     showRepsToolbar = focused
                                 }
+                                .onChange(of: exercise.reps) { _, _ in
+                                    if wasRoutineLoaded {
+                                        wasExerciseModified = true
+                                    }
+                                }
                                 .toolbar {
                                     if showRepsToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
@@ -261,7 +292,7 @@ struct ExerciseView: View {
                             Text("Series")
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
-
+                            
                             TextField("eg. 3", text: $exercise.series)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
@@ -275,6 +306,11 @@ struct ExerciseView: View {
                                 .onChange(of: isSeriesFocused) { _, focused in
                                     validateSeries(focused: focused)
                                     showSeriesToolbar = focused
+                                }
+                                .onChange(of: exercise.series) { _, _ in
+                                    if wasRoutineLoaded {
+                                        wasExerciseModified = true
+                                    }
                                 }
                                 .toolbar {
                                     if showSeriesToolbar {
@@ -299,7 +335,7 @@ struct ExerciseView: View {
                             Text(exercise.intensityIndex.descritpion)
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
-
+                            
                             TextField("eg. 5 or 5-6", text: $exercise.intensity)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
@@ -313,6 +349,11 @@ struct ExerciseView: View {
                                 .onChange(of: isIntensityFocused) { _, focused in
                                     validateIntensity(focused: focused)
                                     showIntensityToolbar = focused
+                                }
+                                .onChange(of: exercise.intensity) { _, _ in
+                                    if wasRoutineLoaded {
+                                        wasExerciseModified = true
+                                    }
                                 }
                                 .toolbar {
                                     if showIntensityToolbar {
@@ -351,6 +392,11 @@ struct ExerciseView: View {
                                     validatePace(focused: focused)
                                     showPaceToolbar = focused
                                 }
+                                .onChange(of: exercise.pace) { _, _ in
+                                    if wasRoutineLoaded {
+                                        wasExerciseModified = true
+                                    }
+                                }
                                 .toolbar {
                                     if showPaceToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
@@ -373,6 +419,11 @@ struct ExerciseView: View {
             }
             //.padding(.horizontal)
             .animation(.easeInOut, value: isDetailsVisible)
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                wasRoutineLoaded = true
+            }
         }
     }
     
@@ -512,7 +563,7 @@ struct RoutineListView_Previews: PreviewProvider {
     @State static var descriptionType: DescriptionType? = DescriptionType.pace
     @State static var alertType: AlertType? = AlertType.description(descriptionType!)
     static var previews: some View {
-        RoutineListView(routine: $routine, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
+        RoutineListView(routine: $routine, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType, wasExerciseModified: $showError)
     }
 }
 

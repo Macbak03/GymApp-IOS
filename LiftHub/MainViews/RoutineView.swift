@@ -9,11 +9,18 @@ import SwiftUI
 import Foundation
 
 struct RoutineView: View {
-    @State private var routineDraft: [ExerciseDraft] = []
-    @State var routineName: String = ""
     let originalRoutineName: String?
     let planName: String
     let planId: Int64
+    
+    @Binding var refreshRoutines: Bool
+    @Binding var successfullySaved: Bool
+    @Binding var savedMessage: String
+    
+    @State private var routineDraft: [ExerciseDraft] = []
+    @State private var routineName: String = ""
+    @State private var wasExerciseModified = false
+    
     private let exercisesDatabaseHelper = ExercisesDataBaseHelper()
     
     @State private var showAlertDialog = false
@@ -22,12 +29,10 @@ struct RoutineView: View {
     @State private var showToast = false
     @State private var toastMessage = ""
     
-    @Binding var refreshRoutines: Bool
-    @Binding var successfullySaved: Bool
-    @Binding var savedMessage: String
-    
     @State private var descriptionType: DescriptionType? = nil
     @State private var alertType: AlertType? = nil
+    @State private var wasRoutineLoaded = false
+    
     
     var body: some View {
         GeometryReader { geometry in
@@ -43,13 +48,18 @@ struct RoutineView: View {
                             .background(Color.ShadowColor)
                             .cornerRadius(10)
                             .padding(.horizontal, 50)
-                        
                             .multilineTextAlignment(.center)
+                            .onChange(of: routineName) { _, _ in
+                                if wasRoutineLoaded {
+                                    wasExerciseModified = true
+                                }
+                            }
+                        
                         
                         Spacer() // Push the TextField to the center
                     }
                     
-                    RoutineListView(routine: $routineDraft, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
+                    RoutineListView(routine: $routineDraft, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType, wasExerciseModified: $wasExerciseModified)
                         .onAppear() {
                             loadRoutine()
                         }
@@ -92,7 +102,11 @@ struct RoutineView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: {
-                    alertType = .navigation
+                    if wasExerciseModified {
+                        alertType = .navigation
+                    } else {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }) {
                     HStack {
                         Image (systemName: "chevron.left")
@@ -124,12 +138,18 @@ struct RoutineView: View {
                 }
             }
         }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                wasRoutineLoaded = true
+            }
+        }
         .toast(isShowing: $showToast, message: toastMessage)
     }
     
     private func addExercise() {
         let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
         routineDraft.append(newExercise)
+        wasExerciseModified = true
     }
     
     private func showDescriptionDialog(title: String, message: String) -> Alert {
@@ -249,7 +269,7 @@ struct RoutineView_Previews: PreviewProvider {
     @State static var savedMessage = ""
     static var previews: some View {
         GeometryReader { geometry in
-            RoutineView(routineName: "", originalRoutineName: nil, planName: "Plan", planId: 0, refreshRoutines: $refreshRoutines, successfullySaved: $successfullySaved, savedMessage: $savedMessage)
+            RoutineView(originalRoutineName: nil, planName: "Plan", planId: 0, refreshRoutines: $refreshRoutines, successfullySaved: $successfullySaved, savedMessage: $savedMessage)
         }
     }
 }
