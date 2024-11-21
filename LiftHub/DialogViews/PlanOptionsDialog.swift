@@ -9,8 +9,7 @@
 import SwiftUI
 
 struct PlanOptionsDialog: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+    @ObservedObject var viewModel: PlansViewModel
     let position: Int
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
@@ -42,8 +41,8 @@ struct PlanOptionsDialog: View {
                             .multilineTextAlignment(.center)
                             .onAppear {
                                 // Set the initial value of planName
-                                if position < trainingPlans.count {
-                                    planName = trainingPlans[position].name
+                                if position < viewModel.trainingPlans.count {
+                                    planName = viewModel.trainingPlans[position].name
                                 }
                             }
                     }
@@ -68,11 +67,11 @@ struct PlanOptionsDialog: View {
                     .padding(.horizontal, 30)
                     .padding(.top, 10)
                     .sheet(isPresented: $showEditPlanDialog, onDismiss: {
-                        if position < trainingPlans.count {
-                            planName = trainingPlans[position].name
+                        if position < viewModel.trainingPlans.count {
+                            planName = viewModel.trainingPlans[position].name
                         }
                     }) {
-                        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planName, position: position)
+//                        CreatePlanDialogView(viewModel: viewModel, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planName, position: position)
                     }
                     
                     // Delete Button
@@ -97,7 +96,7 @@ struct PlanOptionsDialog: View {
                             title: Text("Warning"),
                             message: Text("Are you sure you want to delete \(planName)?"),
                             primaryButton: .destructive(Text("OK")) {
-                                deletePlan()
+                                //viewModel.deletePlan(planName: planName, position: position)
                                 presentationMode.wrappedValue.dismiss()
                             },
                             secondaryButton: .cancel()
@@ -133,10 +132,6 @@ struct PlanOptionsDialog: View {
         }
     }
     
-    func deletePlan() {
-        plansDatabaseHelper.deletePlan(planName: planName)
-        trainingPlans.remove(at: position)
-    }
 }
 
 struct OptionsDialog_Previews: PreviewProvider {
@@ -144,6 +139,6 @@ struct OptionsDialog_Previews: PreviewProvider {
     static var plansDatabaseHelper = PlansDataBaseHelper()
     @State static var planName = "Plan"
     static var previews: some View {
-        PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: 1)
+        PlanOptionsDialog(viewModel: PlansViewModel(), position: 1)
     }
 }

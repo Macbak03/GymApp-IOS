@@ -8,43 +8,32 @@
 import SwiftUI
 
 struct RoutineListView: View {
-    @Binding var routine: [ExerciseDraft]
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
-    @Binding var descriptionType: DescriptionType?
-    @Binding var alertType: AlertType?
-    @Binding var wasExerciseModified: Bool
+    @ObservedObject var viewModel: RoutineDetailsViewModel
     
     var body: some View {
         List {
-            ForEach(routine.indices, id: \.self) {
-                index in
-                ExerciseView(exercise: $routine[index], descriptionType: $descriptionType, alertType: $alertType, showToast: $showToast, toastMessage: $toastMessage, wasExerciseModified: $wasExerciseModified)
+            ForEach(viewModel.routineDraft) {
+                exercise in
+                ExerciseView(viewModel: ExerciseViewModel(exerciseDraft: exercise), routineDetailsViewModel: viewModel)
                 
             }
             .onDelete(perform: { indexSet in
-                deleteItem(atOffsets: indexSet)
+                viewModel.deleteItem(atOffsets: indexSet)
             })
             .onMove(perform: { from, to in
-                moveItem(from: from, to: to)
+                viewModel.moveItem(from: from, to: to)
             })
         }
         .listStyle(PlainListStyle())
     }
     
-    private func deleteItem(atOffsets: IndexSet) {
-        routine.remove(atOffsets: atOffsets)
-        wasExerciseModified = true
-    }
-    
-    private func moveItem(from source: IndexSet, to destination: Int) {
-        routine.move(fromOffsets: source, toOffset: destination)
-    }
 }
 
 struct ExerciseView: View {
+    @StateObject var viewModel: ExerciseViewModel
+    @ObservedObject var routineDetailsViewModel: RoutineDetailsViewModel
     @State private var isDetailsVisible: Bool = false
-    @Binding var exercise: ExerciseDraft
+    //@Binding var exercise: ExerciseDraft
     private let labelWidth: CGFloat = 50
     
     @FocusState private var isExerciseNameFocused: Bool
@@ -54,22 +43,6 @@ struct ExerciseView: View {
     @FocusState private var isSeriesFocused: Bool
     @FocusState private var isIntensityFocused: Bool
     @FocusState private var isPaceFocused: Bool
-    
-    @State private var showNameError = false
-    @State private var showPauseError = false
-    @State private var showLoadError = false
-    @State private var showRepsError = false
-    @State private var showSeriesError = false
-    @State private var showIntensityError = false
-    @State private var showPaceError = false
-    
-    @Binding var descriptionType: DescriptionType?
-    @Binding var alertType: AlertType?
-    
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
-    
-    @Binding var wasExerciseModified: Bool
     
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldPadding: CGFloat = 6
@@ -102,7 +75,7 @@ struct ExerciseView: View {
                             }
                         }
                     
-                    TextField("Exercise name", text: $exercise.name)
+                    TextField("Exercise name", text: $viewModel.exerciseDraft.name)
                         .font(.system(size: 18, weight: .bold))
                         .frame(height: 30)
                         .padding(.leading, 10)
@@ -112,7 +85,7 @@ struct ExerciseView: View {
                     
                         .overlay(Rectangle() // Add underline
                             .frame(height: 1) // Thickness of underline
-                            .foregroundColor(showNameError ? .red : Color.TextUnderline) // Color of underline
+                            .foregroundColor(viewModel.showNameError ? .red : Color.TextUnderline) // Color of underline
                             .padding(.trailing, 37)
                             .padding(.leading, 10)
                             .padding(.top, 40),
@@ -120,11 +93,11 @@ struct ExerciseView: View {
                         )// Adjust underline position
                         .focused($isExerciseNameFocused)
                         .onChange(of: isExerciseNameFocused) { _, focused in
-                            validateExerciseName(focused: focused)
+                            viewModel.validateExerciseName(focused: focused, viewModel: routineDetailsViewModel)
                         }
-                        .onChange(of: exercise.name) { _, _ in
+                        .onChange(of: viewModel.exerciseDraft.name) { _, _ in
                             if wasRoutineLoaded {
-                                wasExerciseModified = true
+                                routineDetailsViewModel.wasExerciseModified = true
                             }
                         }
                     
@@ -141,34 +114,34 @@ struct ExerciseView: View {
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .multilineTextAlignment(.trailing)
                                 .font(.system(size: textSize))
-                            TextField("eg. 3 or 3-5", text: $exercise.pause)
+                            TextField("eg. 3 or 3-5", text: $viewModel.exerciseDraft.pause)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                        .stroke((showPauseError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                                        .stroke((viewModel.showPauseError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isPauseFocused)
                                 .onChange(of: isPauseFocused) { _, focused in
-                                    validatePause(focused: focused)
+                                    viewModel.validatePause(focused: focused, viewModel: routineDetailsViewModel)
                                     showPauseToolbar = focused
                                 }
-                                .onChange(of: exercise.pause) { _, _ in
+                                .onChange(of: viewModel.exerciseDraft.pause) { _, _ in
                                     if wasRoutineLoaded {
-                                        wasExerciseModified = true
+                                        routineDetailsViewModel.wasExerciseModified = true
                                     }
                                 }
                                 .toolbar {
                                     if showPauseToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
-                                            CustomKeyboardToolbar(textFieldValue: $exercise.pause)
+                                            CustomKeyboardToolbar(textFieldValue: $viewModel.exerciseDraft.pause)
                                         }
                                     }
                                 }
                             
-                            Picker("Rest", selection: $exercise.pauseUnit) {
+                            Picker("Rest", selection: $viewModel.exerciseDraft.pauseUnit) {
                                 ForEach(TimeUnit.allCases, id: \.self) { unit in
                                     Text(unit.descritpion).tag(unit)
                                 }
@@ -176,17 +149,17 @@ struct ExerciseView: View {
                             .labelsHidden()
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 60, alignment: .trailing)
-                            .onChange(of: exercise.pauseUnit) { _, _ in
+                            .onChange(of: viewModel.exerciseDraft.pauseUnit) { _, _ in
                                 if wasRoutineLoaded {
-                                    wasExerciseModified = true
+                                    routineDetailsViewModel.wasExerciseModified = true
                                 }
                             }
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
-                                    descriptionType = .pause
-                                    alertType = .description(DescriptionType.pause)
+                                    routineDetailsViewModel.descriptionType = .pause
+                                    routineDetailsViewModel.alertType = .description(DescriptionType.pause)
                                 }
                         }
                         
@@ -196,34 +169,34 @@ struct ExerciseView: View {
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
                             
-                            TextField("eg. 30", text: $exercise.load)
+                            TextField("eg. 30", text: $viewModel.exerciseDraft.load)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                        .stroke((showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                                        .stroke((viewModel.showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isLoadFocused)
                                 .onChange(of: isLoadFocused) { _, focused in
-                                    validateLoad(focused: focused)
+                                    viewModel.validateLoad(focused: focused, viewModel: routineDetailsViewModel)
                                     showLoadToolbar = focused
                                 }
-                                .onChange(of: exercise.load) { _, _ in
+                                .onChange(of: viewModel.exerciseDraft.load) { _, _ in
                                     if wasRoutineLoaded {
-                                        wasExerciseModified = true
+                                        routineDetailsViewModel.wasExerciseModified = true
                                     }
                                 }
                                 .toolbar {
                                     if showLoadToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
-                                            CustomKeyboardToolbar(textFieldValue: $exercise.load)
+                                            CustomKeyboardToolbar(textFieldValue: $viewModel.exerciseDraft.load)
                                         }
                                     }
                                 }
                             
-                            Picker("Load", selection: $exercise.loadUnit) {
+                            Picker("Load", selection: $viewModel.exerciseDraft.loadUnit) {
                                 ForEach(WeightUnit.allCases, id: \.self) { unit in
                                     Text(unit.descritpion).tag(unit)
                                 }
@@ -231,17 +204,17 @@ struct ExerciseView: View {
                             .labelsHidden()
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 60, alignment: .trailing)
-                            .onChange(of: exercise.loadUnit) { _, _ in
+                            .onChange(of: viewModel.exerciseDraft.loadUnit) { _, _ in
                                 if wasRoutineLoaded {
-                                    wasExerciseModified = true
+                                    routineDetailsViewModel.wasExerciseModified = true
                                 }
                             }
                             
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
-                                    descriptionType = .load
-                                    alertType = .description(DescriptionType.load)
+                                    routineDetailsViewModel.descriptionType = .load
+                                    routineDetailsViewModel.alertType = .description(DescriptionType.load)
                                     
                                 }
                         }
@@ -251,29 +224,29 @@ struct ExerciseView: View {
                             Text("Reps")
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
-                            TextField("eg. 6 or 6-8", text: $exercise.reps)
+                            TextField("eg. 6 or 6-8", text: $viewModel.exerciseDraft.reps)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                        .stroke((showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                                        .stroke((viewModel.showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isRepsFocused)
                                 .onChange(of: isRepsFocused) {_,  focused in
-                                    validateReps(focused: focused)
+                                    viewModel.validateReps(focused: focused, viewModel: routineDetailsViewModel)
                                     showRepsToolbar = focused
                                 }
-                                .onChange(of: exercise.reps) { _, _ in
+                                .onChange(of: viewModel.exerciseDraft.reps) { _, _ in
                                     if wasRoutineLoaded {
-                                        wasExerciseModified = true
+                                        routineDetailsViewModel.wasExerciseModified = true
                                     }
                                 }
                                 .toolbar {
                                     if showRepsToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
-                                            CustomKeyboardToolbar(textFieldValue: $exercise.reps)
+                                            CustomKeyboardToolbar(textFieldValue: $viewModel.exerciseDraft.reps)
                                         }
                                     }
                                 }
@@ -281,8 +254,8 @@ struct ExerciseView: View {
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
-                                    descriptionType = .reps
-                                    alertType = .description(DescriptionType.reps)
+                                    routineDetailsViewModel.descriptionType = .reps
+                                    routineDetailsViewModel.alertType = .description(DescriptionType.reps)
                                     
                                 }
                         }
@@ -293,29 +266,29 @@ struct ExerciseView: View {
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
                             
-                            TextField("eg. 3", text: $exercise.series)
+                            TextField("eg. 3", text: $viewModel.exerciseDraft.series)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                        .stroke((showSeriesError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                                        .stroke((viewModel.showSeriesError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isSeriesFocused)
                                 .onChange(of: isSeriesFocused) { _, focused in
-                                    validateSeries(focused: focused)
+                                    viewModel.validateSeries(focused: focused, viewModel: routineDetailsViewModel)
                                     showSeriesToolbar = focused
                                 }
-                                .onChange(of: exercise.series) { _, _ in
+                                .onChange(of: viewModel.exerciseDraft.series) { _, _ in
                                     if wasRoutineLoaded {
-                                        wasExerciseModified = true
+                                        routineDetailsViewModel.wasExerciseModified = true
                                     }
                                 }
                                 .toolbar {
                                     if showSeriesToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
-                                            CustomKeyboardToolbar(textFieldValue: $exercise.series)
+                                            CustomKeyboardToolbar(textFieldValue: $viewModel.exerciseDraft.series)
                                         }
                                     }
                                 }
@@ -323,8 +296,8 @@ struct ExerciseView: View {
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
-                                    descriptionType = .series
-                                    alertType = .description(DescriptionType.series)
+                                    routineDetailsViewModel.descriptionType = .series
+                                    routineDetailsViewModel.alertType = .description(DescriptionType.series)
                                     
                                 }
                             
@@ -332,33 +305,33 @@ struct ExerciseView: View {
                         
                         // Intensity Section
                         HStack {
-                            Text(exercise.intensityIndex.descritpion)
+                            Text(viewModel.exerciseDraft.intensityIndex.descritpion)
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
                             
-                            TextField("eg. 5 or 5-6", text: $exercise.intensity)
+                            TextField("eg. 5 or 5-6", text: $viewModel.exerciseDraft.intensity)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                        .stroke((showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                                        .stroke((viewModel.showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isIntensityFocused)
                                 .onChange(of: isIntensityFocused) { _, focused in
-                                    validateIntensity(focused: focused)
+                                    viewModel.validateIntensity(focused: focused, viewModel: routineDetailsViewModel)
                                     showIntensityToolbar = focused
                                 }
-                                .onChange(of: exercise.intensity) { _, _ in
+                                .onChange(of: viewModel.exerciseDraft.intensity) { _, _ in
                                     if wasRoutineLoaded {
-                                        wasExerciseModified = true
+                                        routineDetailsViewModel.wasExerciseModified = true
                                     }
                                 }
                                 .toolbar {
                                     if showIntensityToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
-                                            CustomKeyboardToolbar(textFieldValue: $exercise.intensity)
+                                            CustomKeyboardToolbar(textFieldValue: $viewModel.exerciseDraft.intensity)
                                         }
                                     }
                                 }
@@ -366,8 +339,8 @@ struct ExerciseView: View {
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
-                                    descriptionType = .intensity
-                                    alertType = .description(DescriptionType.intensity)
+                                    routineDetailsViewModel.descriptionType = .intensity
+                                    routineDetailsViewModel.alertType = .description(DescriptionType.intensity)
                                     
                                 }
                         }
@@ -378,29 +351,29 @@ struct ExerciseView: View {
                                 .frame(width: labelWidth, alignment: .trailing)
                                 .font(.system(size: textSize))
                             
-                            TextField("eg. 2110 or 21x0", text: $exercise.pace)
+                            TextField("eg. 2110 or 21x0", text: $viewModel.exerciseDraft.pace)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: textSize))
                                 .padding(textFieldPadding)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                        .stroke((showPaceError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                                        .stroke((viewModel.showPaceError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .focused($isPaceFocused)
                                 .onChange(of: isPaceFocused) { _, focused in
-                                    validatePace(focused: focused)
+                                    viewModel.validatePace(focused: focused, viewModel: routineDetailsViewModel)
                                     showPaceToolbar = focused
                                 }
-                                .onChange(of: exercise.pace) { _, _ in
+                                .onChange(of: viewModel.exerciseDraft.pace) { _, _ in
                                     if wasRoutineLoaded {
-                                        wasExerciseModified = true
+                                        routineDetailsViewModel.wasExerciseModified = true
                                     }
                                 }
                                 .toolbar {
                                     if showPaceToolbar {
                                         ToolbarItemGroup(placement: .keyboard) {
-                                            CustomKeyboardToolbar(textFieldValue: $exercise.pace)
+                                            CustomKeyboardToolbar(textFieldValue: $viewModel.exerciseDraft.pace)
                                         }
                                     }
                                 }
@@ -408,8 +381,8 @@ struct ExerciseView: View {
                             Image(systemName: "info.circle")
                                 .frame(width: descriptionImageFrameDimentions, height: descriptionImageFrameDimentions)
                                 .onTapGesture {
-                                    descriptionType = .pace
-                                    alertType = .description(DescriptionType.pace)
+                                    routineDetailsViewModel.descriptionType = .pace
+                                    routineDetailsViewModel.alertType = .description(DescriptionType.pace)
                                     
                                 }
                         }
@@ -421,136 +394,13 @@ struct ExerciseView: View {
             .animation(.easeInOut, value: isDetailsVisible)
         }
         .onAppear {
+            //viewModel.initExercise(exerciseDraft: exercise)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 wasRoutineLoaded = true
             }
         }
     }
     
-    private func setToast(errorMessage: String) {
-        toastMessage = errorMessage
-        showToast = true
-    }
-    
-    private func handleExerciseNameException() throws {
-        if exercise.name.isEmpty {
-            throw ValidationException(message: "Exercise name cannot be empty")
-        }
-    }
-    
-    private func validateExerciseName(focused: Bool) {
-        if !focused {
-            do {
-                try handleExerciseNameException()
-            } catch let error as ValidationException {
-                showNameError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showNameError = false
-        }
-    }
-    
-    private func validatePause(focused: Bool) {
-        if !focused {
-            do {
-                try _ = PauseFactory.fromString(exercise.pause, unit: exercise.pauseUnit)
-            } catch let error as ValidationException {
-                showPauseError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showPauseError = false
-        }
-    }
-    
-    private func validateLoad(focused: Bool) {
-        if !focused {
-            do {
-                try _ = Weight.fromStringWithUnit(exercise.load, unit: exercise.loadUnit)
-            } catch let error as ValidationException {
-                showLoadError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showLoadError = false
-        }
-    }
-    
-    private func validateReps(focused: Bool) {
-        if !focused {
-            do {
-                try _ = RepsFactory.fromString(exercise.reps)
-            } catch let error as ValidationException {
-                showRepsError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showRepsError = false
-        }
-    }
-    
-    func handleSeriesException() throws {
-        if exercise.series.isEmpty {
-            throw ValidationException(message: "Series cannot be empty")
-        }
-        guard let _ = Int(exercise.series) else {
-            throw ValidationException(message: "Series must be a number")
-        }
-    }
-    
-    func validateSeries(focused: Bool) {
-        if !focused {
-            do {
-                try handleSeriesException()
-            } catch let error as ValidationException {
-                showSeriesError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showSeriesError = false
-        }
-    }
-    
-    func validateIntensity(focused: Bool) {
-        if !focused {
-            do {
-                try _ = IntensityFactory.fromString(exercise.intensity, index: exercise.intensityIndex)
-            } catch let error as ValidationException {
-                showIntensityError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showIntensityError = false
-        }
-    }
-    
-    func validatePace(focused: Bool) {
-        if !focused {
-            do {
-                try _ = ExercisePace.fromString(exercise.pace)
-            } catch let error as ValidationException {
-                showPaceError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showPaceError = false
-        }
-    }
 }
 
 struct RoutineListView_Previews: PreviewProvider {
@@ -563,7 +413,7 @@ struct RoutineListView_Previews: PreviewProvider {
     @State static var descriptionType: DescriptionType? = DescriptionType.pace
     @State static var alertType: AlertType? = AlertType.description(descriptionType!)
     static var previews: some View {
-        RoutineListView(routine: $routine, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType, wasExerciseModified: $showError)
+        RoutineListView(viewModel: RoutineDetailsViewModel())
     }
 }
 

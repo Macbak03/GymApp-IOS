@@ -80,5 +80,42 @@ class RoutinesDataBaseHelper: Repository {
             return false
         }
     }
+    
+    func getRoutineId(planId: Int64, originalRoutineName: String?) -> Int64? {
+        if originalRoutineName != nil {
+            guard let originalRoutineName = originalRoutineName else {
+                return nil
+            }
+            let query = routinesTable.filter(self.planId == planId && self.routineName == originalRoutineName)
+            do {
+                let rows = try db?.prepare(query)
+                
+                for row in rows! {
+                    print("Found Routine ID: \(row[self.routineId]) for planName: \(row[self.routineName])")
+                    return row[self.routineId]
+                }
+                
+                print("No record found for planName: \(routineName)")
+                
+            } catch {
+                print("Error fetching plan ID: \(error)")
+            }
+        }
+        
+        return nil
+    }
+    
+    func doesRoutineExist(routineName: String, planId: Int64, originalRoutineName: String?) -> Bool {
+        guard let routineId = getRoutineId(planId: planId, originalRoutineName: originalRoutineName) else {
+            return false
+        }
+        do {
+            let query = routinesTable.filter(self.planId == planId && self.routineName == routineName && self.routineId != routineId)
+            return try db?.scalar(query.count) ?? 0 > 0
+        } catch {
+            print("Error checking if routine exists: \(error)")
+            return false
+        }
+    }
 }
 

@@ -58,15 +58,28 @@ struct RepsFactory {
                 throw ValidationException(message: "First number of the range must be lower than the second number")
             }
             
+            if intRangeFrom > 500 {
+                throw ValidationException(message: "Bruh, I think it's time to increase the weight at this point")
+            }
+            if intRangeTo > 500 {
+                throw ValidationException(message: "Bruh, I think it's time to increase the weight at this point")
+            }
+            
             return RangeReps(from: intRangeFrom, to: intRangeTo)
         }
         // Case 2: Exact value match
         else if matchExactValueRange.location != NSNotFound {
             let exactValue = (reps as NSString).substring(with: matchExactValueRange)
             
-            if let intValue = Int(exactValue) {
-                return ExactReps(value: intValue)
+            guard let intValue = Int(exactValue) else {
+                throw ValidationException(message: "Reps cannot be decimal number")
             }
+            
+            if intValue > 500 {
+                throw ValidationException(message: "Bruh, I think it's time to increase the weight at this point")
+            }
+            
+            return ExactReps(value: intValue)
         }
         
         // If nothing matched, throw an error

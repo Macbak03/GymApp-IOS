@@ -33,20 +33,21 @@ struct EditHistoryDetailsView: View {
             .toast(isShowing: $showToast, message: toastMessage)
             .navigationTitle(workoutHistoryElement.routineName)
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Cancel")
+                            .foregroundStyle(Color.red)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        Button(action: {
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            Text("Cancel")
-                                .foregroundStyle(Color.red)
-                        }
-                        Button(action: {
-                            editHistoryDetails()
-                        }) {
-                            Text("Save")
-                        }
+                    Button(action: {
+                        editHistoryDetails()
+                    }) {
+                        Text("Save")
                     }
                 }
             }

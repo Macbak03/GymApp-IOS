@@ -9,20 +9,9 @@ import SwiftUI
 import Foundation
 
 struct RoutinesView: View {
-    @State private var routines: [TrainingPlanElement] = []
-    @State private var openRoutine = false
     let planName: String
-    let plansDatabaseHelper: PlansDataBaseHelper
-    private let routinesDatabaseHelper = RoutinesDataBaseHelper()
+    @StateObject var viewModel = RoutinesViewModel()
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
-    
-    @State private var showToast = false
-    @State private var refreshRoutines = false
-    @State private var toastMessage = ""
-    
-    @State private var performDelete = false
-    
-    @State private var planId: Int64 = -1
     
     var body: some View {
         
@@ -30,48 +19,38 @@ struct RoutinesView: View {
         GeometryReader { geometry in
             ZStack {
                 VStack {
-                    
-                    RoutinesListView(routines: $routines, planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
-                        .onChange(of: refreshRoutines) { _, refreshNeeded in
+                    RoutinesListView(viewModel: viewModel)
+                        .onChange(of: viewModel.refreshRoutines) { _, refreshNeeded in
                             if refreshNeeded {
-                                loadRoutines()
-                                refreshRoutines = false
+                                viewModel.loadRoutines()
+                                viewModel.refreshRoutines = false
                             }
                             
                         }
                         .onAppear() {
-                            loadRoutines()
+                            viewModel.initPlanName(planName: planName)
+                            viewModel.loadRoutines()
                         }
                     
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
-                .fullScreenCover(isPresented: $openRoutine) {
-                    RoutineView(originalRoutineName: nil, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage)
-                }
             }
             .navigationTitle(planName)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(
-                        destination: RoutineView(originalRoutineName: nil, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage),
+                        destination: RoutineView(originalRoutineName: nil, routinesViewModel: viewModel),
                         label: {
                             Image(systemName: "plus")
                         }
                     )
                 }
             }
-            .toast(isShowing: $showToast, message: toastMessage)
+            .toast(isShowing: $viewModel.showToast, message: viewModel.toastMessage)
             .onAppear() {
-                guard let checkedPlanId = plansDatabaseHelper.getPlanId(planName: planName) else {
-                    return
-                }
-                planId = checkedPlanId
+                
             }
         }
-    }
-    
-    private func loadRoutines() {
-        routines = routinesDatabaseHelper.getRoutinesInPlan(planId: planId)
     }
 }
 
@@ -102,6 +81,6 @@ private struct AddButton: View {
 struct RoutinesView_Previews: PreviewProvider {
     static var plansDatabaseHelper = PlansDataBaseHelper()
     static var previews: some View {
-        RoutinesView(planName: "Plan", plansDatabaseHelper: plansDatabaseHelper)
+        RoutinesView(planName: "", viewModel: RoutinesViewModel())
     }
 }

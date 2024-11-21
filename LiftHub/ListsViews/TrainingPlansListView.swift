@@ -8,56 +8,55 @@
 import SwiftUI
 
 struct TrainingPlansListView: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+    @ObservedObject var viewModel: PlansViewModel
     var body: some View {
         List {
-            ForEach(trainingPlans.indices, id: \.self) {
+            ForEach(viewModel.trainingPlans.indices, id: \.self) {
                 index in
                 NavigationLink(
-                    destination: RoutinesView(planName: trainingPlans[index].name, plansDatabaseHelper: plansDatabaseHelper),
+                    destination: RoutinesView(planName: viewModel.trainingPlans[index].name),
                     label: {
-                        TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: index)
+                        TrainingPlansElementView(viewModel: viewModel, position: index)
                     }
                 )
                 
             }
-            .onDelete(perform: { indexSet in
-                deletePlan(atOffsets: indexSet)
-            })
+//            .onDelete(perform: { indexSet in
+//                viewModel.deletePlan(atOffsets: indexSet)
+//            })
             .padding(.top, 5)
         }
     }
-    private func deletePlan(atOffsets indexSet: IndexSet) {
-        indexSet.forEach { index in
-            let planName = trainingPlans[index].name
-            plansDatabaseHelper.deletePlan(planName: planName)
-
-        }
-        trainingPlans.remove(atOffsets: indexSet)
-    }
+//    private func deletePlan(atOffsets indexSet: IndexSet) {
+//        indexSet.forEach { index in
+//            let planName = trainingPlans[index].name
+//            plansDatabaseHelper.deletePlan(planName: planName)
+//
+//        }
+//        trainingPlans.remove(atOffsets: indexSet)
+//    }
 }
 
 struct TrainingPlansElementView: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+    @ObservedObject var viewModel: PlansViewModel
+    @StateObject var planViewModel =  PlanViewModel()
     let position: Int
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
-    @State private var planName: String = ""
+//    @State private var planName: String = ""
     @State private var openRoutines = false
     @State private var showAlertDialog = false
     @State private var showEditPlanDialog = false
     var body: some View {
         
         HStack {
-            Text(planName)
+            Text(planViewModel.planName ?? "")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(Color.TextColorPrimary)
                 .onAppear {
                     // Set the initial value of planName
-                    if position < trainingPlans.count {
-                        planName = trainingPlans[position].name
+                    if position < viewModel.trainingPlans.count {
+                        
                     }
                 }
                 .allowsHitTesting(false)
@@ -77,7 +76,7 @@ struct TrainingPlansElementView: View {
                 }
                 
                 
-                Button(action: {
+                Button(role: .destructive, action: {
                     showAlertDialog = true
                 }) {
                     HStack {
@@ -106,39 +105,39 @@ struct TrainingPlansElementView: View {
         }
             
         .sheet(isPresented: $showEditPlanDialog, onDismiss: {
-            if position < trainingPlans.count {
-                planName = trainingPlans[position].name
+            if position < viewModel.trainingPlans.count {
+                planViewModel.planName = viewModel.trainingPlans[position].name
             }
         }) {
-            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planName, position: position)
+            CreatePlanDialogView(plansViewModel: viewModel, planViewModel: planViewModel, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planViewModel.planName ?? "")
         }
-//        .onTapGesture {
-//            //showOptionsDialog = true
-//        }
         .alert(isPresented: $showAlertDialog) {
             Alert(
                 title: Text("Warning"),
-                message: Text("Are you sure you want to delete \(planName)?"),
+                message: Text("Are you sure you want to delete \(String(describing: planViewModel.planName))?"),
                 primaryButton: .destructive(Text("OK")) {
-                    deletePlan()
+                    do {
+                        try viewModel.deletePlan(planName: planViewModel.planName, position: planViewModel.position)
+                    } catch let exception as ValidationException {
+                        print(exception.message)
+                    } catch {
+                        print("Unexpected error occured when deleting plan: \(error)")
+                    }
                 },
                 secondaryButton: .cancel()
             )
         }
+        .onAppear(){
+            if position < viewModel.trainingPlans.count {
+                planViewModel.initViewModel(planName: viewModel.trainingPlans[position].name, position: position)
+            }
+        }
         
-    }
-    
-    private func deletePlan() {
-        plansDatabaseHelper.deletePlan(planName: planName)
-        trainingPlans.remove(at: position)
     }
 }
 
 struct TrainingPlansListView_Previews: PreviewProvider {
-    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
-    static var plansDatabaseHelper = PlansDataBaseHelper()
-    
     static var previews: some View {
-        TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
+        TrainingPlansListView(viewModel: PlansViewModel())
     }
 }

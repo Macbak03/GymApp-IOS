@@ -40,9 +40,12 @@ struct HistoryListElementView: View {
     let position: Int
     @State private var showOptionsDialog = false
     @State private var openHistoryDetails = false
+    @State private var openEditHistory = false
+    @State private var showAlertDialog = false
     
     @Binding var showToast: Bool
     @Binding var toastMessage: String
+    
 
     var body: some View {
         VStack {
@@ -70,36 +73,73 @@ struct HistoryListElementView: View {
                             .allowsHitTesting(false)
 
                     }
-//                    .padding(.bottom, 5)
-//                    .padding(.horizontal, 25)
+
                 }
-                Button(action: {
-                    showOptionsDialog = true
-                }) {
-                    Image(systemName: "ellipsis")
-                        .resizable()
-                        .frame(width: 15, height: 3)
-                        .padding()
-                        .rotationEffect(.degrees(90))
+                Menu {
+                    NavigationLink ( 
+                        destination: EditHistoryDetailsView(workoutHistoryElement: historyItem, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage),
+                        label: {
+                            Button(action: {
+                                openEditHistory = true
+                            }) {
+                                HStack {
+                                    Text("Edit")
+                                        .foregroundColor(Color.accentColor)
+                                    Image(systemName: "square.and.pencil")
+                                        .padding()
+                                        .foregroundColor(Color.accentColor)
+                                }
+                            }
+                        }
+                    )
+                    
+                    Button(role: .destructive, action: {
+                        showAlertDialog = true
+                    }) {
+                        HStack {
+                            Text("Delete")
+                                .foregroundColor(Color.red)
+                            Image(systemName: "trash")
+                                .padding()
+                                .foregroundColor(Color.red)
+                        }
+                        .foregroundStyle(Color.red)
+                    }
+                    
+                } label: {
+                    Button(action: {
+                    }) {
+                        Image(systemName: "ellipsis")
+                            .resizable()
+                            .frame(width: 15, height: 3)
+                            .padding()
+                            .rotationEffect(.degrees(90))
+                    }
+                    .frame(width: 30, height: 20)
+                    .background(Color.clear)
                 }
-                .frame(width: 30, height: 20, alignment: .trailing)
-                .background(Color.clear) // You can modify this to fit the background style
             }
         }
-//        .background(Color.BackgroundColorList)
-//        .cornerRadius(8)
-//        .shadow(radius: 3)
-//        .padding(.horizontal, 10)
-//        .frame(maxWidth: .infinity)
         .onTapGesture {
             showOptionsDialog = true
         }
-        .fullScreenCover(isPresented: $openHistoryDetails){
-            HistoryDetailsView(rawDate: historyItem.rawDate, date: historyItem.formattedDate, planName: historyItem.planName, routineName: history[position].routineName)
+        .alert(isPresented: $showAlertDialog) {
+            Alert(
+                title: Text("Warning"),
+                message: Text("Are you sure you want to delete \(historyItem.routineName) from \(historyItem.formattedDate)?"),
+                primaryButton: .destructive(Text("OK")) {
+                    deleteHistory()
+                },
+                secondaryButton: .cancel()
+            )
         }
-        .sheet(isPresented: $showOptionsDialog) {
-            HistoryOptionsDialog(history: $history, noFilteredHistory: $noFilteredHistory, historyItem: historyItem, showToast: $showToast, toastMessage: $toastMessage)
-        }
+    }
+    
+    private func deleteHistory() {
+        let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
+        workoutHistoryDatabaseHelper.deleteFromHistory(date: historyItem.rawDate)
+        history.removeAll(where: { $0.rawDate == historyItem.rawDate && $0.planName == historyItem.planName && $0.routineName == historyItem.routineName})
+        noFilteredHistory.removeAll(where: { $0.rawDate == historyItem.rawDate && $0.planName == historyItem.planName && $0.routineName == historyItem.routineName})
     }
 }
 
