@@ -8,22 +8,15 @@
 import SwiftUI
 
 struct HistoryListView: View {
-    @Binding var history: [WorkoutHistoryElement]
-    @Binding var noFilteredHistory: [WorkoutHistoryElement]
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
+    @ObservedObject var viewModel: HistoryViewModel
     var body: some View {
         List {
-            ForEach(Array(history.enumerated()), id: \.element) {
+            ForEach(Array(viewModel.filteredHistory.enumerated()), id: \.element) {
                 (index, element) in
                 NavigationLink(
-                    destination: HistoryDetailsView(
-                        rawDate: element.rawDate,
-                        date: element.formattedDate,
-                        planName: element.planName,
-                        routineName: element.routineName),
+                    destination: HistoryDetailsView(viewModel: HistoryDetailsViewModel(historyElement: element)),
                     label: {
-                        HistoryListElementView(history: $history, noFilteredHistory: $noFilteredHistory, historyItem: element, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                        HistoryListElementView(historyViewModel: viewModel, viewModel: HistoryElementViewModel(historyElement: element, position: index, showToast: viewModel.showToast, toastMessage: viewModel.toastMessage))
                     }
                 )
                 
@@ -34,24 +27,21 @@ struct HistoryListView: View {
 }
 
 struct HistoryListElementView: View {
-    @Binding var history: [WorkoutHistoryElement]
-    @Binding var noFilteredHistory: [WorkoutHistoryElement]
-    let historyItem: WorkoutHistoryElement
-    let position: Int
+    @ObservedObject var historyViewModel: HistoryViewModel
+    @StateObject var viewModel: HistoryElementViewModel
+    
     @State private var showOptionsDialog = false
     @State private var openHistoryDetails = false
     @State private var openEditHistory = false
     @State private var showAlertDialog = false
     
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
     
 
     var body: some View {
         VStack {
             ZStack(alignment: .trailing) {
                 VStack {
-                    Text(historyItem.planName)
+                    Text(viewModel.historyElement.planName)
                         .font(.system(size: 18))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 10)
@@ -59,14 +49,14 @@ struct HistoryListElementView: View {
                         .allowsHitTesting(false)
                     
                     HStack {
-                        Text(historyItem.formattedDate)
+                        Text(viewModel.historyElement.formattedDate)
                             .font(.system(size: 18, weight: .bold))
                             .frame(maxWidth: 100, alignment: .leading)
                             .padding(.leading, 10)
                             .allowsHitTesting(false)
 
                         
-                        Text(historyItem.routineName)
+                        Text(viewModel.historyElement.routineName)
                             .font(.system(size: 18))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.trailing, 10)
@@ -77,7 +67,11 @@ struct HistoryListElementView: View {
                 }
                 Menu {
                     NavigationLink ( 
-                        destination: EditHistoryDetailsView(workoutHistoryElement: historyItem, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage),
+                        destination: EditHistoryDetailsView(historyElementViewModel: viewModel)
+                            .onDisappear() {
+                                historyViewModel.showToast = viewModel.showToast
+                                historyViewModel.toastMessage = viewModel.toastMessage
+                            },
                         label: {
                             Button(action: {
                                 openEditHistory = true
@@ -126,21 +120,15 @@ struct HistoryListElementView: View {
         .alert(isPresented: $showAlertDialog) {
             Alert(
                 title: Text("Warning"),
-                message: Text("Are you sure you want to delete \(historyItem.routineName) from \(historyItem.formattedDate)?"),
+                message: Text("Are you sure you want to delete \(viewModel.historyElement.routineName) from \(viewModel.historyElement.formattedDate)?"),
                 primaryButton: .destructive(Text("OK")) {
-                    deleteHistory()
+                    historyViewModel.deleteFromHistory(historyItem: viewModel.historyElement)
                 },
                 secondaryButton: .cancel()
             )
         }
     }
     
-    private func deleteHistory() {
-        let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
-        workoutHistoryDatabaseHelper.deleteFromHistory(date: historyItem.rawDate)
-        history.removeAll(where: { $0.rawDate == historyItem.rawDate && $0.planName == historyItem.planName && $0.routineName == historyItem.routineName})
-        noFilteredHistory.removeAll(where: { $0.rawDate == historyItem.rawDate && $0.planName == historyItem.planName && $0.routineName == historyItem.routineName})
-    }
 }
 
 struct HistoryListView_Previews: PreviewProvider {
@@ -150,6 +138,6 @@ struct HistoryListView_Previews: PreviewProvider {
     @State static var showToast = false
     @State static var toastMessage = ""
     static var previews: some View {
-        HistoryListView(history: $history, noFilteredHistory: $history, showToast: $showToast, toastMessage: $toastMessage)
+        HistoryListView(viewModel: HistoryViewModel())
     }
 }

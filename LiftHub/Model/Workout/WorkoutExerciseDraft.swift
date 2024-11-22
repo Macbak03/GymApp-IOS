@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WorkoutExerciseDraft: Codable {
+struct WorkoutExerciseDraft: Codable, Identifiable {
     var id = UUID()
     var name: String
     var pause: String

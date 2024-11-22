@@ -20,6 +20,13 @@
 		5FCCD20C2CEECE8E00385BCB /* RoutineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD20B2CEECE8E00385BCB /* RoutineViewModel.swift */; };
 		5FCCD20E2CEED2E800385BCB /* RoutineDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD20D2CEED2E800385BCB /* RoutineDetailsViewModel.swift */; };
 		5FCCD2102CEED94D00385BCB /* ExerciseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD20F2CEED94D00385BCB /* ExerciseViewModel.swift */; };
+		5FCCD2122CEFF2C600385BCB /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD2112CEFF2C600385BCB /* HistoryViewModel.swift */; };
+		5FCCD2142CEFF64300385BCB /* HistoryElementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD2132CEFF64300385BCB /* HistoryElementViewModel.swift */; };
+		5FCCD2162CEFFDFE00385BCB /* HistoryDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD2152CEFFDFE00385BCB /* HistoryDetailsViewModel.swift */; };
+		5FCCD2182CF004E400385BCB /* HistoryDetailsElementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD2172CF004E400385BCB /* HistoryDetailsElementViewModel.swift */; };
+		5FCCD21C2CF0081100385BCB /* EditHistoryDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD21B2CF0081100385BCB /* EditHistoryDetailsViewModel.swift */; };
+		5FCCD21E2CF00B3000385BCB /* EditHistoryDetailsElementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD21D2CF00B3000385BCB /* EditHistoryDetailsElementViewModel.swift */; };
+		5FCCD2202CF00EFB00385BCB /* EditHistoryDetailsSeriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD21F2CF00EFB00385BCB /* EditHistoryDetailsSeriesViewModel.swift */; };
 		5FE53E272C8C727C00FB6400 /* LiftHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E262C8C727C00FB6400 /* LiftHubApp.swift */; };
 		5FE53E292C8C727C00FB6400 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE53E282C8C727C00FB6400 /* ContentView.swift */; };
 		5FE53E2B2C8C727D00FB6400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FE53E2A2C8C727D00FB6400 /* Assets.xcassets */; };
@@ -121,6 +128,13 @@
 		5FCCD20B2CEECE8E00385BCB /* RoutineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineViewModel.swift; sourceTree = "<group>"; };
 		5FCCD20D2CEED2E800385BCB /* RoutineDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineDetailsViewModel.swift; sourceTree = "<group>"; };
 		5FCCD20F2CEED94D00385BCB /* ExerciseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseViewModel.swift; sourceTree = "<group>"; };
+		5FCCD2112CEFF2C600385BCB /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
+		5FCCD2132CEFF64300385BCB /* HistoryElementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryElementViewModel.swift; sourceTree = "<group>"; };
+		5FCCD2152CEFFDFE00385BCB /* HistoryDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailsViewModel.swift; sourceTree = "<group>"; };
+		5FCCD2172CF004E400385BCB /* HistoryDetailsElementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailsElementViewModel.swift; sourceTree = "<group>"; };
+		5FCCD21B2CF0081100385BCB /* EditHistoryDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsViewModel.swift; sourceTree = "<group>"; };
+		5FCCD21D2CF00B3000385BCB /* EditHistoryDetailsElementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsElementViewModel.swift; sourceTree = "<group>"; };
+		5FCCD21F2CF00EFB00385BCB /* EditHistoryDetailsSeriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditHistoryDetailsSeriesViewModel.swift; sourceTree = "<group>"; };
 		5FE53E232C8C727C00FB6400 /* Lift-Hub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lift-Hub.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FE53E262C8C727C00FB6400 /* LiftHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftHubApp.swift; sourceTree = "<group>"; };
 		5FE53E282C8C727C00FB6400 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -240,6 +254,13 @@
 				5FCCD20B2CEECE8E00385BCB /* RoutineViewModel.swift */,
 				5FCCD20D2CEED2E800385BCB /* RoutineDetailsViewModel.swift */,
 				5FCCD20F2CEED94D00385BCB /* ExerciseViewModel.swift */,
+				5FCCD2112CEFF2C600385BCB /* HistoryViewModel.swift */,
+				5FCCD2132CEFF64300385BCB /* HistoryElementViewModel.swift */,
+				5FCCD2152CEFFDFE00385BCB /* HistoryDetailsViewModel.swift */,
+				5FCCD2172CF004E400385BCB /* HistoryDetailsElementViewModel.swift */,
+				5FCCD21B2CF0081100385BCB /* EditHistoryDetailsViewModel.swift */,
+				5FCCD21D2CF00B3000385BCB /* EditHistoryDetailsElementViewModel.swift */,
+				5FCCD21F2CF00EFB00385BCB /* EditHistoryDetailsSeriesViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -647,6 +668,7 @@
 				5FE53E792C8F606D00FB6400 /* RoutinesView.swift in Sources */,
 				5FE53E9D2C909AF600FB6400 /* ToastModifier.swift in Sources */,
 				5FE53E732C8E216800FB6400 /* PlansDataBaseHelper.swift in Sources */,
+				5FCCD2142CEFF64300385BCB /* HistoryElementViewModel.swift in Sources */,
 				5FE53E5D2C8CB42000FB6400 /* UserDefaults.Utils.swift in Sources */,
 				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
 				5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */,
@@ -665,15 +687,19 @@
 				5FCCD20A2CEEC46F00385BCB /* RoutinesViewModel.swift in Sources */,
 				5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */,
 				5FE53EBF2C95D2C300FB6400 /* WorkoutHints.swift in Sources */,
+				5FCCD2162CEFFDFE00385BCB /* HistoryDetailsViewModel.swift in Sources */,
 				5FE53ED02C98BB0100FB6400 /* WorkoutHistoryElement.swift in Sources */,
 				5FE53ED22C98DF0600FB6400 /* HistoryDetailsView.swift in Sources */,
 				5FE53E532C8C9F4000FB6400 /* SafeAreaManager.swift in Sources */,
 				5FE53EC92C975DF300FB6400 /* CustomDate.swift in Sources */,
 				5FE53EAB2C93342F00FB6400 /* DeleteBackgroundView.swift in Sources */,
 				5FE53EB02C949E3700FB6400 /* StartWorkoutSheetView.swift in Sources */,
+				5FCCD2202CF00EFB00385BCB /* EditHistoryDetailsSeriesViewModel.swift in Sources */,
 				5FE53E7B2C8F621300FB6400 /* TrainingPlanElement.swift in Sources */,
 				5FE53ED82C99B41500FB6400 /* EditHistoryDetailsView.swift in Sources */,
+				5FCCD2122CEFF2C600385BCB /* HistoryViewModel.swift in Sources */,
 				5FE53E572C8CAB3400FB6400 /* HomeView.swift in Sources */,
+				5FCCD2182CF004E400385BCB /* HistoryDetailsElementViewModel.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
 				5FE53EC72C9732C800FB6400 /* WorkoutSeriesDataBaseHelper.swift in Sources */,
 				5FE53E5A2C8CB2B700FB6400 /* Color.swift in Sources */,
@@ -686,6 +712,7 @@
 				5FE53EA62C91D23700FB6400 /* ExercisesDataBaseHelper.swift in Sources */,
 				5FE53ECD2C98BA5100FB6400 /* HistoryListView.swift in Sources */,
 				5FCCD2062CEEAD0F00385BCB /* PlansViewModel.swift in Sources */,
+				5FCCD21E2CF00B3000385BCB /* EditHistoryDetailsElementViewModel.swift in Sources */,
 				5FCCD1FC2CE3EDD400385BCB /* ChartView.swift in Sources */,
 				5FE53EB72C94B79400FB6400 /* WorkoutSeriesDraft.swift in Sources */,
 				5F88E9742CBF100B002C345C /* CustomKeyboardToolbar.swift in Sources */,
@@ -704,6 +731,7 @@
 				5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */,
 				5FE53ECB2C98974400FB6400 /* HistoryView.swift in Sources */,
 				5FE53EDA2C99BF7B00FB6400 /* EditHistoryDetailsListView.swift in Sources */,
+				5FCCD21C2CF0081100385BCB /* EditHistoryDetailsViewModel.swift in Sources */,
 				5FE53EA82C9204B200FB6400 /* Repository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

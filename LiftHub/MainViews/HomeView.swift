@@ -42,39 +42,12 @@ struct HomeView: View {
             ZStack {
                 Backgroundimage(geometry: geometry, imageName: "workout_icon")
                 VStack {
-                    VStack(alignment: .center) {
-                        //                        Text("Current plan:")
-                        //                            .foregroundStyle(Color.TextColorPrimary)
-                        //                            .font(.system(size: 25, weight: .bold))
-                        //                            .multilineTextAlignment(.center)
-                        // This Spinner is custom, so let's just place a placeholder
-                        Menu {
-                            Picker(selection: $selectedPlan) {
-                                ForEach(plans, id: \.self) { plan in
-                                    Text(plan.name).tag(plan.description)
-                                }
-                            } label: {}
-                            .frame(minWidth: 100, minHeight: 30)
-                            .clipped()
-                            .onChange(of: selectedPlan) { _, plan in
-                                UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
-                            }
-                            .disabled(!isWorkoutEnded)
-                        } label: {
-                            HStack {
-                                Text(selectedPlan)
-                                    .font(.system(size: 20))
-                                Image(systemName: "chevron.up.chevron.down")
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 6)
-                    .padding(.horizontal, 12)
-                    
                     if showLastWorkout {
                         NavigationLink(
-                            destination: HistoryDetailsView(rawDate: lastWorkoutRawDate, date: lastWorkoutDate, planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName),
+                            destination: HistoryDetailsView(viewModel: HistoryDetailsViewModel(historyElement: WorkoutHistoryElement(planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName, formattedDate: lastWorkoutDate, rawDate: lastWorkoutRawDate)))
+                                .onDisappear() {
+                                    loadLastWorkout()
+                                },
                             label: { VStack(alignment: .center, spacing: 10) {
                                 Text("Last workout:")
                                     .foregroundStyle(Color.TextColorPrimary)
@@ -124,6 +97,31 @@ struct HomeView: View {
                             }
                         )
                     }
+                    
+                    VStack(alignment: .center) {
+                        Menu {
+                            Picker(selection: $selectedPlan) {
+                                ForEach(plans, id: \.self) { plan in
+                                    Text(plan.name).tag(plan.description)
+                                }
+                            } label: {}
+                            .frame(minWidth: 100, minHeight: 30)
+                            .clipped()
+                            .onChange(of: selectedPlan) { _, plan in
+                                UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
+                            }
+                            .disabled(!isWorkoutEnded)
+                        } label: {
+                            HStack {
+                                Text(selectedPlan)
+                                    .font(.system(size: 20))
+                                Image(systemName: "chevron.up.chevron.down")
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 6)
+                    .padding(.horizontal, 12)
                     
                     Spacer()
                     
@@ -188,16 +186,13 @@ struct HomeView: View {
                 StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
             }
             .fullScreenCover(isPresented: Binding(get: {
-                startWorkout || openLastWorkout || startNoPlanWorkout
+                startWorkout || startNoPlanWorkout
             }, set: { newValue in
                 if !newValue {
                     startWorkout = false
-                    openLastWorkout = false
                     startNoPlanWorkout = false
                 }
-            }), onDismiss: {
-                loadLastWorkout()
-            }) {
+            })) {
                 if startWorkout {
                     WorkoutView(planName: selectedPlan,
                                 routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error routine name",
@@ -206,8 +201,6 @@ struct HomeView: View {
                                 isWorkoutEnded: $isWorkoutEnded,
                                 showWorkoutSavedToast: $showToast,
                                 savedWorkoutToastMessage: $toastMessage)
-                } else if openLastWorkout {
-                    HistoryDetailsView(rawDate: lastWorkoutRawDate, date: lastWorkoutDate, planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName)
                 } else if startNoPlanWorkout {
                     NoPlanWorkoutView(planName: selectedPlan,
                                       date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate(),
