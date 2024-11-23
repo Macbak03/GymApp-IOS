@@ -215,7 +215,7 @@ struct NoPlanWorkoutView: View {
             toastMessage = "An unexpected error occured \(error)"
             return
         }
-        var workout = [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])]()
+        var workout = [Workout]()
         var series = [WorkoutSeries]()
         for (index, pair) in workoutDraft.enumerated() {
             let loadUnit = pair.workoutSeriesDraftList[0].loadUnit
@@ -246,7 +246,7 @@ struct NoPlanWorkoutView: View {
             }
             do {
                 let exercise = try exerciseDraft.toExercise()
-                workout.append((workoutExercise: WorkoutExercise(exercise: exercise, exerciseCount: (index + 1), note: pair.workoutExerciseDraft.note), exerciseSeries: series))
+                workout.append(Workout(workoutExercise: WorkoutExercise(exercise: exercise, exerciseCount: (index + 1), note: pair.workoutExerciseDraft.note), exerciseSeriesList: series))
                 series.removeAll()
             } catch let error as ValidationException {
                 showToast = true

@@ -8,19 +8,10 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    @StateObject private var stateViewModel = HomeStateViewModel()
     @State var routines: [TrainingPlanElement] = []
     @State private var plans: [TrainingPlan] = []
     @State private var selectedPlan = ""
-    @State private var openStartWorkoutSheet = false
-    private var isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
-    
-    @State private var startWorkout = false
-    @State private var startNoPlanWorkout = false
-    @State private var closeStartWorkoutSheet = false
-    @State private var isWorkoutEnded = true
-    
-    @State private var showToast = false
-    @State private var toastMessage = ""
     
     @State private var showLastWorkout = false
     @State private var lastWorkoutPlanName = "Plan"
@@ -110,7 +101,7 @@ struct HomeView: View {
                             .onChange(of: selectedPlan) { _, plan in
                                 UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
                             }
-                            .disabled(!isWorkoutEnded)
+                            .disabled(!stateViewModel.isWorkoutEnded)
                         } label: {
                             HStack {
                                 Text(selectedPlan)
@@ -127,12 +118,12 @@ struct HomeView: View {
                     
                     // Two buttons (Return to workout and Start Workout)
                     VStack(spacing: 20) {
-                        if !isWorkoutEnded {
+                        if !stateViewModel.isWorkoutEnded {
                             Button(action: {
                                 if selectedPlan == Constants.NO_PLAN_NAME {
-                                    startNoPlanWorkout = true
+                                    stateViewModel.startNoPlanWorkout = true
                                 } else {
-                                    startWorkout = true
+                                    stateViewModel.startWorkout = true
                                 }
                             }) {
                                 Text("Return to workout")
@@ -148,11 +139,11 @@ struct HomeView: View {
                         }
                         
                         Button(action: {
-                            if isWorkoutEnded {
+                            if stateViewModel.isWorkoutEnded {
                                 if selectedPlan == Constants.NO_PLAN_NAME {
-                                    startNoPlanWorkout = true
+                                    stateViewModel.startNoPlanWorkout = true
                                 } else {
-                                    openStartWorkoutSheet = true
+                                    stateViewModel.openStartWorkoutSheet = true
                                 }
                             } else {
                                 showNewWorkoutAlert = true
@@ -180,47 +171,48 @@ struct HomeView: View {
                 if !plans.isEmpty {
                     initPickerChoice()
                 }
-                isWorkoutEnded = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+                stateViewModel.isWorkoutEnded = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
             }
-            .sheet(isPresented: $openStartWorkoutSheet) {
-                StartWorkoutSheetView(planName: selectedPlan, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
+            .sheet(isPresented: $stateViewModel.openStartWorkoutSheet) {
+                StartWorkoutSheetView(planName: selectedPlan, homeStateViewModel: stateViewModel)
             }
             .fullScreenCover(isPresented: Binding(get: {
-                startWorkout || startNoPlanWorkout
+                stateViewModel.startWorkout || stateViewModel.startNoPlanWorkout
             }, set: { newValue in
                 if !newValue {
-                    startWorkout = false
-                    startNoPlanWorkout = false
+                    stateViewModel.startWorkout = false
+                    stateViewModel.startNoPlanWorkout = false
                 }
             })) {
-                if startWorkout {
-                    WorkoutView(planName: selectedPlan,
+                if stateViewModel.startWorkout {
+                    WorkoutView(
+                        viewModel: 
+                            WorkoutViewModel(
+                                planName: selectedPlan,
                                 routineName: UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? "Error routine name",
-                                date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate(),
-                                closeStartWorkoutSheet: $closeStartWorkoutSheet,
-                                isWorkoutEnded: $isWorkoutEnded,
-                                showWorkoutSavedToast: $showToast,
-                                savedWorkoutToastMessage: $toastMessage)
-                } else if startNoPlanWorkout {
+                                date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate()),
+                        homeStateViewModel: stateViewModel
+                        )
+                } else if stateViewModel.startNoPlanWorkout {
                     NoPlanWorkoutView(planName: selectedPlan,
                                       date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate(),
-                                      isWorkoutEnded: $isWorkoutEnded,
-                                      showWorkoutSavedToast: $showToast,
-                                      savedWorkoutToastMessage: $toastMessage,
+                                      isWorkoutEnded: $stateViewModel.isWorkoutEnded,
+                                      showWorkoutSavedToast: $stateViewModel.showToast,
+                                      savedWorkoutToastMessage: $stateViewModel.toastMessage,
                                       intensityIndex: intensityIndex,
                                       weightUnit: weightUnit)
                 }
             }
-            .toast(isShowing: $showToast, message: toastMessage)
+            .toast(isShowing: $stateViewModel.showToast, message: stateViewModel.toastMessage)
             .alert(isPresented: $showNewWorkoutAlert) {
                 Alert(title: Text("Warning"),
                       message: Text("You have unsaved workout. Are you sure you want to start a new one?"),
                       primaryButton: .destructive(Text("YES")) {
-                        isWorkoutEnded = true
+                    stateViewModel.isWorkoutEnded = true
                         if selectedPlan == Constants.NO_PLAN_NAME {
-                            startNoPlanWorkout = true
+                            stateViewModel.startNoPlanWorkout = true
                         } else {
-                            openStartWorkoutSheet = true
+                            stateViewModel.openStartWorkoutSheet = true
                         }
                       },
                       secondaryButton: .cancel()
