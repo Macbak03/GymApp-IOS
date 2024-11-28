@@ -8,12 +8,9 @@
 import SwiftUI
 
 struct HistoryView: View {
-    @State private var history = [WorkoutHistoryElement]()
-    @State private var searchList = [WorkoutHistoryElement]()
+    @StateObject private var viewModel = HistoryViewModel()
     @State private var searchText = ""
     
-    @State private var showToast = false
-    @State private var toastMessage = ""
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -39,33 +36,28 @@ struct HistoryView: View {
                     .padding(.horizontal, 20)
                     
                     // Workout history list (Equivalent to RecyclerView)
-                    HistoryListView(history: $searchList, noFilteredHistory: $history, showToast: $showToast, toastMessage: $toastMessage)
+                    HistoryListView(viewModel: viewModel)
                 }
                 .searchable(text: $searchText)
 
             }
             .onAppear() {
-                loadHistory()
+                viewModel.loadHistory()
             }
             .navigationTitle("")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .navigationBarHidden(false)
-            .toast(isShowing: $showToast, message: toastMessage)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(false)
+            .toast(isShowing: $viewModel.showToast, message: viewModel.toastMessage)
         }
     }
     
-    private func loadHistory() {
-        let workoutHistoryDatabaseHelper =  WorkoutHistoryDataBaseHelper()
-        history = workoutHistoryDatabaseHelper.getHistory()
-        searchList = history
-    }
     
     private func filterSearchResults() {
         if searchText.isEmpty {
-            searchList = history
+            viewModel.filteredHistory = viewModel.history
         } else {
             let lowercasedQuery = searchText.lowercased()
-            searchList = history.filter { historyItem in
+            viewModel.filteredHistory = viewModel.history.filter { historyItem in
                 let planNameMatch = historyItem.planName.lowercased().starts(with: lowercasedQuery)
                 let routineNameMatch = historyItem.routineName.lowercased().starts(with: lowercasedQuery)
                 let dateMatch = historyItem.formattedDate.lowercased().contains(lowercasedQuery)

@@ -21,20 +21,9 @@ struct TrainingPlansListView: View {
                 )
                 
             }
-//            .onDelete(perform: { indexSet in
-//                viewModel.deletePlan(atOffsets: indexSet)
-//            })
             .padding(.top, 5)
         }
     }
-//    private func deletePlan(atOffsets indexSet: IndexSet) {
-//        indexSet.forEach { index in
-//            let planName = trainingPlans[index].name
-//            plansDatabaseHelper.deletePlan(planName: planName)
-//
-//        }
-//        trainingPlans.remove(atOffsets: indexSet)
-//    }
 }
 
 struct TrainingPlansElementView: View {
@@ -43,7 +32,6 @@ struct TrainingPlansElementView: View {
     let position: Int
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
-//    @State private var planName: String = ""
     @State private var openRoutines = false
     @State private var showAlertDialog = false
     @State private var showEditPlanDialog = false

@@ -8,23 +8,20 @@
 import SwiftUI
 
 struct HistoryDetailsListView: View {
-    @Binding var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
-    let planName: String
+    @ObservedObject var viewModel: HistoryDetailsViewModel
     
     @State private var isExpanded = false
     var body: some View {
         ScrollView {
-            ForEach(workout.indices, id: \.self) {
-                index in
-                HistoryDetailsListExerciseView(exercise: $workout[index], planName: planName)
+            ForEach(viewModel.workout) { exercise in
+                HistoryDetailsListExerciseView(viewModel: HistoryDetailsElementViewModel(exercise: exercise, planName: viewModel.historyElement.planName))
             }
         }
     }
 }
 
 private struct HistoryDetailsListExerciseView: View {
-    @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
-    let planName: String
+    @StateObject var viewModel: HistoryDetailsElementViewModel
     
     @State private var isDetailsVisible = false
     @State private var displayNote = false
@@ -40,7 +37,7 @@ private struct HistoryDetailsListExerciseView: View {
             VStack(alignment: .leading, spacing: 3) {
                 // First Horizontal Layout (Exercise Name)
                 HStack {
-                    Text(exercise.workoutExerciseDraft.name)
+                    Text(viewModel.exercise.workoutExerciseDraft.name)
                         .font(.system(size: 18, weight: .bold))  // Equivalent to bold and textSize 24sp
                         .frame(height: 15)  // Equivalent to layout_height="30dp"
                     //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
@@ -48,7 +45,7 @@ private struct HistoryDetailsListExerciseView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                if planName != Constants.NO_PLAN_NAME {
+                if viewModel.planName != Constants.NO_PLAN_NAME {
                     
                     // Second Horizontal Layout (Rest, Series, Intensity, Pace)
                     HStack(alignment: .center) {
@@ -59,11 +56,11 @@ private struct HistoryDetailsListExerciseView: View {
                             Text("Rest:")
                                 .font(.system(size: textSize))
                             HStack(spacing: 1) {
-                                Text(exercise.workoutExerciseDraft.pause)
+                                Text(viewModel.exercise.workoutExerciseDraft.pause)
                                     .font(.system(size: textSize))
                                     .frame(alignment: .trailing)
                                 
-                                Text(exercise.workoutExerciseDraft.pauseUnit.rawValue)
+                                Text(viewModel.exercise.workoutExerciseDraft.pauseUnit.rawValue)
                                     .font(.system(size: textSize))
                                     .frame(alignment: .leading)
                             }
@@ -74,7 +71,7 @@ private struct HistoryDetailsListExerciseView: View {
                         VStack(spacing: VSpacing) {
                             Text("Series:")
                                 .font(.system(size: textSize))
-                            Text(exercise.workoutExerciseDraft.series)
+                            Text(viewModel.exercise.workoutExerciseDraft.series)
                                 .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -82,9 +79,9 @@ private struct HistoryDetailsListExerciseView: View {
                         
                         // Intensity Layout
                         VStack(spacing: VSpacing) {
-                            Text(exercise.workoutExerciseDraft.intensityIndex.rawValue)
+                            Text(viewModel.exercise.workoutExerciseDraft.intensityIndex.rawValue)
                                 .font(.system(size: textSize))
-                            Text(exercise.workoutExerciseDraft.intensity)
+                            Text(viewModel.exercise.workoutExerciseDraft.intensity)
                                 .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -94,7 +91,7 @@ private struct HistoryDetailsListExerciseView: View {
                         VStack(spacing: VSpacing) {
                             Text("Pace:")
                                 .font(.system(size: textSize))
-                            Text(exercise.workoutExerciseDraft.pace)
+                            Text(viewModel.exercise.workoutExerciseDraft.pace)
                                 .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -103,7 +100,7 @@ private struct HistoryDetailsListExerciseView: View {
                     .padding(.horizontal, 15)
                 }
             }
-            .frame(height: (planName != Constants.NO_PLAN_NAME) ? 55 : 35)
+            .frame(height: (viewModel.planName != Constants.NO_PLAN_NAME) ? 55 : 35)
             .padding(.horizontal, 15)  // General padding for the whole view
         }
         .onTapGesture {
@@ -115,13 +112,13 @@ private struct HistoryDetailsListExerciseView: View {
             .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
             .background(Color(.systemGray6)) // Set color for the line
         if isDetailsVisible {
-            ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
+            ForEach(viewModel.exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                HistoryDetailsListSeriesView(series: $exercise.workoutSeriesDraftList[index], position: index)
+                HistoryDetailsListSeriesView(series: $viewModel.exercise.workoutSeriesDraftList[index], position: index)
             }
             // Note Input
-            if(!exercise.workoutExerciseDraft.note.isEmpty){
-                Text(exercise.workoutExerciseDraft.note)
+            if(!viewModel.exercise.workoutExerciseDraft.note.isEmpty){
+                Text(viewModel.exercise.workoutExerciseDraft.note)
                     .font(.system(size: textSize))
                     .padding(.leading, 15)
                     .padding(.trailing, 10)
@@ -224,7 +221,7 @@ struct HistoryDetailsListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        HistoryDetailsListView(workout: $workout, planName: "Constants.NO_PLAN_NAME")
+        HistoryDetailsListView(viewModel: HistoryDetailsViewModel(historyElement: WorkoutHistoryElement(planName: "", routineName: "", formattedDate: "", rawDate: "")))
     }
 }
 

@@ -10,11 +10,9 @@ import SwiftUI
 struct StartWorkoutSheetView: View {
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
     let planName: String
+    @ObservedObject var homeStateViewModel: HomeStateViewModel
     @State private var routines: [TrainingPlanElement] = []
     @State private var closeWorkoutSheetView = false
-    @Binding var isWorkoutEnded: Bool
-    @Binding var showWorkoutSavedToast: Bool
-    @Binding var savedWorkoutToastMessage: String
     var body: some View {
         ZStack{
             Color.black.opacity(0.3)
@@ -34,7 +32,7 @@ struct StartWorkoutSheetView: View {
                     ScrollView {
                         ForEach(routines.indices, id: \.self) {
                             index in
-                            SheetListElement(routine: routines[index], planName: planName, closeWorkoutSheetElement: $closeWorkoutSheetView, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showWorkoutSavedToast, savedWorkoutToastMessage: $savedWorkoutToastMessage)
+                            SheetListElement(homeStateViewModel: homeStateViewModel, routine: routines[index], planName: planName, closeWorkoutSheetElement: $closeWorkoutSheetView)
                         }
                         .padding(.top, 5)
                     }
@@ -71,12 +69,10 @@ struct StartWorkoutSheetView: View {
 
 private struct SheetListElement: View {
     @State private var startWorkout: Bool = false
+    @ObservedObject var homeStateViewModel: HomeStateViewModel
     let routine: TrainingPlanElement
     let planName: String
     @Binding var closeWorkoutSheetElement: Bool
-    @Binding var isWorkoutEnded: Bool
-    @Binding var showWorkoutSavedToast: Bool
-    @Binding var savedWorkoutToastMessage: String
     @State private var date: String = CustomDate.getCurrentDate()
     var body: some View {
         HStack {
@@ -104,8 +100,17 @@ private struct SheetListElement: View {
 
             startWorkout = true
         }
-        .fullScreenCover(isPresented: $startWorkout) {
-            WorkoutView(planName: planName, routineName: routine.name, date: date, closeStartWorkoutSheet: $closeWorkoutSheetElement, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $showWorkoutSavedToast, savedWorkoutToastMessage: $savedWorkoutToastMessage)
+        .fullScreenCover(isPresented: $startWorkout, onDismiss: {
+            closeWorkoutSheetElement = true
+        }) {
+            WorkoutView(
+                viewModel:
+                    WorkoutViewModel(
+                        planName: planName,
+                        routineName: routine.name,
+                        date: date),
+                homeStateViewModel: homeStateViewModel
+            )
         }
     }
 }
@@ -117,7 +122,7 @@ struct StartWorkoutSheet_Previews: PreviewProvider {
     @State static var unfinishedRoutineName: String = ""
     static var planName = "Plan"
     static var previews: some View {
-        StartWorkoutSheetView(planName: planName, isWorkoutEnded: $isWorkoutEnded, showWorkoutSavedToast: $isWorkoutEnded, savedWorkoutToastMessage: $unfinishedRoutineName)
+        StartWorkoutSheetView(planName: planName, homeStateViewModel: HomeStateViewModel())
         //SheetListElement(routine: TrainingPlanElement(name: "Rotuine"), planName: planName)
     }
 }

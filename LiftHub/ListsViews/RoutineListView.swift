@@ -33,7 +33,6 @@ struct ExerciseView: View {
     @StateObject var viewModel: ExerciseViewModel
     @ObservedObject var routineDetailsViewModel: RoutineDetailsViewModel
     @State private var isDetailsVisible: Bool = false
-    //@Binding var exercise: ExerciseDraft
     private let labelWidth: CGFloat = 50
     
     @FocusState private var isExerciseNameFocused: Bool

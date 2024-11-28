@@ -8,10 +8,10 @@
 import Foundation
 
 struct WorkoutHistoryElement: Hashable {
-    let planName: String
-    let routineName: String
-    let formattedDate: String
-    let rawDate: String
+    var planName: String
+    var routineName: String
+    var formattedDate: String
+    var rawDate: String
     
     init(planName: String, routineName: String, formattedDate: String, rawDate: String) {
         self.planName = planName

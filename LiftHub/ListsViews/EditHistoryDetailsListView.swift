@@ -9,41 +9,26 @@ import Foundation
 import SwiftUI
 
 struct EditHistoryDetailsListView: View {
-    @Binding var workout: [(workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])]
-    let planName: String
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
+    @ObservedObject var viewModel: EditHistoryDetailsViewModel
 
     var body: some View {
         ScrollView {
-            ForEach(workout.indices, id: \.self) {
+            ForEach(viewModel.workoutDraft.indices, id: \.self) {
                 index in
-                EditHistoryDetailsListExerciseView(exercise: $workout[index], planName: planName, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                EditHistoryDetailsListExerciseView(exercise: $viewModel.workoutDraft[index], editHistoryDetailsViewModel: viewModel, viewModel: EditHistoryDetailsElementViewModel(planName: viewModel.planName, position: index))
             }
         }
     }
 }
 
 private struct EditHistoryDetailsListExerciseView: View {
-    @Binding var exercise: (workoutExerciseDraft: WorkoutExerciseDraft, workoutSeriesDraftList: [WorkoutSeriesDraft])
-    let planName: String
-    let position: Int
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
+    @Binding var exercise: WorkoutDraft
+    @ObservedObject var editHistoryDetailsViewModel: EditHistoryDetailsViewModel
+    @StateObject var viewModel: EditHistoryDetailsElementViewModel
     
     @State private var isDetailsVisible = false
     @State private var displayNote = false
     
-    @State private var exerciseName = "Exercise"
-    
-    @State private var intensityIndexText = "Intensity"
-    @State private var restValue = "val"
-    @State private var restUnit = "val"
-    @State private var seriesValue = "val"
-    @State private var intensityValue = "val"
-    @State private var paceValue = "val"
-    
-    @State private var noteHint = "Note"
     
     private let textSize: CGFloat = 15
     private let outllineFrameHeight: CGFloat = 30
@@ -58,7 +43,7 @@ private struct EditHistoryDetailsListExerciseView: View {
             VStack(alignment: .leading, spacing: 3) {
                 // First Horizontal Layout (Exercise Name)
                 HStack {
-                    Text(exerciseName)
+                    Text(viewModel.exerciseName)
                         .font(.system(size: 18, weight: .bold))  // Equivalent to bold and textSize 24sp
                         .frame(height: 15)  // Equivalent to layout_height="30dp"
                     //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
@@ -66,7 +51,7 @@ private struct EditHistoryDetailsListExerciseView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                if planName != Constants.NO_PLAN_NAME {
+                if viewModel.planName != Constants.NO_PLAN_NAME {
                     // Second Horizontal Layout (Rest, Series, Intensity, Pace)
                     HStack(alignment: .center) {
                         let VSpacing: CGFloat = 2
@@ -75,11 +60,11 @@ private struct EditHistoryDetailsListExerciseView: View {
                             Text("Rest:")
                                 .font(.system(size: textSize))
                             HStack(spacing: 1) {
-                                Text(restValue)
+                                Text(viewModel.restValue)
                                     .font(.system(size: textSize))
                                     .frame(alignment: .trailing)
                                 
-                                Text(restUnit)
+                                Text(viewModel.restUnit)
                                     .font(.system(size: textSize))
                                     .frame(alignment: .leading)
                             }
@@ -89,16 +74,16 @@ private struct EditHistoryDetailsListExerciseView: View {
                         VStack(spacing: VSpacing) {
                             Text("Series:")
                                 .font(.system(size: textSize))
-                            Text(seriesValue)
+                            Text(viewModel.seriesValue)
                                 .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
                         Spacer()
                         // Intensity Layout
                         VStack(spacing: VSpacing) {
-                            Text(intensityIndexText)
+                            Text(viewModel.intensityIndexText)
                                 .font(.system(size: textSize))
-                            Text(intensityValue)
+                            Text(viewModel.intensityValue)
                                 .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -107,7 +92,7 @@ private struct EditHistoryDetailsListExerciseView: View {
                         VStack(spacing: VSpacing) {
                             Text("Pace:")
                                 .font(.system(size: textSize))
-                            Text(paceValue)
+                            Text(viewModel.paceValue)
                                 .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -124,7 +109,7 @@ private struct EditHistoryDetailsListExerciseView: View {
             }
         }
         .onAppear() {
-            initValues(workoutExerciseDraft: exercise.workoutExerciseDraft)
+            viewModel.initValues(workoutExerciseDraft: exercise.workoutExerciseDraft)
         }
         Divider()
             .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
@@ -132,10 +117,10 @@ private struct EditHistoryDetailsListExerciseView: View {
         if isDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                HistoryDetailsListSeriesView(series: $exercise.workoutSeriesDraftList[index], seriesCount: exercise.workoutSeriesDraftList.count, position: index, showToast: $showToast, toastMessage: $toastMessage)
+                HistoryDetailsListSeriesView(series: $exercise.workoutSeriesDraftList[index], editHistoryDetailsViewModel: editHistoryDetailsViewModel, viewModel: EditHistoryDetailsSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index))
             }
             // Note Input
-            TextField(noteHint, text: $exercise.workoutExerciseDraft.note)
+            TextField(viewModel.noteHint, text: $exercise.workoutExerciseDraft.note)
                 .font(.system(size: textSize))
                 .frame(height: outllineFrameHeight)
                 .padding(.horizontal, 10)
@@ -150,40 +135,17 @@ private struct EditHistoryDetailsListExerciseView: View {
         }
         
     }
-    private func initValues(workoutExerciseDraft: WorkoutExerciseDraft) {
-        self.exerciseName = workoutExerciseDraft.name
-        self.intensityIndexText = workoutExerciseDraft.intensityIndex.rawValue
-        self.restValue = workoutExerciseDraft.pause
-        self.restUnit = workoutExerciseDraft.pauseUnit.rawValue
-        self.seriesValue = workoutExerciseDraft.series
-        self.intensityValue = workoutExerciseDraft.intensity
-        self.paceValue = workoutExerciseDraft.pace
-    }
 }
 
 private struct HistoryDetailsListSeriesView: View {
     @Binding var series: WorkoutSeriesDraft
-    let seriesCount: Int
-    let position: Int
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
-    
-    
-    @State private var repsHint: String = "Reps"
-    @State private var weightHint: String = "Weight"
-    @State private var intensityHint: String = "RPE"
-    
-    @State private var intensityIndexText: String = "RPE"
-    @State private var weightUnitText: String = "kg"
-    
-    @State private var showLoadError = false
-    @State private var showRepsError = false
-    @State private var showIntensityError = false
+    @ObservedObject var editHistoryDetailsViewModel: EditHistoryDetailsViewModel
+    @StateObject var viewModel: EditHistoryDetailsSeriesViewModel
     
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
     @FocusState private var isIntensityFocused: Bool
-
+    
     private let textFieldCornerRadius: CGFloat = 5
     private let textFieldStrokeLineWidth: CGFloat = 0.5
     
@@ -199,12 +161,12 @@ private struct HistoryDetailsListSeriesView: View {
             // First Horizontal Layout for Series Count, Reps, Weight
             HStack(spacing: 5) {
                 // Series Count
-                Text("\(position + 1).")
+                Text("\(viewModel.position + 1).")
                     .font(.system(size: textSize))
                     .padding(.leading, 4) // Equivalent to layout_marginStart="10dp"
                 
                 // Reps Input
-                TextField(repsHint, text: $series.actualReps)
+                TextField(viewModel.repsHint, text: $series.actualReps)
                     .keyboardType(.decimalPad)
                     .font(.system(size: textSize))
                     .frame(height: outllineFrameHeight)
@@ -212,11 +174,11 @@ private struct HistoryDetailsListSeriesView: View {
                     .padding(.horizontal, 10)
                     .overlay(
                         RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                            .stroke((viewModel.showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                     )
                     .focused($isRepsFocused)
                     .onChange(of: isRepsFocused) { _, focused in
-                        validateReps(focused: focused)
+                        viewModel.validateReps(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
                         showRepsToolbar = focused
                     }
                     .toolbar {
@@ -234,7 +196,7 @@ private struct HistoryDetailsListSeriesView: View {
                     .multilineTextAlignment(.center)
                 
                 // Weight Input
-                TextField(weightHint, text: $series.actualLoad)
+                TextField(viewModel.weightHint, text: $series.actualLoad)
                     .keyboardType(.decimalPad)
                     .font(.system(size: textSize))
                     .frame(height: outllineFrameHeight)
@@ -242,11 +204,11 @@ private struct HistoryDetailsListSeriesView: View {
                     .padding(.horizontal, 10)
                     .overlay(
                         RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                            .stroke((viewModel.showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                     )
                     .focused($isLoadFocused)
                     .onChange(of: isLoadFocused) { _, focused in
-                        validateLoad(focused: focused)
+                        viewModel.validateLoad(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
                         showLoadToolbar = focused
                     }
                     .toolbar {
@@ -258,18 +220,18 @@ private struct HistoryDetailsListSeriesView: View {
                     }
                 
                 // Weight Unit Value
-                Text(weightUnitText)  // Assuming the weight unit is kilograms
+                Text(viewModel.weightUnitText)  // Assuming the weight unit is kilograms
                     .font(.system(size: textSize))
-
+                
                 Divider()
                     .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
                     .background(Color(.systemGray6)) // Set color for the line
                 
                 // Intensity Value
-                Text("\(intensityIndexText):")
+                Text("\(viewModel.intensityIndexText):")
                     .font(.system(size: textSize))
                 // Intensity Input
-                TextField(intensityHint, text: $series.actualIntensity)
+                TextField(viewModel.intensityHint, text: $series.actualIntensity)
                     .keyboardType(.decimalPad)
                     .font(.system(size: textSize))
                     .frame(width: 40,height: 25)
@@ -277,11 +239,11 @@ private struct HistoryDetailsListSeriesView: View {
                     .padding(.horizontal, 10)
                     .overlay(
                         RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                            .stroke((viewModel.showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                     )
                     .focused($isIntensityFocused)
                     .onChange(of: isIntensityFocused) { _, focused in
-                        validateIntensity(focused: focused)
+                        viewModel.validateIntensity(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
                         showIntensityToolbar = focused
                     }
                     .toolbar {
@@ -298,66 +260,11 @@ private struct HistoryDetailsListSeriesView: View {
             .padding(.horizontal, 10)
         }
         .onAppear() {
-            initValues(series: series)
-        }
-    }
-    
-    private func initValues(series: WorkoutSeriesDraft){
-        self.weightUnitText = series.loadUnit.rawValue
-        self.intensityIndexText = series.intensityIndex.rawValue
-        self.intensityHint = series.intensityIndex.rawValue
-    }
-    
-    private func setToast(errorMessage: String) {
-        toastMessage = errorMessage
-        showToast = true
-    }
-    
-    private func validateReps(focused: Bool) {
-        if !focused {
-            do {
-                try _ = RepsFactory.fromString(series.actualReps)
-            } catch let error as ValidationException {
-                showRepsError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showRepsError = false
-        }
-    }
-    
-    private func validateLoad(focused: Bool) {
-        if !focused {
-            do {
-                try _ = Weight.fromStringWithUnit(series.actualLoad, unit: series.loadUnit)
-            } catch let error as ValidationException {
-                showLoadError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showLoadError = false
-        }
-    }
-    
-    func validateIntensity(focused: Bool) {
-        if !focused {
-            do {
-                try _ = IntensityFactory.fromStringForWorkout(series.actualIntensity, index: series.intensityIndex)
-            } catch let error as ValidationException {
-                showIntensityError = true
-                setToast(errorMessage: error.message)
-            } catch {
-                toastMessage = "An unexpected error occured \(error)"
-            }
-        } else {
-            showIntensityError = false
+            viewModel.initValues(series: series)
         }
     }
 }
+    
 
 struct EditHistoryDetailsListView_previews: PreviewProvider {
     @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "3-5", pauseUnit: TimeUnit.min, series: "1", reps: "1", intensity: "1", intensityIndex: IntensityIndex.RPE, pace: "1111", note: "note1")
@@ -381,7 +288,7 @@ struct EditHistoryDetailsListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        EditHistoryDetailsListView(workout: $workout, planName: Constants.NO_PLAN_NAME, showToast: $showToast, toastMessage: $toastMessage)
+        EditHistoryDetailsListView(viewModel: EditHistoryDetailsViewModel())
 //        WorkoutListExerciseView(exercise: $wholeExercise2)
 //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }

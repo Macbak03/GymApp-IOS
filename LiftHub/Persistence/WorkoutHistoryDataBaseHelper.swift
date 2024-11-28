@@ -149,13 +149,13 @@ class WorkoutHistoryDataBaseHelper: Repository {
     }
     
     //MARK: Add workout exercises to history in a transaction
-    func addExercises(workout: [(workoutExercise: WorkoutExercise, exerciseSeries: [WorkoutSeries])], date: String, planName: String, routineName: String) {
+    func addExercises(workout: [Workout], date: String, planName: String, routineName: String) {
         do {
             try db?.transaction {
                 for exercise in workout {
                     addExerciseToHistory(date: date, workoutExercise: exercise.workoutExercise, planName: planName, routineName: routineName)
                     if let lastId = getLastExerciseId() {
-                        addSeries(seriesList: exercise.exerciseSeries, exerciseId: lastId)
+                        addSeries(seriesList: exercise.exerciseSeriesList, exerciseId: lastId)
                     }
                 }
             }
