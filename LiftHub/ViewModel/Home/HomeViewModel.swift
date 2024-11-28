@@ -6,3 +6,31 @@
 //
 
 import Foundation
+
+class HomeViewModel: ObservableObject {
+    @Published var workoutHistoryElement = WorkoutHistoryElement(planName: "plan", routineName: "routine", formattedDate: "date", rawDate: "rawDate")
+    
+    private let historyDatabaseHelper = WorkoutHistoryDataBaseHelper()
+    
+    func loadLastWorkout(stateViewModel: HomeStateViewModel){
+        if historyDatabaseHelper.isTableNotEmpty() {
+            stateViewModel.showLastWorkout = true
+        } else {
+            stateViewModel.showLastWorkout = false
+        }
+        let lastWorkout = historyDatabaseHelper.getLastWorkout()
+        guard let workoutPlanName = lastWorkout[0] else {
+            return
+        }
+        guard let workoutDate = lastWorkout[1] else {
+            return
+        }
+        guard let workoutRoutineName = lastWorkout[2] else {
+            return
+        }
+        workoutHistoryElement.planName = workoutPlanName
+        workoutHistoryElement.rawDate = workoutDate
+        workoutHistoryElement.formattedDate = CustomDate.getFormattedDate(savedDate: workoutDate)
+        workoutHistoryElement.routineName = workoutRoutineName
+    }
+}

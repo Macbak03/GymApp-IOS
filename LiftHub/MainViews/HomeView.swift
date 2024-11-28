@@ -8,18 +8,10 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    @StateObject private var viewModel = HomeViewModel()
     @StateObject private var stateViewModel = HomeStateViewModel()
-    @State var routines: [TrainingPlanElement] = []
     @State private var plans: [TrainingPlan] = []
     @State private var selectedPlan = ""
-    
-    @State private var showLastWorkout = false
-    @State private var lastWorkoutPlanName = "Plan"
-    @State private var lastWorkoutDate = "Date"
-    @State private var lastWorkoutRoutineName = "Routine"
-    @State private var lastWorkoutRawDate = ""
-    
-    @State private var openLastWorkout = false
     
     @State private var intensityIndex = IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity())!
     @State private var weightUnit = WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit())!
@@ -33,11 +25,11 @@ struct HomeView: View {
             ZStack {
                 Backgroundimage(geometry: geometry, imageName: "workout_icon")
                 VStack {
-                    if showLastWorkout {
+                    if stateViewModel.showLastWorkout {
                         NavigationLink(
-                            destination: HistoryDetailsView(viewModel: HistoryDetailsViewModel(historyElement: WorkoutHistoryElement(planName: lastWorkoutPlanName, routineName: lastWorkoutRoutineName, formattedDate: lastWorkoutDate, rawDate: lastWorkoutRawDate)))
+                            destination: HistoryDetailsView(viewModel: HistoryDetailsViewModel(historyElement: viewModel.workoutHistoryElement))
                                 .onDisappear() {
-                                    loadLastWorkout()
+                                    viewModel.loadLastWorkout(stateViewModel: stateViewModel)
                                 },
                             label: { VStack(alignment: .center, spacing: 10) {
                                 Text("Last workout:")
@@ -46,7 +38,7 @@ struct HomeView: View {
                                     .multilineTextAlignment(.center)
                                 
                                 VStack {
-                                    Text(lastWorkoutPlanName)
+                                    Text(viewModel.workoutHistoryElement.planName)
                                         .foregroundStyle(Color.TextColorPrimary)
                                         .font(.system(size: 18))
                                         .frame(maxWidth: .infinity)
@@ -55,13 +47,13 @@ struct HomeView: View {
                                         .padding(.vertical, 1)
                                     
                                     HStack {
-                                        Text(lastWorkoutDate)
+                                        Text(viewModel.workoutHistoryElement.formattedDate)
                                             .foregroundStyle(Color.TextColorPrimary)
                                             .font(.system(size: 18, weight: .bold))
                                             .frame(maxWidth: .infinity, alignment: .trailing)
                                             .padding(.leading, 10)
                                         
-                                        Text(lastWorkoutRoutineName)
+                                        Text(viewModel.workoutHistoryElement.routineName)
                                             .foregroundStyle(Color.TextColorPrimary)
                                             .font(.system(size: 18))
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -70,18 +62,15 @@ struct HomeView: View {
                                     .padding(.bottom, 5)
                                     .padding(.horizontal, 25)
                                 }
-                                //.background(Color.BackgroundColorList)
                                 .cornerRadius(8)
                                 .shadow(radius: 2)
                                 .padding(.horizontal, 20)
                                 .frame(maxWidth: .infinity)
-//                                .onTapGesture {
-//                                    openLastWorkout = true
-//                                }
+
                                 
                                 Divider()
-                                    .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
-                                    .background(Color(.systemGray6)) // Set color for the line
+                                    .frame(maxWidth: .infinity, maxHeight: 2)
+                                    .background(Color(.systemGray6))
                             }
                                 
                             .frame(maxWidth: .infinity)
@@ -116,7 +105,7 @@ struct HomeView: View {
                     
                     Spacer()
                     
-                    // Two buttons (Return to workout and Start Workout)
+                    //MARK: Two buttons (Return to workout and Start Workout)
                     VStack(spacing: 20) {
                         if !stateViewModel.isWorkoutEnded {
                             Button(action: {
@@ -167,7 +156,7 @@ struct HomeView: View {
             .onAppear() {
                 SettingsView.applyTheme(theme: UserDefaultsUtils.shared.getTheme())
                 initPickerData()
-                loadLastWorkout()
+                viewModel.loadLastWorkout(stateViewModel: stateViewModel)
                 if !plans.isEmpty {
                     initPickerChoice()
                 }
@@ -194,13 +183,14 @@ struct HomeView: View {
                         homeStateViewModel: stateViewModel
                         )
                 } else if stateViewModel.startNoPlanWorkout {
-                    NoPlanWorkoutView(planName: selectedPlan,
-                                      date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate(),
-                                      isWorkoutEnded: $stateViewModel.isWorkoutEnded,
-                                      showWorkoutSavedToast: $stateViewModel.showToast,
-                                      savedWorkoutToastMessage: $stateViewModel.toastMessage,
-                                      intensityIndex: intensityIndex,
-                                      weightUnit: weightUnit)
+                    NoPlanWorkoutView(
+                        viewModel:
+                            NoPlanWorkoutViewModel(
+                                planName: selectedPlan,
+                                date: UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate(),
+                                intensityIndex: intensityIndex,
+                                weightUnit: weightUnit),
+                        homeStateViewModel: stateViewModel)
                 }
             }
             .toast(isShowing: $stateViewModel.showToast, message: stateViewModel.toastMessage)
@@ -236,28 +226,7 @@ struct HomeView: View {
         plans.insert(TrainingPlan(name: Constants.NO_PLAN_NAME), at: 0)
     }
     
-    private func loadLastWorkout(){
-        let historyDatabaseHelper = WorkoutHistoryDataBaseHelper()
-        if historyDatabaseHelper.isTableNotEmpty() {
-            showLastWorkout = true
-        } else {
-            showLastWorkout = false
-        }
-        let lastWorkout = historyDatabaseHelper.getLastWorkout()
-        guard let workoutPlanName = lastWorkout[0] else {
-            return
-        }
-        guard let workoutDate = lastWorkout[1] else {
-            return
-        }
-        guard let workoutRoutineName = lastWorkout[2] else {
-            return
-        }
-        lastWorkoutPlanName = workoutPlanName
-        lastWorkoutRawDate = workoutDate
-        lastWorkoutDate = CustomDate.getFormattedDate(savedDate: workoutDate)
-        lastWorkoutRoutineName = workoutRoutineName
-    }
+    
 }
 
 struct HomeView_Previews: PreviewProvider {

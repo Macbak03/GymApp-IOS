@@ -8,10 +8,10 @@
 import Foundation
 
 class HomeStateViewModel: ObservableObject {
-    var isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    let isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
     
     @Published var openStartWorkoutSheet = false
-
+    @Published var showLastWorkout = false
     
     @Published var startWorkout = false
     @Published var startNoPlanWorkout = false
@@ -20,4 +20,9 @@ class HomeStateViewModel: ObservableObject {
     
     @Published var showToast = false
     @Published var toastMessage = ""
+    
+    func setToast(message: String) {
+        showToast = true
+        toastMessage = message
+    }
 }

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,11 @@
 		5FAAF9342CF15590002D9412 /* WorkoutExerciseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF9332CF15590002D9412 /* WorkoutExerciseViewModel.swift */; };
 		5FAAF9362CF15709002D9412 /* WorkoutSeriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF9352CF15709002D9412 /* WorkoutSeriesViewModel.swift */; };
 		5FAAF9392CF15FE5002D9412 /* HomeStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF9382CF15FE5002D9412 /* HomeStateViewModel.swift */; };
+		5FAAF93B2CF21772002D9412 /* NoPlanWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF93A2CF21772002D9412 /* NoPlanWorkoutViewModel.swift */; };
+		5FAAF93D2CF221AA002D9412 /* NoPlanWorkoutExerciseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF93C2CF221AA002D9412 /* NoPlanWorkoutExerciseViewModel.swift */; };
+		5FAAF93F2CF224CB002D9412 /* NoPlanWorkoutSetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF93E2CF224CB002D9412 /* NoPlanWorkoutSetViewModel.swift */; };
+		5FAAF9442CF24262002D9412 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 5FAAF9432CF24262002D9412 /* SwiftUIIntrospect */; };
+		5FAAF9462CF8CB86002D9412 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF9452CF8CB86002D9412 /* HomeViewModel.swift */; };
 		5FCCD1F52CE03DC100385BCB /* MessageBubbleShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD1F42CE03DC100385BCB /* MessageBubbleShape.swift */; };
 		5FCCD1FA2CE3ECA700385BCB /* BottomStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD1F92CE3ECA700385BCB /* BottomStatsView.swift */; };
 		5FCCD1FC2CE3EDD400385BCB /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCD1FB2CE3EDD400385BCB /* ChartView.swift */; };
@@ -128,6 +133,10 @@
 		5FAAF9332CF15590002D9412 /* WorkoutExerciseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseViewModel.swift; sourceTree = "<group>"; };
 		5FAAF9352CF15709002D9412 /* WorkoutSeriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSeriesViewModel.swift; sourceTree = "<group>"; };
 		5FAAF9382CF15FE5002D9412 /* HomeStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeStateViewModel.swift; sourceTree = "<group>"; };
+		5FAAF93A2CF21772002D9412 /* NoPlanWorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutViewModel.swift; sourceTree = "<group>"; };
+		5FAAF93C2CF221AA002D9412 /* NoPlanWorkoutExerciseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutExerciseViewModel.swift; sourceTree = "<group>"; };
+		5FAAF93E2CF224CB002D9412 /* NoPlanWorkoutSetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPlanWorkoutSetViewModel.swift; sourceTree = "<group>"; };
+		5FAAF9452CF8CB86002D9412 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		5FCCD1F42CE03DC100385BCB /* MessageBubbleShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleShape.swift; sourceTree = "<group>"; };
 		5FCCD1F92CE3ECA700385BCB /* BottomStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomStatsView.swift; sourceTree = "<group>"; };
 		5FCCD1FB2CE3EDD400385BCB /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
@@ -226,6 +235,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FE53E752C8E223500FB6400 /* SQLite in Frameworks */,
+				5FAAF9442CF24262002D9412 /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +305,9 @@
 				5FAAF92A2CF14DAA002D9412 /* WorkoutStateViewModel.swift */,
 				5FAAF9332CF15590002D9412 /* WorkoutExerciseViewModel.swift */,
 				5FAAF9352CF15709002D9412 /* WorkoutSeriesViewModel.swift */,
+				5FAAF93A2CF21772002D9412 /* NoPlanWorkoutViewModel.swift */,
+				5FAAF93C2CF221AA002D9412 /* NoPlanWorkoutExerciseViewModel.swift */,
+				5FAAF93E2CF224CB002D9412 /* NoPlanWorkoutSetViewModel.swift */,
 			);
 			path = Workout;
 			sourceTree = "<group>";
@@ -303,6 +316,7 @@
 			isa = PBXGroup;
 			children = (
 				5FAAF9382CF15FE5002D9412 /* HomeStateViewModel.swift */,
+				5FAAF9452CF8CB86002D9412 /* HomeViewModel.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -599,6 +613,7 @@
 			name = "Lift-Hub";
 			packageProductDependencies = (
 				5FE53E742C8E223500FB6400 /* SQLite */,
+				5FAAF9432CF24262002D9412 /* SwiftUIIntrospect */,
 			);
 			productName = LiftHub;
 			productReference = 5FE53E232C8C727C00FB6400 /* Lift-Hub.app */;
@@ -674,6 +689,7 @@
 			mainGroup = 5FE53E1A2C8C727C00FB6400;
 			packageReferences = (
 				5FE53E702C8E213900FB6400 /* XCRemoteSwiftPackageReference "SQLite" */,
+				5FAAF9422CF24262002D9412 /* XCLocalSwiftPackageReference "../../Downloads/swiftui-introspect-main" */,
 			);
 			productRefGroup = 5FE53E242C8C727C00FB6400 /* Products */;
 			projectDirPath = "";
@@ -739,6 +755,7 @@
 				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
 				5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */,
 				5FE53EE32C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift in Sources */,
+				5FAAF93D2CF221AA002D9412 /* NoPlanWorkoutExerciseViewModel.swift in Sources */,
 				5FE53EDC2C9B53C400FB6400 /* StatsView.swift in Sources */,
 				5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */,
 				5FE53E802C8F7A5100FB6400 /* RoutineView.swift in Sources */,
@@ -767,8 +784,10 @@
 				5FE53ED82C99B41500FB6400 /* EditHistoryDetailsView.swift in Sources */,
 				5FCCD2122CEFF2C600385BCB /* HistoryViewModel.swift in Sources */,
 				5FE53E572C8CAB3400FB6400 /* HomeView.swift in Sources */,
+				5FAAF9462CF8CB86002D9412 /* HomeViewModel.swift in Sources */,
 				5FCCD2182CF004E400385BCB /* HistoryDetailsElementViewModel.swift in Sources */,
 				5FE53E632C8CD8C200FB6400 /* PlansView.swift in Sources */,
+				5FAAF93B2CF21772002D9412 /* NoPlanWorkoutViewModel.swift in Sources */,
 				5FE53EC72C9732C800FB6400 /* WorkoutSeriesDataBaseHelper.swift in Sources */,
 				5FE53E5A2C8CB2B700FB6400 /* Color.swift in Sources */,
 				5FE53E962C90933E00FB6400 /* WeightUnit.swift in Sources */,
@@ -801,6 +820,7 @@
 				5FE53E872C908C5300FB6400 /* ExercisePace.swift in Sources */,
 				5FE53E692C8DE7FF00FB6400 /* TrainingPlansListView.swift in Sources */,
 				5FE53ECB2C98974400FB6400 /* HistoryView.swift in Sources */,
+				5FAAF93F2CF224CB002D9412 /* NoPlanWorkoutSetViewModel.swift in Sources */,
 				5FE53EDA2C99BF7B00FB6400 /* EditHistoryDetailsListView.swift in Sources */,
 				5FCCD21C2CF0081100385BCB /* EditHistoryDetailsViewModel.swift in Sources */,
 				5FAAF92D2CF15084002D9412 /* Workout.swift in Sources */,
@@ -1135,6 +1155,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5FAAF9422CF24262002D9412 /* XCLocalSwiftPackageReference "../../Downloads/swiftui-introspect-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../Downloads/swiftui-introspect-main";
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		5FE53E702C8E213900FB6400 /* XCRemoteSwiftPackageReference "SQLite" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1147,6 +1174,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5FAAF9432CF24262002D9412 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftUIIntrospect;
+		};
 		5FE53E742C8E223500FB6400 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5FE53E702C8E213900FB6400 /* XCRemoteSwiftPackageReference "SQLite" */;

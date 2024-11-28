@@ -9,8 +9,9 @@ import SwiftUI
 import UIKit
 
 struct WorkoutView: View {
-    @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
+    @Environment(\.presentationMode) var presentationMode
     @Environment(\.scenePhase) var scenePhase
+    
     @StateObject var stateViewModel =  WorkoutStateViewModel()
     @StateObject var viewModel: WorkoutViewModel
 

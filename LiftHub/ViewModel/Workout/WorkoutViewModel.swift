@@ -117,7 +117,7 @@ class WorkoutViewModel: ObservableObject {
         }
     }
     
-    func saveWorkoutToHistory(workoutStateViewModel: WorkoutStateViewModel, homeStateViewModel: HomeStateViewModel, presentationMode: EnvironmentValues) {
+    func saveWorkoutToHistory(workoutStateViewModel: WorkoutStateViewModel, homeStateViewModel: HomeStateViewModel) {
         var workout = [Workout]()
         var series = [WorkoutSeries]()
         for (index, pair) in workoutDraft.enumerated() {
