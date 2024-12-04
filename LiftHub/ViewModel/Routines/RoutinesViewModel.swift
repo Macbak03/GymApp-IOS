@@ -37,6 +37,8 @@ class RoutinesViewModel: ObservableObject {
         indexSet.forEach { index in
             let routineName = routines[index].name
             routinesDatabaseHelper.deleteRoutine(planID: planId, routineName: routineName)
+            clearOngoingWorkout(routineName: routineName) //clears user defaults if user deletes the same routine as ongoing workout
+
         }
         routines.remove(atOffsets: indexSet)
     }
@@ -44,6 +46,14 @@ class RoutinesViewModel: ObservableObject {
     func deleteRoutine(routineName: String, position: Int) {
         routinesDatabaseHelper.deleteRoutine(planID: planId, routineName: routineName)
         routines.remove(at: position)
+        clearOngoingWorkout(routineName: routineName)
+    }
+    
+    private func clearOngoingWorkout(routineName: String) {
+        if routineName == UserDefaultsUtils.shared.getUnfinishedRoutineName() {
+            UserDefaultsUtils.shared.removeDate()
+            UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
+        }
     }
     
 }

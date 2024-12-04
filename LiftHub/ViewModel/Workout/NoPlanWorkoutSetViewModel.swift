@@ -25,7 +25,7 @@ class NoPlanWorkoutSetViewModel: ObservableObject {
         self.seriesCount = seriesCount
     }
     
-    func validateReps(focused: Bool, set: WorkoutSeriesDraft, stateViewModel: WorkoutStateViewModel) {
+    func validateReps(focused: Bool, set: WorkoutSeriesDraft,  stateViewModel: WorkoutStateViewModel) {
         if !focused {
             do {
                 try _ = RepsFactory.fromString(set.actualReps)

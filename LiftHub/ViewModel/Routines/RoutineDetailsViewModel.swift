@@ -24,6 +24,12 @@ class RoutineDetailsViewModel: ObservableObject {
     private let exercisesDatabaseHelper = ExercisesDataBaseHelper()
     private let routinesDatabaseHelper = RoutinesDataBaseHelper()
     
+    var planName: String = ""
+    
+    func setPlanName(planName: String){
+        self.planName = planName
+    }
+    
     func addExercise() {
         let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
         routineDraft.append(newExercise)
@@ -94,8 +100,8 @@ class RoutineDetailsViewModel: ObservableObject {
         routineDraft.move(fromOffsets: source, toOffset: destination)
     }
     
-    func setToast(errorMessage: String) {
-        toastMessage = errorMessage
+    func setToast(message: String) {
+        toastMessage = message
         showToast = true
     }
     

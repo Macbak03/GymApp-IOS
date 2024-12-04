@@ -19,6 +19,8 @@ class WorkoutExerciseViewModel: ObservableObject {
     
     @Published var noteHint: String = "Note"
     
+    @Published var areDetailsVisible = false
+    
     
     func initValues(workoutExerciseDraft: WorkoutExerciseDraft, workoutHints: WorkoutHints) {
         self.exerciseName = workoutExerciseDraft.name

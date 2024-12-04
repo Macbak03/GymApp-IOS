@@ -37,9 +37,9 @@ class ExerciseViewModel: ObservableObject {
                 try handleExerciseNameException()
             } catch let error as ValidationException {
                 showNameError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showNameError = false
@@ -52,9 +52,9 @@ class ExerciseViewModel: ObservableObject {
                 try _ = PauseFactory.fromString(exerciseDraft.pause, unit: exerciseDraft.pauseUnit)
             } catch let error as ValidationException {
                 showPauseError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showPauseError = false
@@ -67,9 +67,9 @@ class ExerciseViewModel: ObservableObject {
                 try _ = Weight.fromStringWithUnit(exerciseDraft.load, unit: exerciseDraft.loadUnit)
             } catch let error as ValidationException {
                 showLoadError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showLoadError = false
@@ -82,9 +82,9 @@ class ExerciseViewModel: ObservableObject {
                 try _ = RepsFactory.fromString(exerciseDraft.reps)
             } catch let error as ValidationException {
                 showRepsError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showRepsError = false
@@ -109,9 +109,9 @@ class ExerciseViewModel: ObservableObject {
                 try handleSeriesException()
             } catch let error as ValidationException {
                 showSeriesError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showSeriesError = false
@@ -124,9 +124,9 @@ class ExerciseViewModel: ObservableObject {
                 try _ = IntensityFactory.fromString(exerciseDraft.intensity, index: exerciseDraft.intensityIndex)
             } catch let error as ValidationException {
                 showIntensityError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showIntensityError = false
@@ -139,9 +139,9 @@ class ExerciseViewModel: ObservableObject {
                 try _ = ExercisePace.fromString(exerciseDraft.pace)
             } catch let error as ValidationException {
                 showPaceError = true
-                viewModel.setToast(errorMessage: error.message)
+                viewModel.setToast(message: error.message)
             } catch {
-                viewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+                viewModel.setToast(message: "An unexpected error occured \(error)")
             }
         } else {
             showPaceError = false

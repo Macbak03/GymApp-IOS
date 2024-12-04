@@ -56,6 +56,10 @@ class PlansViewModel: ObservableObject {
         guard let planName = planName else {
             throw ValidationException(message: "Plan's name was found null when deleting plan")
         }
+        let userDefaultsSavedPlanName = UserDefaultsUtils.shared.getSelectedPlan()
+        if planName == userDefaultsSavedPlanName {
+            UserDefaultsUtils.shared.removeSelectedPlan()
+        }
         guard let position = position else {
             throw ValidationException(message: "Plan's position was found null when deleting plan")
         }

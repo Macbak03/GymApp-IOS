@@ -18,7 +18,7 @@ class WorkoutStateViewModel: ObservableObject {
     
     @Published var areHintsConverted = false
     
-    let isWorkoutSaved = UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    let isWorkoutSaved = UserDefaultsUtils.shared.getWorkoutSaved()
     
     func setToast(errorMessage: String) {
         toastMessage = errorMessage

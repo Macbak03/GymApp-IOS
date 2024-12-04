@@ -16,7 +16,7 @@ struct WorkoutListView: View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints[index], workoutStateViewModel: workoutStateViewModel, viewModel: WorkoutExerciseViewModel())
+                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints[index], workoutStateViewModel: workoutStateViewModel)
             }
         }
     }
@@ -27,9 +27,8 @@ private struct WorkoutListExerciseView: View {
     @Binding var workoutHints: WorkoutHints
     
     @ObservedObject var workoutStateViewModel: WorkoutStateViewModel
-    @StateObject var viewModel: WorkoutExerciseViewModel
+    @StateObject private var viewModel =  WorkoutExerciseViewModel()
     
-    @State private var isDetailsVisible = false
     @State private var displayNote = false
     
     private let textSize: CGFloat = 15
@@ -40,7 +39,7 @@ private struct WorkoutListExerciseView: View {
     var body: some View {
         HStack {
             Image(systemName: "chevron.down")
-                .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
+                .rotationEffect(.degrees(viewModel.areDetailsVisible ? 0 : -90))
                 .frame(width: 20, height: 20)
                 .padding(.leading, 15)
             VStack(alignment: .leading, spacing: 3) {
@@ -106,7 +105,7 @@ private struct WorkoutListExerciseView: View {
         }
         .onTapGesture {
             withAnimation {
-                isDetailsVisible.toggle()
+                viewModel.areDetailsVisible.toggle()
             }
         }
         .onAppear() {
@@ -114,7 +113,7 @@ private struct WorkoutListExerciseView: View {
         }
         .onChange(of: workoutStateViewModel.isSaveClicked) { _, clicked in
             if clicked {
-                isDetailsVisible = true
+                viewModel.areDetailsVisible = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
                     isSaveClicked = true
                 }
@@ -123,7 +122,7 @@ private struct WorkoutListExerciseView: View {
         Divider()
             .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
             .background(Color(.systemGray6)) // Set color for the line
-        if isDetailsVisible {
+        if viewModel.areDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
                 WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints, stateViewModel: workoutStateViewModel, viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index), isSaveClicked: $isSaveClicked)

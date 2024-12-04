@@ -18,13 +18,29 @@ struct RoutineListView: View {
                 
             }
             .onDelete(perform: { indexSet in
-                viewModel.deleteItem(atOffsets: indexSet)
+                if routineIsUsedInCurrentWorkout() && !indexSet.contains(viewModel.routineDraft.count - 1) {
+                    viewModel.setToast(message: "You can't delete exercises when you're in middle of workout")
+                } else {
+                    viewModel.deleteItem(atOffsets: indexSet)
+                }
             })
+            
             .onMove(perform: { from, to in
-                viewModel.moveItem(from: from, to: to)
+                if routineIsUsedInCurrentWorkout() {
+                    viewModel.setToast(message: "You can't move exercises when you're in middle of workout")
+                } else {
+                    viewModel.moveItem(from: from, to: to)
+                }
             })
         }
         .listStyle(PlainListStyle())
+    }
+    
+    private func routineIsUsedInCurrentWorkout() -> Bool{
+        if viewModel.planName == UserDefaultsUtils.shared.getSelectedPlan() && viewModel.routineName == UserDefaultsUtils.shared.getUnfinishedRoutineName() {
+            return true
+        }
+        return false
     }
     
 }

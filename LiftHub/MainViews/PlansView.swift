@@ -14,16 +14,27 @@ struct PlansView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                Backgroundimage(geometry: geometry, imageName: "plans_icon")
-                VStack {
-                    TrainingPlansListView(viewModel: viewModel)
-                        .onAppear() {
-                            viewModel.loadPlans()
+            VStack {
+                if viewModel.trainingPlans.isEmpty {
+                    Button(action : {
+                        showCreatePlanDialog = true
+                    }) {
+                        VStack {
+                            Image(systemName: "plus")
+                                .resizable()
+                                .frame(width: 70, height: 70)
+                            Text("Create Training Plan")
                         }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                    }
+                    
+                    
+                } else {
+                    TrainingPlansListView(viewModel: viewModel)
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height)
+                    
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -37,11 +48,11 @@ struct PlansView: View {
         .sheet(isPresented: $showCreatePlanDialog) {
             CreatePlanDialogView(plansViewModel: viewModel, planViewModel: PlanViewModel(), dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "")
         }
+        .onAppear() {
+            viewModel.loadPlans()
+        }
     }
     
-//    func loadPlans() {
-//        trainingPlans = plansDatabaseHelper.getPlans()
-//    }
 }
 
 struct PlansView_Previews: PreviewProvider {

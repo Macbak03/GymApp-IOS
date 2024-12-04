@@ -17,24 +17,26 @@ struct RoutinesView: View {
         
         
         GeometryReader { geometry in
-            ZStack {
-                VStack {
-                    RoutinesListView(viewModel: viewModel)
-                        .onChange(of: viewModel.refreshRoutines) { _, refreshNeeded in
-                            if refreshNeeded {
-                                viewModel.loadRoutines()
-                                viewModel.refreshRoutines = false
+            VStack {
+                if viewModel.routines.isEmpty {
+                    NavigationLink(
+                        destination: RoutineView(originalRoutineName: nil, routinesViewModel: viewModel),
+                        label: {
+                            VStack {
+                                Image(systemName: "plus")
+                                    .resizable()
+                                    .frame(width: 70, height: 70)
+                                Text("Create Routine")
                             }
-                            
+                            .frame(width: geometry.size.width, height: geometry.size.height)
                         }
-                        .onAppear() {
-                            viewModel.initPlanName(planName: planName)
-                            viewModel.loadRoutines()
-                        }
+                    )
                     
+                } else {
+                    RoutinesListView(viewModel: viewModel)
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height)
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
             .navigationTitle(planName)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -47,8 +49,16 @@ struct RoutinesView: View {
                 }
             }
             .toast(isShowing: $viewModel.showToast, message: viewModel.toastMessage)
-            .onAppear() {
+            .onChange(of: viewModel.refreshRoutines) { _, refreshNeeded in
+                if refreshNeeded {
+                    viewModel.loadRoutines()
+                    viewModel.refreshRoutines = false
+                }
                 
+            }
+            .onAppear() {
+                viewModel.initPlanName(planName: planName)
+                viewModel.loadRoutines()
             }
         }
     }

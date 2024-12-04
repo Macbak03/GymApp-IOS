@@ -124,6 +124,7 @@ struct RoutineView: View {
             }
         }
         .onAppear {
+            viewModel.setPlanName(planName: routinesViewModel.planName)
             viewModel.loadRoutine(originalRoutineName: originalRoutineName, planId: routinesViewModel.planId)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 viewModel.wasRoutineLoaded = true

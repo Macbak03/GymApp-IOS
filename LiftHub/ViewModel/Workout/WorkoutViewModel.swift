@@ -107,9 +107,9 @@ class WorkoutViewModel: ObservableObject {
             if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let fileURL = documentDirectory.appendingPathComponent("workout.json")
                 try jsonData.write(to: fileURL)
-                UserDefaults.standard.setValue(false, forKey: Constants.IS_WORKOUT_SAVED_KEY)
-                UserDefaults.standard.setValue(routineName, forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME)
-                UserDefaults.standard.setValue(date, forKey: Constants.DATE)
+                UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: false)
+                UserDefaultsUtils.shared.setUnfinishedRoutineName(routineName: routineName)
+                UserDefaultsUtils.shared.setDate(date: date)
                 print("Workout data saved at: \(fileURL)")
             }
         } catch {
@@ -159,8 +159,8 @@ class WorkoutViewModel: ObservableObject {
             }
         }
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
-        UserDefaults.standard.setValue(nil, forKey: Constants.DATE)
-        UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
+        UserDefaultsUtils.shared.removeDate()
+        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
         homeStateViewModel.isWorkoutEnded = true
         workoutStateViewModel.isWorkoutFinished = true
         homeStateViewModel.showToast = true

@@ -43,7 +43,7 @@ struct WorkoutView: View {
                     title: Text("Warning"),
                     message: Text("Workout won't be saved. Do you want to cancel?"),
                     primaryButton: .destructive(Text("Yes")) {
-                        UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
+                        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
                         homeStateViewModel.isWorkoutEnded = true
                         stateViewModel.isWorkoutFinished = true
                         presentationMode.wrappedValue.dismiss()

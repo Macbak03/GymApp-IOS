@@ -32,9 +32,7 @@ struct HistoryListElementView: View {
     
     @State private var showOptionsDialog = false
     @State private var openHistoryDetails = false
-    @State private var openEditHistory = false
     @State private var showAlertDialog = false
-    
     
 
     var body: some View {
@@ -73,16 +71,13 @@ struct HistoryListElementView: View {
                                 historyViewModel.toastMessage = viewModel.toastMessage
                             },
                         label: {
-                            Button(action: {
-                                openEditHistory = true
-                            }) {
-                                HStack {
-                                    Text("Edit")
-                                        .foregroundColor(Color.accentColor)
-                                    Image(systemName: "square.and.pencil")
-                                        .padding()
-                                        .foregroundColor(Color.accentColor)
-                                }
+                            HStack {
+                                Text("Edit")
+                                    .foregroundColor(Color.accentColor)
+                                Image(systemName: "square.and.pencil")
+                                    .padding()
+                                    .foregroundColor(Color.accentColor)
+                                
                             }
                         }
                     )

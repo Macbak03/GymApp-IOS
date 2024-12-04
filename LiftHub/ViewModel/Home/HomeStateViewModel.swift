@@ -21,8 +21,24 @@ class HomeStateViewModel: ObservableObject {
     @Published var showToast = false
     @Published var toastMessage = ""
     
+    @Published var activeAlert: HomeAlertType? = nil
+    
     func setToast(message: String) {
         showToast = true
         toastMessage = message
+    }
+    
+    enum HomeAlertType: Identifiable {
+        case newWorkout
+        case deleteFromHistory
+        
+        var id: Int {
+            switch self {
+            case .newWorkout:
+                return 1
+            case .deleteFromHistory:
+                return 2
+            }
+        }
     }
 }

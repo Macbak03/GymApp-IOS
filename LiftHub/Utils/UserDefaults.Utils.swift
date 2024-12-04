@@ -37,4 +37,52 @@ class UserDefaultsUtils {
         UserDefaults.standard.set(unit, forKey: weightUnitKey)
     }
     
+    func setSelectedPlan(planName: String) {
+        UserDefaults.standard.set(planName, forKey: Constants.SELECTED_PLAN_NAME)
+    }
+    
+    func getSelectedPlan() -> String {
+        return UserDefaults.standard.string(forKey: Constants.SELECTED_PLAN_NAME) ?? Constants.NO_PLAN_NAME
+    }
+    
+    func removeSelectedPlan() {
+        UserDefaults.standard.removeObject(forKey: Constants.SELECTED_PLAN_NAME)
+    }
+    
+    func setUnfinishedRoutineName(routineName: String) {
+        UserDefaults.standard.set(routineName, forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME)
+    }
+    
+    func getUnfinishedRoutineName() -> String {
+        return UserDefaults.standard.string(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME) ?? ""
+    }
+    
+    func removeUnfinishedRoutineName() {
+        UserDefaults.standard.removeObject(forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME)
+    }
+    
+    func setDate(date: String) {
+        UserDefaults.standard.set(date, forKey: Constants.DATE)
+    }
+    
+    func getDate() -> String {
+        return UserDefaults.standard.string(forKey: Constants.DATE) ?? CustomDate.getCurrentDate()
+    }
+    
+    func removeDate() {
+        UserDefaults.standard.removeObject(forKey: Constants.DATE)
+    }
+    
+    func setWorkoutSaved(workoutSaved: Bool) {
+        UserDefaults.standard.setValue(workoutSaved, forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    }
+    
+    func getWorkoutSaved() -> Bool {
+        UserDefaults.standard.bool(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    }
+    
+    func removeWorkoutSaved() {
+        UserDefaults.standard.removeObject(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    }
+    
 }

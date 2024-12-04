@@ -41,12 +41,6 @@ struct TrainingPlansElementView: View {
             Text(planViewModel.planName ?? "")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(Color.TextColorPrimary)
-                .onAppear {
-                    // Set the initial value of planName
-                    if position < viewModel.trainingPlans.count {
-                        
-                    }
-                }
                 .allowsHitTesting(false)
             
             Spacer()

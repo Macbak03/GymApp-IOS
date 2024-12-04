@@ -10,6 +10,11 @@ import Foundation
 class HomeViewModel: ObservableObject {
     @Published var workoutHistoryElement = WorkoutHistoryElement(planName: "plan", routineName: "routine", formattedDate: "date", rawDate: "rawDate")
     
+    @Published var intensityIndex = IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity())!
+    @Published var weightUnit = WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit())!
+    
+    @Published var unsavedWorkoutPlanName = ""
+    
     private let historyDatabaseHelper = WorkoutHistoryDataBaseHelper()
     
     func loadLastWorkout(stateViewModel: HomeStateViewModel){
@@ -33,4 +38,9 @@ class HomeViewModel: ObservableObject {
         workoutHistoryElement.formattedDate = CustomDate.getFormattedDate(savedDate: workoutDate)
         workoutHistoryElement.routineName = workoutRoutineName
     }
+    
+    func getUnsavedWorkoutPlanName() {
+        unsavedWorkoutPlanName = UserDefaultsUtils.shared.getSelectedPlan()
+    }
+    
 }

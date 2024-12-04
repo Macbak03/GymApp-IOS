@@ -119,13 +119,13 @@ private struct WorkoutListExerciseView: View {
         
         if isDetailsVisible {
             List {
-                ForEach(exercise.workoutSeriesDraftList) {
-                    set in
-                    WorkoutListSeriesView(set: binding(for: set), stateViewModel: stateViewModel, noPlanWorkoutViewModel: noPlanWorkoutViewModel, viewModel: NoPlanWorkoutSetViewModel(seriesCount: exercise.workoutSeriesDraftList.count))
+                ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
+                    index in
+                    WorkoutListSeriesView(set: $exercise.workoutSeriesDraftList[index], stateViewModel: stateViewModel, viewModel: NoPlanWorkoutSetViewModel(seriesCount: index + 1))
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             if exercise.workoutSeriesDraftList.count > 1 {
                                 Button(role: .destructive) {
-                                    removeSet(id: set.id)
+                                    removeSet(id: exercise.workoutSeriesDraftList[index].id)
                                 } label: {
                                     Text("Delete")
                                 }
@@ -192,7 +192,6 @@ private struct WorkoutListExerciseView: View {
 private struct WorkoutListSeriesView: View {
     @Binding var set: WorkoutSeriesDraft
     @ObservedObject var stateViewModel: WorkoutStateViewModel
-    @ObservedObject var noPlanWorkoutViewModel: NoPlanWorkoutViewModel
     @StateObject var viewModel: NoPlanWorkoutSetViewModel
     
     @FocusState private var isLoadFocused: Bool
@@ -215,8 +214,7 @@ private struct WorkoutListSeriesView: View {
         GeometryReader { geometry in
             let screenWidth = geometry.size.width
             VStack(alignment: .leading) {
-                // First Horizontal Layout for Series Count, Reps, Weight
-                
+
                 HStack(spacing: getSpacing(for: screenWidth)) {
                     // Series Count
                     Text("\(viewModel.seriesCount).")
@@ -247,7 +245,6 @@ private struct WorkoutListSeriesView: View {
                             }
                         }
                     
-                    // Multiplication Sign
                     Text("x")
                         .font(.system(size: textSize))
                         .frame(width: 10)
