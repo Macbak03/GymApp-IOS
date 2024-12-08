@@ -63,13 +63,13 @@ struct PauseFactory {
             }
             
             if unit == .min {
-                if intRangeFrom > 60 {
+                if intRangeFrom > 60 || intRangeTo > 60 {
                     throw ValidationException(message: "Why go to the gym if you're resting for that long between sets???")
                 }
                 return RangePause(from: intRangeFrom * seconds, to: intRangeTo * seconds, pauseUnit: unit)
             } else {
-                if intRangeFrom > 3600 {
-                    throw ValidationException(message: "Why go to the gym if you're resting for that long between sets???")
+                if intRangeFrom > 600 || intRangeTo > 600 {
+                    throw ValidationException(message: "Change to minutes at this point")
                 }
                 return RangePause(from: intRangeFrom, to: intRangeTo, pauseUnit: unit)
             }
@@ -84,8 +84,8 @@ struct PauseFactory {
                     }
                     return ExactPause(value: intValue * seconds, pauseUnit: unit)
                 } else {
-                    if intValue > 3600 {
-                        throw ValidationException(message: "Why go to the gym if you're resting for that long between sets???")
+                    if intValue > 600 {
+                        throw ValidationException(message: "Change to minutes at this point")
                     }
                     return ExactPause(value: intValue, pauseUnit: unit)
                 }

@@ -130,6 +130,33 @@ class WorkoutSeriesDataBaseHelper : Repository{
             print("Error updating series values: \(error)")
         }
     }
+    
+    func getLastWorkoutExercisePerformance(exerciseId: Int64?) -> [WorkoutSeriesDraft] {
+        var sets = [WorkoutSeriesDraft]()
+        guard let exerciseId = exerciseId else {
+            return sets
+        }
+        do {
+            let query = workoutSeriesTable
+                .filter(self.exerciseId == exerciseId)
+            
+            for row in try db!.prepare(query) {
+                let actualRepsDouble = try row.get(actualReps)
+                let loadValueDouble = try row.get(loadValue)
+                let intensityValueInt = try row.get(intensityValue)
+                
+                let actualReps = actualRepsDouble.description
+                let loadValue = loadValueDouble.description
+                let intensityValue = intensityValueInt.description
+                let loadUnit = getLoadUnit(exerciseId: exerciseId)
+                let intensityIndex = getIntensityIndex(exerciseId: exerciseId)
+                sets.append(WorkoutSeriesDraft(actualReps: actualReps, actualLoad: loadValue, loadUnit: loadUnit!, intensityIndex: intensityIndex!, actualIntensity: intensityValue))
+            }
+        } catch {
+            print("Error fetching last workout performance: \(error)")
+        }
+        return sets
+    }
 
     // MARK: - Get Chart Data
     func getChartData(exerciseId: Int64) -> (reps: Double, weight: Double) {

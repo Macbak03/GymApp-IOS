@@ -39,6 +39,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
                             pauseUnit: TimeUnit.min,
                             series: "0",
                             reps: "0",
+                            loadUnit: weightUnit,
                             intensity: "0",
                             intensityIndex: intensityIndex,
                             pace: "0000",
@@ -185,7 +186,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
     }
     
     func addExercise() {
-        let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "0", pauseUnit: TimeUnit.min, series: "0", reps: "0", intensity: "0", intensityIndex: intensityIndex, pace: "0000", note: "")
+        let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "0", pauseUnit: TimeUnit.min, series: "0", reps: "0", loadUnit: WeightUnit.kg, intensity: "0", intensityIndex: intensityIndex, pace: "0000", note: "")
         let exerciseSetDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
         workoutDraft.append(WorkoutDraft(workoutExerciseDraft: exerciseDraft, workoutSeriesDraftList: [exerciseSetDraft]))
         objectWillChange.send()

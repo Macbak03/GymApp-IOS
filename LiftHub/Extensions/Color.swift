@@ -32,6 +32,9 @@ extension Color {
     static var TextColorSecondary: Color  {
         return Color("TextColorSecondary")
     }
+    static var TextColorTetiary: Color  {
+        return Color("TextColorTetiary")
+    }
     static var TextFieldOutline: Color  {
         return Color("TextFieldOutline")
     }
@@ -49,5 +52,8 @@ extension Color {
     }
     static var CustomRed: Color {
         return Color("CustomRed")
+    }
+    static var MenuPickerColorSecondary: Color {
+        return Color("MenuPickerColorSecondary")
     }
 }

@@ -49,10 +49,9 @@ private struct HistoryDetailsListExerciseView: View {
                     
                     // Second Horizontal Layout (Rest, Series, Intensity, Pace)
                     HStack(alignment: .center) {
-                        let VSpacing: CGFloat = 3
-                        
+                        let VSpacing: CGFloat = 2
                         // Rest Layout
-                        VStack(spacing: VSpacing) {
+                        HStack(spacing: VSpacing) {
                             Text("Rest:")
                                 .font(.system(size: textSize))
                             HStack(spacing: 1) {
@@ -65,43 +64,43 @@ private struct HistoryDetailsListExerciseView: View {
                                     .frame(alignment: .leading)
                             }
                         }
-                        Spacer()
-                        
-                        // Series Layout
-                        VStack(spacing: VSpacing) {
-                            Text("Series:")
-                                .font(.system(size: textSize))
-                            Text(viewModel.exercise.workoutExerciseDraft.series)
-                                .font(.system(size: textSize))
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                        }
-                        Spacer()
-                        
-                        // Intensity Layout
-                        VStack(spacing: VSpacing) {
-                            Text(viewModel.exercise.workoutExerciseDraft.intensityIndex.rawValue)
-                                .font(.system(size: textSize))
-                            Text(viewModel.exercise.workoutExerciseDraft.intensity)
-                                .font(.system(size: textSize))
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                        }
-                        Spacer()
-                        
+                        .frame(width: 110, alignment: .leading)
+                        .foregroundStyle(Color.TextColorSecondary)
+    //                    Spacer()
+    //                    // Series Layout
+    //                    VStack(spacing: VSpacing) {
+    //                        Text("Series:")
+    //                            .font(.system(size: textSize))
+    //                        Text(viewModel.seriesValue)
+    //                            .font(.system(size: textSize))
+    //                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+    //                    }
+    //                    Spacer()
+    //                    // Intensity Layout
+    //                    VStack(spacing: VSpacing) {
+    //                        Text("\(viewModel.intensityIndexText):")
+    //                            .font(.system(size: textSize))
+    //                        Text(viewModel.intensityValue)
+    //                            .font(.system(size: textSize))
+    //                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+    //                    }
+                        //Spacer()
                         // Pace Layout
-                        VStack(spacing: VSpacing) {
+                        HStack(spacing: VSpacing) {
                             Text("Pace:")
                                 .font(.system(size: textSize))
                             Text(viewModel.exercise.workoutExerciseDraft.pace)
                                 .font(.system(size: textSize))
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+                                //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
+                        .foregroundStyle(Color.TextColorSecondary)
+                        Spacer()
                     }
-                    .frame(maxWidth: .infinity, idealHeight: 50)
-                    .padding(.horizontal, 15)
+                    .frame(maxWidth: .infinity)
                 }
             }
-            .frame(height: (viewModel.planName != Constants.NO_PLAN_NAME) ? 55 : 35)
-            .padding(.horizontal, 15)  // General padding for the whole view
+            .frame(height: (viewModel.planName != Constants.NO_PLAN_NAME) ? 40 : 35)
+            .padding(.horizontal, 10)  // General padding for the whole view
         }
         .onTapGesture {
             withAnimation {
@@ -200,12 +199,12 @@ private struct HistoryDetailsListSeriesView: View {
 }
 
 struct HistoryDetailsListView_previews: PreviewProvider {
-    @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "1", pauseUnit: TimeUnit.min, series: "1", reps: "1", intensity: "1", intensityIndex: IntensityIndex.RPE, pace: "1111", note: "note1")
+    @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "1", pauseUnit: TimeUnit.min, series: "1", reps: "1", loadUnit: WeightUnit.kg, intensity: "1", intensityIndex: IntensityIndex.RPE, pace: "1111", note: "note1")
     @State static var series1_1 = WorkoutSeriesDraft(actualReps: "11", actualLoad: "11", loadUnit: WeightUnit.kg, intensityIndex: IntensityIndex.RPE, actualIntensity: "1")
     
     @State static var wholeExercise1 = (workoutExerciseDraft: exercise1, workoutSeriesDraftList: [series1_1])
     
-    @State static var exercise2 = WorkoutExerciseDraft(name: "Exercise2", pause: "2", pauseUnit: TimeUnit.s, series: "2", reps: "2", intensity: "2", intensityIndex: IntensityIndex.RIR, pace: "2222", note: "note2")
+    @State static var exercise2 = WorkoutExerciseDraft(name: "Exercise2", pause: "2", pauseUnit: TimeUnit.s, series: "2", reps: "2", loadUnit: WeightUnit.lbs, intensity: "2", intensityIndex: IntensityIndex.RIR, pace: "2222", note: "note2")
     @State static var series2_1 = WorkoutSeriesDraft(actualReps: "21", actualLoad: "21", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "2")
     @State static var series2_2 = WorkoutSeriesDraft(actualReps: "22", actualLoad: "222", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "3")
     

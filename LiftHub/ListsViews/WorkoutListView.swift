@@ -11,12 +11,14 @@ struct WorkoutListView: View {
     @Binding var workout: [WorkoutDraft]
     @Binding var workoutHints: [WorkoutHints]
     @ObservedObject var workoutStateViewModel: WorkoutStateViewModel
+    let planName: String
+    let routineName: String
 
     var body: some View {
         ScrollView {
             ForEach(workout.indices, id: \.self) {
                 index in
-                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints[index], workoutStateViewModel: workoutStateViewModel)
+                WorkoutListExerciseView(exercise: $workout[index], workoutHints: $workoutHints[index], workoutStateViewModel: workoutStateViewModel, planName: planName, routineName: routineName)
             }
         }
     }
@@ -29,12 +31,17 @@ private struct WorkoutListExerciseView: View {
     @ObservedObject var workoutStateViewModel: WorkoutStateViewModel
     @StateObject private var viewModel =  WorkoutExerciseViewModel()
     
+    let planName: String
+    let routineName: String
+    
     @State private var displayNote = false
     
     private let textSize: CGFloat = 15
     private let outllineFrameHeight: CGFloat = 30
     
     @State private var isSaveClicked = false
+    
+    @State private var defaultSetComparison = WorkoutHints(repsHint: "reps", weightHint: UserDefaultsUtils.shared.getWeightUnit(),  intensityHint: UserDefaultsUtils.shared.getIntensity(), noteHint: "note")
     
     var body: some View {
         HStack {
@@ -57,7 +64,7 @@ private struct WorkoutListExerciseView: View {
                 HStack(alignment: .center) {
                     let VSpacing: CGFloat = 2
                     // Rest Layout
-                    VStack(spacing: VSpacing) {
+                    HStack(spacing: VSpacing) {
                         Text("Rest:")
                             .font(.system(size: textSize))
                         HStack(spacing: 1) {
@@ -70,36 +77,40 @@ private struct WorkoutListExerciseView: View {
                                 .frame(alignment: .leading)
                         }
                     }
-                    Spacer()
-                    // Series Layout
-                    VStack(spacing: VSpacing) {
-                        Text("Series:")
-                            .font(.system(size: textSize))
-                        Text(viewModel.seriesValue)
-                            .font(.system(size: textSize))
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
-                    Spacer()
-                    // Intensity Layout
-                    VStack(spacing: VSpacing) {
-                        Text("\(viewModel.intensityIndexText):")
-                            .font(.system(size: textSize))
-                        Text(viewModel.intensityValue)
-                            .font(.system(size: textSize))
-                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-                    }
-                    Spacer()
+                    .frame(width: 110, alignment: .leading)
+                    .foregroundStyle(Color.TextColorSecondary)
+//                    Spacer()
+//                    // Series Layout
+//                    VStack(spacing: VSpacing) {
+//                        Text("Series:")
+//                            .font(.system(size: textSize))
+//                        Text(viewModel.seriesValue)
+//                            .font(.system(size: textSize))
+//                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+//                    }
+//                    Spacer()
+//                    // Intensity Layout
+//                    VStack(spacing: VSpacing) {
+//                        Text("\(viewModel.intensityIndexText):")
+//                            .font(.system(size: textSize))
+//                        Text(viewModel.intensityValue)
+//                            .font(.system(size: textSize))
+//                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
+//                    }
+                    //Spacer()
                     // Pace Layout
-                    VStack(spacing: VSpacing) {
+                    HStack(spacing: VSpacing) {
                         Text("Pace:")
                             .font(.system(size: textSize))
                         Text(viewModel.paceValue)
                             .font(.system(size: textSize))
                             //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                     }
+                    .foregroundStyle(Color.TextColorSecondary)
+                    Spacer()
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, 15)
+                //.padding(.horizontal, 15)
             }
             .padding(.horizontal, 10)  // General padding for the whole view
         }
@@ -110,6 +121,7 @@ private struct WorkoutListExerciseView: View {
         }
         .onAppear() {
             viewModel.initValues(workoutExerciseDraft: exercise.workoutExerciseDraft, workoutHints: workoutHints)
+            viewModel.loadLastWorkoutComparison(planName: planName, routineName: routineName)
         }
         .onChange(of: workoutStateViewModel.isSaveClicked) { _, clicked in
             if clicked {
@@ -123,9 +135,27 @@ private struct WorkoutListExerciseView: View {
             .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
             .background(Color(.systemGray6)) // Set color for the line
         if viewModel.areDetailsVisible {
+            Menu {
+                Picker(selection: $viewModel.selectedComparingMethod) {
+                    Text(SelectedComparingMethod.lastWorkout.description).tag(SelectedComparingMethod.lastWorkout)
+                    Text(SelectedComparingMethod.trainingPlan.description).tag(SelectedComparingMethod.trainingPlan)
+                } label: {}
+            } label: {
+                HStack {
+                    Text(viewModel.selectedComparingMethod.description)
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color.MenuPickerColorSecondary)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .foregroundStyle(Color.MenuPickerColorSecondary)
+                }
+            }
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints, stateViewModel: workoutStateViewModel, viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index), isSaveClicked: $isSaveClicked)
+                if index < viewModel.lastWorkoutComparison.count {
+                    WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints, setComparison: $viewModel.lastWorkoutComparison[index], stateViewModel: workoutStateViewModel, viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index), isSaveClicked: $isSaveClicked, selectedComparisonMethod: $viewModel.selectedComparingMethod)
+                } else {
+                    WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints, setComparison: $defaultSetComparison, stateViewModel: workoutStateViewModel, viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index), isSaveClicked: $isSaveClicked, selectedComparisonMethod: $viewModel.selectedComparingMethod)
+                }
             }
             // Note Input
             TextField(viewModel.noteHint, text: $exercise.workoutExerciseDraft.note)
@@ -148,10 +178,13 @@ private struct WorkoutListExerciseView: View {
 private struct WorkoutListSeriesView: View {
     @Binding var series: WorkoutSeriesDraft
     @Binding var workoutHint: WorkoutHints
+    @Binding var setComparison: WorkoutHints
     @ObservedObject var stateViewModel: WorkoutStateViewModel
     @StateObject var viewModel: WorkoutSeriesViewModel
     
     @Binding var isSaveClicked: Bool
+    
+    @Binding var selectedComparisonMethod: SelectedComparingMethod
 
     
     @FocusState private var isLoadFocused: Bool
@@ -178,6 +211,8 @@ private struct WorkoutListSeriesView: View {
                 Text("\(viewModel.position + 1).")
                     .font(.system(size: textSize))
                     .padding(.leading, 4) // Equivalent to layout_marginStart="10dp"
+                    .frame(width: 20)
+                
                 
                 // Reps Input
                 TextField(viewModel.repsHint, text: $series.actualReps)
@@ -234,12 +269,12 @@ private struct WorkoutListSeriesView: View {
                     }
                 
                 // Weight Unit Value
-                Text(viewModel.weightUnitText)  // Assuming the weight unit is kilograms
+                Text(viewModel.weightUnitText)
                     .font(.system(size: textSize))
                 
                 Divider()
-                    .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
-                    .background(Color(.systemGray6)) // Set color for the line
+                    .frame(width: 2, height: 25)
+                    .background(Color(.systemGray6))
                 
                 // Intensity Value
                 Text("\(viewModel.intensityIndexText):")
@@ -249,7 +284,7 @@ private struct WorkoutListSeriesView: View {
                     .keyboardType(.decimalPad)
                     .font(.system(size: textSize))
                     .frame(width: 40, height: outllineFrameHeight)
-                    .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                    .multilineTextAlignment(.leading)
                     .padding(.horizontal, 10)
                     .overlay(
                         RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -274,7 +309,7 @@ private struct WorkoutListSeriesView: View {
             .padding(.horizontal, 10)
         }
         .onAppear() {
-            viewModel.initValues(series: series, hint: workoutHint)
+            viewModel.initValues(series: series, hint: workoutHint, setCompariosn: setComparison, selectedComparingMethod: selectedComparisonMethod)
         }
         .onChange(of: isSaveClicked) { _, clicked in
             if isSaveClicked {
@@ -288,6 +323,9 @@ private struct WorkoutListSeriesView: View {
                     print("Unexpected error occured when converting hints: \(error)")
                 }
             }
+        }
+        .onChange(of: selectedComparisonMethod) { _, _ in
+            viewModel.reloadHints(hint: workoutHint, setCompariosn: setComparison, selectedComparingMethod: selectedComparisonMethod)
         }
     }
     
@@ -318,12 +356,12 @@ private struct WorkoutListSeriesView: View {
 }
 
 struct WorkoutListView_previews: PreviewProvider {
-    @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "3-5", pauseUnit: TimeUnit.min, series: "1", reps: "1", intensity: "1", intensityIndex: IntensityIndex.RPE, pace: "1111", note: "note1")
+    @State static var exercise1 = WorkoutExerciseDraft(name: "Exercise1", pause: "59-60", pauseUnit: TimeUnit.min, series: "1", reps: "1", loadUnit: WeightUnit.kg, intensity: "10", intensityIndex: IntensityIndex.RPE, pace: "xxxx", note: "note1")
     @State static var series1_1 = WorkoutSeriesDraft(actualReps: "11", actualLoad: "11", loadUnit: WeightUnit.kg, intensityIndex: IntensityIndex.RPE, actualIntensity: "1")
     
     @State static var wholeExercise1 = WorkoutDraft(workoutExerciseDraft: exercise1, workoutSeriesDraftList: [series1_1])
     
-    @State static var exercise2 = WorkoutExerciseDraft(name: "Exercise2", pause: "2", pauseUnit: TimeUnit.s, series: "2", reps: "2", intensity: "2", intensityIndex: IntensityIndex.RIR, pace: "2222", note: "note2")
+    @State static var exercise2 = WorkoutExerciseDraft(name: "Exercise2", pause: "599-600", pauseUnit: TimeUnit.s, series: "2", reps: "2", loadUnit: WeightUnit.lbs, intensity: "2", intensityIndex: IntensityIndex.RIR, pace: "2222", note: "note2")
     @State static var series2_1 = WorkoutSeriesDraft(actualReps: "21", actualLoad: "21", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "2")
     @State static var series2_2 = WorkoutSeriesDraft(actualReps: "22", actualLoad: "22", loadUnit: WeightUnit.lbs, intensityIndex: IntensityIndex.RIR, actualIntensity: "3")
     
@@ -331,7 +369,7 @@ struct WorkoutListView_previews: PreviewProvider {
     
     @State static var workout =  [wholeExercise1, wholeExercise2]
     
-    @State static var workoutHint1 = WorkoutHints(repsHint: "1", weightHint: "1", intensityHint: "1", noteHint: "Note1")
+    @State static var workoutHint1 = WorkoutHints(repsHint: "100", weightHint: "100", intensityHint: "1", noteHint: "Note1")
     @State static var workoutHint2 = WorkoutHints(repsHint: "2", weightHint: "2", intensityHint: "2", noteHint: "Note2")
     @State static var workoutHints = [workoutHint1, workoutHint2]
     
@@ -339,7 +377,7 @@ struct WorkoutListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        WorkoutListView(workout: $workout, workoutHints: $workoutHints, workoutStateViewModel: WorkoutStateViewModel())
+        WorkoutListView(workout: $workout, workoutHints: $workoutHints, workoutStateViewModel: WorkoutStateViewModel(), planName: "", routineName: "")
 //        WorkoutListExerciseView(exercise: $wholeExercise2)
 //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }

@@ -20,7 +20,7 @@ struct WorkoutView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                WorkoutListView(workout: $viewModel.workoutDraft, workoutHints: $viewModel.workoutHints, workoutStateViewModel: stateViewModel)
+                WorkoutListView(workout: $viewModel.workoutDraft, workoutHints: $viewModel.workoutHints, workoutStateViewModel: stateViewModel, planName: viewModel.planName, routineName: viewModel.routineName)
                 
             }
             .onAppear(){

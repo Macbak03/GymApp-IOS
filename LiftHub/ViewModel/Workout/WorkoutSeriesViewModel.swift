@@ -27,12 +27,31 @@ class WorkoutSeriesViewModel: ObservableObject {
         self.position = position
     }
     
-    func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints){
+    func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints, setCompariosn: WorkoutHints, selectedComparingMethod: SelectedComparingMethod){
         self.weightUnitText = series.loadUnit.rawValue
         self.intensityIndexText = series.intensityIndex.rawValue
-        self.repsHint = hint.repsHint
-        self.weightHint = hint.weightHint
-        self.intensityHint = hint.intensityHint
+        
+        if selectedComparingMethod == .trainingPlan {
+            self.repsHint = hint.repsHint
+            self.weightHint = hint.weightHint
+            self.intensityHint = hint.intensityHint
+        } else if selectedComparingMethod == .lastWorkout {
+            self.repsHint = setCompariosn.repsHint
+            self.weightHint = setCompariosn.weightHint
+            self.intensityHint = setCompariosn.intensityHint
+        }
+    }
+    
+    func reloadHints(hint: WorkoutHints, setCompariosn: WorkoutHints, selectedComparingMethod: SelectedComparingMethod){
+        if selectedComparingMethod == .trainingPlan {
+            self.repsHint = hint.repsHint
+            self.weightHint = hint.weightHint
+            self.intensityHint = hint.intensityHint
+        } else if selectedComparingMethod == .lastWorkout {
+            self.repsHint = setCompariosn.repsHint
+            self.weightHint = setCompariosn.weightHint
+            self.intensityHint = setCompariosn.intensityHint
+        }
     }
     
     

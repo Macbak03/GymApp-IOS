@@ -20,7 +20,7 @@ struct MessageBubbleView: View {
                     MessageBubbleShape(arrowOffset: arrowOffset)
                         .fill(Color.ShadowColor)
                 )
-                .foregroundColor(.TextColorSecondary) // Text color
+                .foregroundColor(Color.TextColorTetiary) // Text color
                 .font(.system(size: 14)) // Set font size as needed
                 .fixedSize(horizontal: false, vertical: true) // Prevents the text from being truncated and allows it to grow
                 .multilineTextAlignment(.center)

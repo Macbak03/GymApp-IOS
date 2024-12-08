@@ -67,7 +67,7 @@ struct HomeView: View {
                                 }
                             }) {
                                 Text("Return to workout")
-                                    .foregroundColor(Color.TextColorSecondary)
+                                    .foregroundColor(Color.TextColorTetiary)
                                     .font(.system(size: 18))
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 65)

@@ -33,15 +33,20 @@ class WorkoutViewModel: ObservableObject {
         }
         let savedRoutine = exercisesDatabaseHelper.getRoutine(routineName: routineName, planId: String(planId))
         for (index, savedExercise) in savedRoutine.enumerated() {
-            let exercise = WorkoutExerciseDraft(name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
+            let exercise = WorkoutExerciseDraft(name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, loadUnit: savedExercise.loadUnit,intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
             let seriesList: [WorkoutSeriesDraft] = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
             workoutDraft.append(WorkoutDraft(workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
             let savedNotes = workoutHistoryDatabaseHelper.getLastTrainingNotes(planName: planName, routineName: routineName)
             if !savedNotes.isEmpty {
-                let note = savedNotes[index]
-                if !note.isEmpty {
-                    let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
-                    self.workoutHints.append(workoutHint)
+                if index < savedNotes.count {
+                    let note = savedNotes[index]
+                    if !note.isEmpty {
+                        let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
+                        self.workoutHints.append(workoutHint)
+                    } else {
+                        let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
+                        self.workoutHints.append(workoutHint)
+                    }
                 } else {
                     let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
                     self.workoutHints.append(workoutHint)
@@ -50,6 +55,7 @@ class WorkoutViewModel: ObservableObject {
                 let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
                 self.workoutHints.append(workoutHint)
             }
+                
         }
         if !isWorkoutSaved {
             initRecoveredWorkoutData()

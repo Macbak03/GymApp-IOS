@@ -301,6 +301,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
                 } else {
                     RangeReps(from: repsRangeFrom, to: repsRangeTo).description
                 }
+                let loadUnit: String = try row.get(self.loadUnit)
                 
                 let series = try row.get(self.series)
                 
@@ -322,6 +323,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
                     pauseUnit: pauseUnit,
                     series: String(series),
                     reps: reps,
+                    loadUnit: WeightUnit(rawValue: loadUnit)!,
                     intensity: intensity,
                     intensityIndex: IntensityIndex(rawValue: intensityIndex)!,
                     pace: pace,
@@ -411,6 +413,24 @@ class WorkoutHistoryDataBaseHelper: Repository {
             }
         }
         return notesList
+    }
+    
+    func getLastSessionExercisesId(planName: String, routineName: String, exerciseName: String) -> Int64? {
+        var exerciseId: Int64? = nil
+        if let lastDate = getLastTrainingSessionDate(planName: planName, routineName: routineName) {
+            do {
+                let query = workoutHistoryTable
+                    .select(self.exerciseId)
+                    .filter(self.date == lastDate && self.exerciseName == exerciseName)
+                
+                if let row = try db?.pluck(query) {
+                    exerciseId = try row.get(self.exerciseId)
+                }
+            } catch {
+                print("Error fetching exercises Ids: \(error)")
+            }
+        }
+        return exerciseId
     }
     
     // MARK: - Get Exercise Names

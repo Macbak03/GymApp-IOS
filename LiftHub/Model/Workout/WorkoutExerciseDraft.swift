@@ -14,17 +14,19 @@ struct WorkoutExerciseDraft: Codable, Identifiable, Hashable {
     var pauseUnit: TimeUnit
     var series: String
     var reps: String
+    var loadUnit: WeightUnit
     var intensity: String
     var intensityIndex: IntensityIndex
     var pace: String
     var note: String
 
-    init(name: String, pause: String, pauseUnit: TimeUnit, series: String, reps: String, intensity: String, intensityIndex: IntensityIndex, pace: String, note: String) {
+    init(name: String, pause: String, pauseUnit: TimeUnit, series: String, reps: String, loadUnit: WeightUnit, intensity: String, intensityIndex: IntensityIndex, pace: String, note: String) {
         self.name = name
         self.pause = pause
         self.pauseUnit = pauseUnit
         self.series = series
         self.reps = reps
+        self.loadUnit = loadUnit
         self.intensity = intensity
         self.intensityIndex = intensityIndex
         self.pace = pace
