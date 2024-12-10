@@ -496,7 +496,7 @@ class WorkoutHistoryDataBaseHelper: Repository {
             let cursor = try db!.prepare(query)
             for row in cursor {
                 let dateString = try row.get(self.date)
-                if let date = CustomDate.stringToDate(dateString) {
+                if let date = CustomDate.rawStringToDate(dateString) {
                     if let extractedYear = extractYear(from: dateString), extractedYear == year {
                         let exerciseId = try row.get(self.exerciseId)
                         exercises.append((exerciseId, date))

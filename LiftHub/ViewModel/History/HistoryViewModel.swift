@@ -16,8 +16,7 @@ class HistoryViewModel: ObservableObject {
     private let historyDatabaseHelper = WorkoutHistoryDataBaseHelper()
     
     func loadHistory() {
-        let workoutHistoryDatabaseHelper =  WorkoutHistoryDataBaseHelper()
-        history = workoutHistoryDatabaseHelper.getHistory()
+        history = historyDatabaseHelper.getHistory()
         filteredHistory = history
     }
     

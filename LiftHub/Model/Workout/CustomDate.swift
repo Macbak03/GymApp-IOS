@@ -22,9 +22,16 @@ class CustomDate {
         return formatter.string(from: date)
     }
     
-    static func stringToDate(_ dateString: String) -> Date? {
+    static func rawStringToDate(_ dateString: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = CustomDate.RAW_PATTERN
+        formatter.timeZone = TimeZone.current
+        return formatter.date(from: dateString)
+    }
+    
+    static func formattedStringToDate(_ dateString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = CustomDate.PATTERN
         formatter.timeZone = TimeZone.current
         return formatter.date(from: dateString)
     }

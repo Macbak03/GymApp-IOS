@@ -16,20 +16,8 @@ struct StartWorkoutSheetView: View {
     @State private var startNoPlanWorkout = false
     var body: some View {
         NavigationStack {
-            ZStack{
-                Color.black.opacity(0.3)
-                    .edgesIgnoringSafeArea(.all)
-                    .blur(radius: 50)
                 VStack {
-                    Spacer()
                     VStack{
-                        Image(systemName: "rectangle.fill")
-                            .resizable()
-                            .frame(width: 60, height: 7)
-                            .padding(.top, 5)
-                            .foregroundColor(.gray)
-                            .frame(maxWidth: .infinity)
-                        
                         Menu {
                             Picker(selection: $viewModel.selectedPlan) {
                                 ForEach(viewModel.trainingPlans, id: \.self) { plan in
@@ -58,7 +46,7 @@ struct StartWorkoutSheetView: View {
                                 VStack {
                                     Text("To start workout, create a routine first.")
                                     Text("Create routine")
-                                        .foregroundColor(Color.TextColorSecondary)
+                                        .foregroundColor(Color.TextColorTetiary)
                                         .font(.system(size: 18))
                                         .frame(maxWidth: .infinity)
                                         .frame(height: 50)
@@ -77,7 +65,7 @@ struct StartWorkoutSheetView: View {
                                 startNoPlanWorkout = true
                             }) {
                                 Text("Start no plan workout")
-                                    .foregroundColor(Color.TextColorSecondary)
+                                    .foregroundColor(Color.TextColorTetiary)
                                     .font(.system(size: 18))
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 50)
@@ -88,24 +76,18 @@ struct StartWorkoutSheetView: View {
                             .padding(.horizontal, 70)
                             .padding(.bottom, 20)
                         } else {
-                            ScrollView {
+                            List {
                                 ForEach(viewModel.routines.indices, id: \.self) {
                                     index in
                                     SheetListElement(homeStateViewModel: homeStateViewModel, routine: viewModel.routines[index], planName: viewModel.selectedPlan, closeWorkoutSheetElement: $closeWorkoutSheetView)
                                         .id(viewModel.selectedPlan)
                                         .transition(.move(edge: .bottom))
                                 }
-                                .padding(.top, 5)
                             }
-                            //.opacity(animateList ? 1:0)
                             .animation(.easeInOut(duration: 0.3), value: animateList)
                         }
                         
                     }
-                    .background(Color.BackgroundColor)
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    .padding(.horizontal)
                     .frame(maxWidth: .infinity, maxHeight: viewModel.isListVisible ? 150:350)
                     .clipped()
                     .animation(.easeInOut(duration: 0.3), value: viewModel.isListVisible)
@@ -157,7 +139,6 @@ struct StartWorkoutSheetView: View {
                     homeStateViewModel: homeStateViewModel)
             }
         }
-    }
 }
 
 private struct SheetListElement: View {
@@ -169,28 +150,24 @@ private struct SheetListElement: View {
     @State private var date: String = CustomDate.getCurrentDate()
     var body: some View {
         HStack {
-            Text(routine.name)
-                .font(.system(size: 18, weight: .medium))
-                .foregroundColor(Color.TextColorPrimary)
-                .padding(.leading, 5)
-            
-            Spacer()
-            
+            HStack {
+                Text(routine.name)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(Color.TextColorPrimary)
+                    .padding(.leading, 5)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .padding(.trailing, 5)
+                    .foregroundStyle(Color.gray)
+                    .font(.system(size: 15))
+            }
         }
+        .contentShape(Rectangle())
         .frame(maxWidth: .infinity, minHeight: 35)
-        .padding(5)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.BackgroundColorList)
-                .shadow(radius: 3)
-        )
-        .padding(.horizontal, 8) // Card marginHorizontal
-        
         .onTapGesture {
             UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
-            //let customDate = CustomDate()
-            //date = customDate.getDate()
-
             startWorkout = true
         }
         .fullScreenCover(isPresented: $startWorkout, onDismiss: {
@@ -216,7 +193,6 @@ struct StartWorkoutSheet_Previews: PreviewProvider {
     static var planName = "Plan"
     static var previews: some View {
         StartWorkoutSheetView(homeStateViewModel: HomeStateViewModel())
-        //SheetListElement(routine: TrainingPlanElement(name: "Rotuine"), planName: planName)
     }
 }
 

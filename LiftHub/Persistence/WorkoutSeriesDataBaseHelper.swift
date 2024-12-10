@@ -192,4 +192,17 @@ class WorkoutSeriesDataBaseHelper : Repository{
 
         return (actualReps, loadValue)
     }
+    
+    func getExerciseSumWeight(exerciseId: Int64) -> Double {
+        do {
+            let sqlQuery = "SELECT SUM(\(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)) FROM \(WorkoutSeriesDataBaseHelper.TABLE_NAME) WHERE exerciseId = ?"
+
+            if let sum = try db?.scalar(sqlQuery, exerciseId) as? Double {
+                return sum
+            }
+        } catch {
+            print("Error fetching weight sum: \(error)")
+        }
+        return 0.0
+    }
 }

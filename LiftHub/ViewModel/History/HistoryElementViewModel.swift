@@ -13,7 +13,7 @@ class HistoryElementViewModel: ObservableObject {
     @Published var toastMessage: String
     let position: Int
     
-    init(historyElement: WorkoutHistoryElement, position: Int, showToast: Bool, toastMessage: String) {
+    init(historyElement: WorkoutHistoryElement, position: Int, showToast: Bool = false, toastMessage: String = "") {
         self.historyElement = historyElement
         self.position = position
         self.showToast = showToast

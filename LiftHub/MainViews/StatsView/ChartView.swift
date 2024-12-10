@@ -186,7 +186,7 @@ struct ChartView: View {
 
 private extension ChartView {
     func getMarker(for date: Date) -> ChartData {
-        return viewModel.filteredChartData.first(where: { calendar.isDate($0.date, equalTo: date, toGranularity: .day) }) ?? ChartData(exerciseId: 0, date: Date(), reps: 0, weight: Weight(weight: 0, unit: WeightUnit.kg))
+        return viewModel.filteredChartData.first(where: { calendar.isDate($0.date, equalTo: date, toGranularity: .day) }) ?? ChartData(exerciseId: 0, date: Date(), reps: 0, weight: Weight(weight: 0, unit: WeightUnit.kg), sumWeight: 0.0)
     }
     
     func closestDataPoint(to index: Int) -> Int {

@@ -116,6 +116,7 @@ struct HomeView: View {
                         viewModel.loadLastWorkout(stateViewModel: stateViewModel)
                         viewModel.getUnsavedWorkoutPlanName()
                     }
+                    .presentationDetents([.medium, .large])
             }
             .fullScreenCover(isPresented: Binding(get: {
                 stateViewModel.startWorkout || stateViewModel.startNoPlanWorkout

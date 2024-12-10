@@ -151,7 +151,7 @@ struct BottomStatsView: View {
     
     private func getWeightSum() -> Double {
         return viewModel.filteredChartData.reduce(0.0) { sum, data in
-            sum + data.weight.weight
+            sum + data.sumWeight
         }
     }
     
