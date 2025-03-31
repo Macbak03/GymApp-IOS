@@ -11,9 +11,9 @@ struct CalendarView: UIViewRepresentable {
     let interval: DateInterval
     @ObservedObject var historyElements: WorkoutHistoryElements
     @Binding var dateSelected: DateComponents?
-    @Binding var selectedTraining: WorkoutHistoryElement?
+    //@Binding var selectedTraining: WorkoutHistoryElement?
     @Binding var displayHistorySheet: Bool
-    @Binding var displayEditHistoryView: Bool
+    //@Binding var displayEditHistoryView: Bool
     @Binding var visibleMonth: DateComponents
     @Binding var trainingCount: Int
     
@@ -79,14 +79,15 @@ struct CalendarView: UIViewRepresentable {
             let foundTrainings = historyElements.history
                 .filter { CustomDate.rawStringToDate($0.rawDate)?.startOfDay == dateComponents.date?.startOfDay }
             
-            if foundTrainings.count > 1 {
+            if foundTrainings.count > 0 {
                 parent.displayHistorySheet.toggle()
-            } else if foundTrainings.count == 1 {
-                if let singleTraining = foundTrainings.first {
-                    parent.selectedTraining = singleTraining
-                    parent.displayEditHistoryView = true
-                }
-            }
+            } 
+//            else if foundTrainings.count == 1 {
+//                if let singleTraining = foundTrainings.first {
+//                    parent.selectedTraining = singleTraining
+//                    parent.displayEditHistoryView = true
+//                }
+//            }
         }
         
         func calendarView(_ calendarView: UICalendarView, didChangeVisibleDateComponentsFrom previousDateComponents: DateComponents) {

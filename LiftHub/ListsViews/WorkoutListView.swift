@@ -201,6 +201,8 @@ private struct WorkoutListSeriesView: View {
     @State private var showLoadToolbar = false
     @State private var showRepsToolbar = false
     @State private var showIntensityToolbar = false
+    
+    @State private var compareWeight = false
 
     
     var body: some View {
@@ -259,6 +261,7 @@ private struct WorkoutListSeriesView: View {
                     .onChange(of: isLoadFocused) { _, focused in
                         viewModel.validateLoad(focused: focused, series: series, stateViewModel: stateViewModel)
                         showLoadToolbar = focused
+                        compareWeight = !focused
                     }
                     .toolbar {
                         if showLoadToolbar {
@@ -271,6 +274,30 @@ private struct WorkoutListSeriesView: View {
                 // Weight Unit Value
                 Text(viewModel.weightUnitText)
                     .font(.system(size: textSize))
+                
+                let compareResult = calculateAndCompareWeightDifference()
+                if compareResult.value != 0 && compareWeight {
+                    if compareResult.comparison == "more" {
+                        HStack(spacing: 1) {
+                            Image(systemName: "arrow.up")
+                                .foregroundColor(Color.green)
+                                .scaleEffect(CGSize(width: 0.8, height: 1))
+                            Text(formatDouble(compareResult.value))
+                                .font(.system(size: textSize))
+                        }
+                        .frame(width: 50)
+                    }
+                    if compareResult.comparison == "less" {
+                        HStack(spacing: 1) {
+                            Image(systemName: "arrow.down")
+                                .foregroundColor(Color.red)
+                                .scaleEffect(CGSize(width: 0.8, height: 1))
+                            Text(formatDouble(compareResult.value))
+                                .font(.system(size: textSize))
+                        }
+                        .frame(width: 50)
+                    }
+                }
                 
                 Divider()
                     .frame(width: 2, height: 25)
@@ -352,6 +379,30 @@ private struct WorkoutListSeriesView: View {
             series.actualIntensity = viewModel.intensityHint
         }
         
+    }
+    
+    func calculateAndCompareWeightDifference() -> (value: Double, comparison: String) {
+        guard let comparingWeight = Double(setComparison.weightHint) else {
+            return (value: 0, comparison: "")
+        }
+        guard let actualWeight = Double(series.actualLoad) else {
+            return (value: 0, comparison: "")
+        }
+        if comparingWeight > actualWeight {
+            return (value: comparingWeight - actualWeight, comparison: "less")
+        }
+        if comparingWeight < actualWeight {
+            return (value: actualWeight - comparingWeight, comparison: "more")
+        }
+        return (value: 0, comparison: "")
+    }
+    
+    func formatDouble(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
 }
 

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HistoryDialog: View {
+    @Environment(\.presentationMode) var presentationMode
     @ObservedObject var historyElements: WorkoutHistoryElements
     @Binding var dateSelected: DateComponents?
     @State private var indexSet: IndexSet = []
@@ -44,6 +45,11 @@ struct HistoryDialog: View {
                     },
                     secondaryButton: .cancel()
                 )
+            }
+            .onChange(of: foundTrainings.count) {
+                if foundTrainings.count < 1 {
+                    presentationMode.wrappedValue.dismiss()
+                }
             }
         }
     }

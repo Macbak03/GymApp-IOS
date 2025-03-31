@@ -13,8 +13,8 @@ struct HistoryView: View {
     @StateObject var workoutHistoryElements = WorkoutHistoryElements()
     @State private var dateSelected: DateComponents?
     @State private var displayTrainings = false
-    @State private var displayEditHitoryView = false
-    @State private var selectedTraining: WorkoutHistoryElement? = nil
+    //@State private var displayEditHitoryView = false
+    //@State private var selectedTraining: WorkoutHistoryElement? = nil
     @State private var visibleMonth: DateComponents = Calendar.current.dateComponents([.year, .month], from: Date())
     @State private var trainingCount: Int = 0
     
@@ -61,9 +61,7 @@ struct HistoryView: View {
                         interval: DateInterval(start: .distantPast, end: .distantFuture),
                         historyElements: workoutHistoryElements,
                         dateSelected: $dateSelected,
-                        selectedTraining: $selectedTraining,
                         displayHistorySheet: $displayTrainings,
-                        displayEditHistoryView: $displayEditHitoryView,
                         visibleMonth: $visibleMonth,
                         trainingCount: $trainingCount
                     )
@@ -72,19 +70,19 @@ struct HistoryView: View {
                     .onAppear {
                         workoutHistoryElements.fetchTrainings()
                     }
-                    NavigationLink(
-                        isActive: $displayEditHitoryView,
-                        destination: {
-                            if let selectedTraining = selectedTraining {
-                                EditHistoryDetailsView(
-                                    historyElementViewModel: HistoryElementViewModel(historyElement: selectedTraining, position: 0)
-                                )
-                            } else {
-                                EmptyView()
-                            }
-                        },
-                        label: { EmptyView() }
-                    )
+//                    NavigationLink(
+//                        isActive: $displayEditHitoryView,
+//                        destination: {
+//                            if let selectedTraining = selectedTraining {
+//                                EditHistoryDetailsView(
+//                                    historyElementViewModel: HistoryElementViewModel(historyElement: selectedTraining, position: 0)
+//                                )
+//                            } else {
+//                                EmptyView()
+//                            }
+//                        },
+//                        label: { EmptyView() }
+//                    )
                 }
                 Spacer()
                 

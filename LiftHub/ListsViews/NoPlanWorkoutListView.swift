@@ -95,6 +95,7 @@ private struct WorkoutListExerciseView: View {
                     viewModel.validateExerciseName(focused: focused, exercise: exercise.workoutExerciseDraft, stateViewModel: stateViewModel)
                 }
             Button(action: {
+                isDetailsVisible = true
                 addSet()
             }) {
                 Image(systemName: "plus.circle")

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StartWorkoutSheetView: View {
-    @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
+    @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel = StartWorkoutSheetViewModel()
     @ObservedObject var homeStateViewModel: HomeStateViewModel
     @State private var closeWorkoutSheetView = false
