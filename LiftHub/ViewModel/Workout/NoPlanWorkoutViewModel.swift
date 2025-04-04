@@ -18,6 +18,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
     
     private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
     private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
+    private var isWorkoutRepeated = false
     
     init(planName: String, date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
         self.planName = planName
@@ -26,8 +27,30 @@ class NoPlanWorkoutViewModel: ObservableObject {
         self.weightUnit = weightUnit
     }
     
-    func loadRoutine(isWorkoutSaved: Bool, isWorkoutEnded: Bool) {
-        if !isWorkoutSaved && !isWorkoutEnded {
+    
+    init(workoutDraft: [WorkoutDraft], planName: String, date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
+        self.workoutDraft = workoutDraft
+        self.planName = planName
+        self.date = date
+        self.intensityIndex = intensityIndex
+        self.weightUnit = weightUnit
+        isWorkoutRepeated = true
+        for i in self.workoutDraft.indices {
+            for j in self.workoutDraft[i].workoutSeriesDraftList.indices {
+                self.workoutDraft[i].workoutSeriesDraftList[j].actualLoad = ""
+                self.workoutDraft[i].workoutSeriesDraftList[j].actualIntensity = ""
+                self.workoutDraft[i].workoutSeriesDraftList[j].actualReps = ""
+            }
+            self.workoutDraft[i].workoutExerciseDraft.note = ""
+        }
+    }
+    
+    func loadRoutine(isWorkoutSaved: Bool) {
+        let hasWorkoutEnded = UserDefaultsUtils.shared.getHasWorkoutEnded()
+        if isWorkoutRepeated {
+            return
+        }
+        if !isWorkoutSaved && !hasWorkoutEnded {
             initRecoveredWorkoutData()
         } else {
             workoutDraft.append(
@@ -105,7 +128,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
         }
     }
     
-    func saveWorkoutToHistory(workoutStateViewModel: WorkoutStateViewModel, homeStateViewModel: HomeStateViewModel) {
+    func saveWorkoutToHistory(workoutStateViewModel: WorkoutStateViewModel) {
         do {
             try handleWorkoutNameException()
         } catch let error as ValidationException {
@@ -159,9 +182,9 @@ class NoPlanWorkoutViewModel: ObservableObject {
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
         UserDefaults.standard.setValue(nil, forKey: Constants.DATE)
         UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
-        homeStateViewModel.isWorkoutEnded = true
+        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
+        UserDefaultsUtils.shared.removeUnsavedWorkoutPlanName()
         workoutStateViewModel.isWorkoutFinished = true
-        homeStateViewModel.setToast(message: "Workout saved!")
     }
     
     private func handleWorkoutNameException() throws {

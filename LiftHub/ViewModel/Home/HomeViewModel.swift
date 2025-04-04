@@ -40,7 +40,7 @@ class HomeViewModel: ObservableObject {
     }
     
     func getUnsavedWorkoutPlanName() {
-        unsavedWorkoutPlanName = UserDefaultsUtils.shared.getSelectedPlan()
+        unsavedWorkoutPlanName = UserDefaultsUtils.shared.getUnsavedWorkoutPlanName()
     }
     
 }

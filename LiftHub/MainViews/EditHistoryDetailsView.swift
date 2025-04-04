@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EditHistoryDetailsView: View {
     @ObservedObject var historyElementViewModel: HistoryElementViewModel
-    @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
+    @Environment(\.presentationMode) var presentationMode
     @Environment(\.scenePhase) var scenePhase
     
     @StateObject private var viewModel = EditHistoryDetailsViewModel()
@@ -39,6 +39,13 @@ struct EditHistoryDetailsView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
+                        viewModel.repeatWorkout = true
+                    }) {
+                        Text("Repeat")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
                         viewModel.editHistoryDetails(historyElementViewModel: historyElementViewModel)
                         if viewModel.historySuccessfullyEdited {
                             presentationMode.wrappedValue.dismiss()
@@ -47,6 +54,17 @@ struct EditHistoryDetailsView: View {
                         Text("Save")
                     }
                 }
+            }
+            .fullScreenCover(isPresented: $viewModel.repeatWorkout) {
+                NoPlanWorkoutView(
+                    viewModel:
+                        NoPlanWorkoutViewModel(
+                            workoutDraft: viewModel.workoutDraft,
+                            planName: viewModel.planName,
+                            date: CustomDate.getCurrentDate(),
+                            intensityIndex: viewModel.intensityIndex,
+                            weightUnit: viewModel.weightUnit)
+                )
             }
         }
     }

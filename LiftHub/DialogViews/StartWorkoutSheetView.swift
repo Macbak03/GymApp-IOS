@@ -29,7 +29,7 @@ struct StartWorkoutSheetView: View {
                                 .onChange(of: viewModel.selectedPlan) { _, plan in
                                     UserDefaultsUtils.shared.setSelectedPlan(planName: plan)
                                 }
-                                .disabled(!homeStateViewModel.isWorkoutEnded)
+                                .disabled(!UserDefaultsUtils.shared.getHasWorkoutEnded())
                         } label: {
                             HStack {
                                 Text(viewModel.selectedPlan)
@@ -135,8 +135,7 @@ struct StartWorkoutSheetView: View {
                             planName: Constants.NO_PLAN_NAME,
                             date: CustomDate.getCurrentDate(),
                             intensityIndex: viewModel.intensityIndex,
-                            weightUnit: viewModel.weightUnit),
-                    homeStateViewModel: homeStateViewModel)
+                            weightUnit: viewModel.weightUnit))
             }
         }
 }

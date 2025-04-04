@@ -49,6 +49,18 @@ class UserDefaultsUtils {
         UserDefaults.standard.removeObject(forKey: Constants.SELECTED_PLAN_NAME)
     }
     
+    func setUnsavedWorkoutPlanName(planName: String) {
+        UserDefaults.standard.set(planName, forKey: Constants.UNFINISHED_PLAN_NAME)
+    }
+    
+    func getUnsavedWorkoutPlanName() -> String {
+        return UserDefaults.standard.string(forKey: Constants.UNFINISHED_PLAN_NAME) ?? Constants.NO_PLAN_NAME
+    }
+    
+    func removeUnsavedWorkoutPlanName() {
+        UserDefaults.standard.removeObject(forKey: Constants.UNFINISHED_PLAN_NAME)
+    }
+    
     func setUnfinishedRoutineName(routineName: String) {
         UserDefaults.standard.set(routineName, forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME)
     }
@@ -83,6 +95,14 @@ class UserDefaultsUtils {
     
     func removeWorkoutSaved() {
         UserDefaults.standard.removeObject(forKey: Constants.IS_WORKOUT_SAVED_KEY)
+    }
+    
+    func setHasWorkoutEnded(_ hasWorkoutEnded: Bool) {
+        UserDefaults.standard.setValue(hasWorkoutEnded, forKey: Constants.HAS_WORKOUT_ENDED)
+    }
+    
+    func getHasWorkoutEnded() -> Bool {
+        UserDefaults.standard.bool(forKey: Constants.HAS_WORKOUT_ENDED)
     }
     
 }

@@ -167,9 +167,8 @@ class WorkoutViewModel: ObservableObject {
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
         UserDefaultsUtils.shared.removeDate()
         UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
-        homeStateViewModel.isWorkoutEnded = true
+        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
+        UserDefaultsUtils.shared.removeUnsavedWorkoutPlanName()
         workoutStateViewModel.isWorkoutFinished = true
-        homeStateViewModel.showToast = true
-        homeStateViewModel.toastMessage = "Workout Saved!"
     }
 }

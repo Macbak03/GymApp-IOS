@@ -16,8 +16,13 @@ class EditHistoryDetailsViewModel: ObservableObject {
     
     @Published var historySuccessfullyEdited = false
     
+    @Published var repeatWorkout = false
+    
     private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
     private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
+    
+    @Published var intensityIndex = IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity())!
+    @Published var weightUnit = WeightUnit(rawValue: UserDefaultsUtils.shared.getWeightUnit())!
     
     func loadRoutine(historyElementViewModel: HistoryElementViewModel) {
         planName = historyElementViewModel.historyElement.planName

@@ -13,9 +13,7 @@ struct NoPlanWorkoutView: View {
     
     @StateObject var viewModel: NoPlanWorkoutViewModel
     @StateObject var stateViewModel = WorkoutStateViewModel()
-    
-    @ObservedObject var homeStateViewModel: HomeStateViewModel
-    
+        
     @FocusState private var isWorkoutNameFocused: Bool
     
     
@@ -29,27 +27,18 @@ struct NoPlanWorkoutView: View {
                         ZStack {
                             TextField("Enter workout name", text: $viewModel.routineName)
                                 .font(.system(size: 18))
-                                .frame(height: 40)
-                                .background(Color.ShadowColor)
-                                .cornerRadius(10)
-                                .padding(.horizontal, 35)
+                                .frame(height: 35)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke((viewModel.showNameError ? Color.red : Color.textFieldOutline), lineWidth: 1)
+                                )
+                                .padding(.horizontal, 45)
                                 .multilineTextAlignment(.center)
                                 .focused($isWorkoutNameFocused)
                                 .onChange(of: isWorkoutNameFocused) { _, focused in
                                     viewModel.validateWorkoutName(focused: focused, workoutStateViewModel: stateViewModel)
                                 }
                             
-                            
-                            
-                            if viewModel.showNameError {
-                                HStack {
-                                    Spacer()
-                                    Image(systemName: "exclamationmark.circle.fill")
-                                        .resizable()
-                                        .foregroundColor(.red)
-                                        .frame(width: 25, height: 25)
-                                }
-                            }
                         }
                         Spacer() // Push the TextField to the center
                     }
@@ -60,11 +49,12 @@ struct NoPlanWorkoutView: View {
                 
             }
             .onAppear(){
-                viewModel.loadRoutine(isWorkoutSaved: stateViewModel.isWorkoutSaved, isWorkoutEnded: homeStateViewModel.isWorkoutEnded)
+                viewModel.loadRoutine(isWorkoutSaved: stateViewModel.isWorkoutSaved)
             }
             .onDisappear(){
                 if !stateViewModel.isWorkoutFinished {
-                    homeStateViewModel.isWorkoutEnded = false
+                    UserDefaultsUtils.shared.setHasWorkoutEnded(false)
+                    //homeStateViewModel.isWorkoutEnded = false
                     viewModel.saveWorkoutToFile()
                 }
             }
@@ -78,8 +68,9 @@ struct NoPlanWorkoutView: View {
                     title: Text("Warning"),
                     message: Text("Workout won't be saved. Do you want to cancel?"),
                     primaryButton: .destructive(Text("Yes")) {
-                        UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
-                        homeStateViewModel.isWorkoutEnded = true
+                        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
+                        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
+                        //homeStateViewModel.isWorkoutEnded = true
                         stateViewModel.isWorkoutFinished = true
                         presentationMode.wrappedValue.dismiss()
                     },
@@ -97,7 +88,7 @@ struct NoPlanWorkoutView: View {
                                 .foregroundStyle(Color.red)
                         }
                         Button(action: {
-                            viewModel.saveWorkoutToHistory(workoutStateViewModel: stateViewModel, homeStateViewModel: homeStateViewModel)
+                            viewModel.saveWorkoutToHistory(workoutStateViewModel: stateViewModel)
                         }) {
                             Text("Save")
                         }
@@ -136,7 +127,7 @@ struct NoPlanWorkoutView_Previews: PreviewProvider {
     @State static var toastMessage: String = ""
     @State static var rotineName = "Routine"
     static var previews: some View {
-        NoPlanWorkoutView(viewModel: NoPlanWorkoutViewModel(planName: "", date: "", intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg), homeStateViewModel: HomeStateViewModel())
+        NoPlanWorkoutView(viewModel: NoPlanWorkoutViewModel(planName: "", date: "", intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg))
     }
 }
 

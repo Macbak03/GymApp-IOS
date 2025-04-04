@@ -79,25 +79,6 @@ private struct WorkoutListExerciseView: View {
                     }
                     .frame(width: 110, alignment: .leading)
                     .foregroundStyle(Color.TextColorSecondary)
-//                    Spacer()
-//                    // Series Layout
-//                    VStack(spacing: VSpacing) {
-//                        Text("Series:")
-//                            .font(.system(size: textSize))
-//                        Text(viewModel.seriesValue)
-//                            .font(.system(size: textSize))
-//                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-//                    }
-//                    Spacer()
-//                    // Intensity Layout
-//                    VStack(spacing: VSpacing) {
-//                        Text("\(viewModel.intensityIndexText):")
-//                            .font(.system(size: textSize))
-//                        Text(viewModel.intensityValue)
-//                            .font(.system(size: textSize))
-//                            //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
-//                    }
-                    //Spacer()
                     // Pace Layout
                     HStack(spacing: VSpacing) {
                         Text("Pace:")

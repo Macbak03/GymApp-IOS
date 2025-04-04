@@ -16,17 +16,16 @@ class HomeStateViewModel: ObservableObject {
     @Published var startWorkout = false
     @Published var startNoPlanWorkout = false
     @Published var closeStartWorkoutSheet = false
-    @Published var isWorkoutEnded = true
-    
-    @Published var showToast = false
-    @Published var toastMessage = ""
+//    @Published var showToast = false
+//    @Published var toastMessage = ""
     
     @Published var activeAlert: HomeAlertType? = nil
     
-    func setToast(message: String) {
-        showToast = true
-        toastMessage = message
-    }
+    
+//    func setToast(message: String) {
+//        showToast = true
+//        toastMessage = message
+//    }
     
     enum HomeAlertType: Identifiable {
         case newWorkout

@@ -67,7 +67,6 @@ private struct WorkoutListExerciseView: View {
             Image(systemName: "chevron.down")
                 .rotationEffect(.degrees(isDetailsVisible ? 0 : -90))
                 .frame(width: 20, height: 20)
-                .padding(.leading, 10)
                 .onTapGesture {
                     withAnimation {
                         isDetailsVisible.toggle()
@@ -220,14 +219,14 @@ private struct WorkoutListSeriesView: View {
                     // Series Count
                     Text("\(viewModel.seriesCount).")
                         .font(.system(size: textSize))
-                        .padding(.leading, 10)
+                        //.padding(.leading, 10)
                         .frame(width: 30)
                     // Reps Input
                     TextField(viewModel.repsHint, text: $set.actualReps)
                         .keyboardType(.decimalPad)
                         .font(.system(size: textSize))
                         .frame(width: 40, height: outllineFrameHeight)
-                        .multilineTextAlignment(.trailing)// Equivalent to textAlignment="textEnd"
+                        .multilineTextAlignment(.trailing)
                         .padding(.horizontal, 10)
                         .overlay(
                             RoundedRectangle(cornerRadius: textFieldCornerRadius)
@@ -349,7 +348,7 @@ struct NoPlanWorkoutListView_previews: PreviewProvider {
     @State static var toastMessage = ""
     
     static var previews: some View {
-        NoPlanWorkoutListView(viewModel: NoPlanWorkoutViewModel(planName: "", date: "", intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg), stateViewModel: WorkoutStateViewModel())
+        NoPlanWorkoutListView(viewModel: NoPlanWorkoutViewModel(workoutDraft: workout, planName: "", date: "", intensityIndex: IntensityIndex.RPE, weightUnit: WeightUnit.kg), stateViewModel: WorkoutStateViewModel())
         //        WorkoutListExerciseView(exercise: $wholeExercise2)
         //        WorkoutListSeriesView(series: $series1_1, seriesCount: 0, position: 0)
     }

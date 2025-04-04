@@ -14,7 +14,7 @@ struct HomeView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Backgroundimage(geometry: geometry, imageName: "workout_icon")
+                //Backgroundimage(geometry: geometry, imageName: "workout_icon")
                 VStack {
                     if stateViewModel.showLastWorkout {
                         NavigationLink(
@@ -29,36 +29,11 @@ struct HomeView: View {
                         )
                     }
                     
-                    //                    VStack(alignment: .center) {
-                    //                        Menu {
-                    //                            Picker(selection: $selectedPlan) {
-                    //                                ForEach(plans, id: \.self) { plan in
-                    //                                    Text(plan.name).tag(plan.description)
-                    //                                }
-                    //                            } label: {}
-                    //                            .frame(minWidth: 100, minHeight: 30)
-                    //                            .clipped()
-                    //                            .onChange(of: selectedPlan) { _, plan in
-                    //                                UserDefaults.standard.setValue(plan, forKey: Constants.SELECTED_PLAN_NAME)
-                    //                            }
-                    //                            .disabled(!stateViewModel.isWorkoutEnded)
-                    //                        } label: {
-                    //                            HStack {
-                    //                                Text(selectedPlan)
-                    //                                    .font(.system(size: 20))
-                    //                                Image(systemName: "chevron.up.chevron.down")
-                    //                            }
-                    //                        }
-                    //                    }
-                    //                    .frame(maxWidth: .infinity)
-                    //                    .padding(.top, 6)
-                    //                    .padding(.horizontal, 12)
-                    
                     Spacer()
                     
                     //MARK: Two buttons (Return to workout and Start Workout)
                     VStack(spacing: 20) {
-                        if !stateViewModel.isWorkoutEnded {
+                        if !UserDefaultsUtils.shared.getHasWorkoutEnded() {
                             Button(action: {
                                 if viewModel.unsavedWorkoutPlanName == Constants.NO_PLAN_NAME {
                                     stateViewModel.startNoPlanWorkout = true
@@ -79,7 +54,7 @@ struct HomeView: View {
                         }
                         
                         Button(action: {
-                            if stateViewModel.isWorkoutEnded {
+                            if UserDefaultsUtils.shared.getHasWorkoutEnded() {
                                 /* if viewModel.unsavedWorkoutPlanName == Constants.NO_PLAN_NAME {
                                  stateViewModel.startNoPlanWorkout = true
                                  } else { */
@@ -107,7 +82,7 @@ struct HomeView: View {
             .onAppear() {
                 SettingsView.applyTheme(theme: UserDefaultsUtils.shared.getTheme())
                 viewModel.loadLastWorkout(stateViewModel: stateViewModel)
-                stateViewModel.isWorkoutEnded = UserDefaultsUtils.shared.getWorkoutSaved()
+                UserDefaultsUtils.shared.setHasWorkoutEnded(UserDefaultsUtils.shared.getWorkoutSaved())
                 viewModel.getUnsavedWorkoutPlanName()
             }
             .sheet(isPresented: $stateViewModel.openStartWorkoutSheet) {
@@ -147,11 +122,10 @@ struct HomeView: View {
                                 planName: viewModel.unsavedWorkoutPlanName,
                                 date: UserDefaultsUtils.shared.getDate(),
                                 intensityIndex: viewModel.intensityIndex,
-                                weightUnit: viewModel.weightUnit),
-                        homeStateViewModel: stateViewModel)
+                                weightUnit: viewModel.weightUnit))
                 }
             }
-            .toast(isShowing: $stateViewModel.showToast, message: stateViewModel.toastMessage)
+            //.toast(isShowing: $stateViewModel.showToast, message: stateViewModel.toastMessage)
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(false)
@@ -219,8 +193,8 @@ private struct lastWorkoutView: View {
                         showToast: viewModel.showToast,
                         toastMessage: viewModel.toastMessage))
                     .onDisappear() {
-                        homeStateViewModel.showToast = viewModel.showToast
-                        homeStateViewModel.toastMessage = viewModel.toastMessage
+//                        homeStateViewModel.showToast = viewModel.showToast
+//                        homeStateViewModel.toastMessage = viewModel.toastMessage
                     },
                     label: {
                         HStack {
@@ -271,7 +245,7 @@ private struct lastWorkoutView: View {
                 return Alert(title: Text("Warning"),
                              message: Text("You have unsaved workout. Are you sure you want to start a new one?"),
                              primaryButton: .destructive(Text("YES")) {
-                    homeStateViewModel.isWorkoutEnded = true
+                    UserDefaultsUtils.shared.setHasWorkoutEnded(true)
                     if homeViewModel.unsavedWorkoutPlanName == Constants.NO_PLAN_NAME {
                         homeStateViewModel.startNoPlanWorkout = true
                     } else {

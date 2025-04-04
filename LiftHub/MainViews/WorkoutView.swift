@@ -28,7 +28,8 @@ struct WorkoutView: View {
             }
             .onDisappear(){
                 if !stateViewModel.isWorkoutFinished {
-                    homeStateViewModel.isWorkoutEnded = false
+                    UserDefaultsUtils.shared.setHasWorkoutEnded(false)
+                    //homeStateViewModel.isWorkoutEnded = false
                     viewModel.saveWorkoutToFile()
                 }
                 homeStateViewModel.closeStartWorkoutSheet = true
@@ -44,7 +45,8 @@ struct WorkoutView: View {
                     message: Text("Workout won't be saved. Do you want to cancel?"),
                     primaryButton: .destructive(Text("Yes")) {
                         UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
-                        homeStateViewModel.isWorkoutEnded = true
+                        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
+                        //homeStateViewModel.isWorkoutEnded = true
                         stateViewModel.isWorkoutFinished = true
                         presentationMode.wrappedValue.dismiss()
                     },
