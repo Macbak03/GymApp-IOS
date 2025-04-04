@@ -97,14 +97,13 @@ private struct WorkoutListExerciseView: View {
                 isDetailsVisible = true
                 addSet()
             }) {
-                Image(systemName: "plus.circle")
+                Image(systemName: "plus")
                     .resizable()
-                    .frame(width: 23, height: 23)
-                    .padding(.trailing, 15)
+                    .frame(width: 18, height: 18)
+                    .padding(.trailing, 5)
                     .foregroundStyle(Color.accentColor)
             }
             .frame(width: 30, height: 30)
-            .padding(.trailing, -10)
             
         }
         .frame(maxWidth: .infinity)
