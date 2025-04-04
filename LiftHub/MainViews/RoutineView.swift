@@ -9,25 +9,12 @@ import SwiftUI
 import Foundation
 
 struct RoutineView: View {
-    @State private var routineDraft: [ExerciseDraft] = []
-    @State var routineName: String = ""
     let originalRoutineName: String?
-    let planName: String
-    let planId: Int64
-    private let exercisesDatabaseHelper = ExercisesDataBaseHelper()
-    
+    @ObservedObject var routinesViewModel: RoutinesViewModel
+    @StateObject var viewModel = RoutineDetailsViewModel()
+        
     @State private var showAlertDialog = false
     @Environment(\.presentationMode) var presentationMode
-    
-    @State private var showToast = false
-    @State private var toastMessage = ""
-    
-    @Binding var refreshRoutines: Bool
-    @Binding var successfullySaved: Bool
-    @Binding var savedMessage: String
-    
-    @State private var descriptionType: DescriptionType? = nil
-    @State private var alertType: AlertType? = nil
     
     var body: some View {
         GeometryReader { geometry in
@@ -37,56 +24,32 @@ struct RoutineView: View {
                     HStack {
                         Spacer() // Push the TextField to the center
                         
-                        TextField("Enter routine name", text: $routineName)
+                        TextField("Enter routine name", text: $viewModel.routineName)
                             .font(.system(size: 18))
                             .frame(height: 40)
                             .background(Color.ShadowColor)
                             .cornerRadius(10)
                             .padding(.horizontal, 50)
-                        
                             .multilineTextAlignment(.center)
+                            .onChange(of: viewModel.routineName) { _, _ in
+                                if viewModel.wasRoutineLoaded {
+                                    viewModel.wasExerciseModified = true
+                                }
+                            }
+                        
                         
                         Spacer() // Push the TextField to the center
                     }
                     
-                    RoutineListView(routine: $routineDraft, showToast: $showToast, toastMessage: $toastMessage, descriptionType: $descriptionType, alertType: $alertType)
-                        .onAppear() {
-                            loadRoutine()
-                        }
+                    RoutineListView(viewModel: viewModel)
+                        
                     
                     Spacer()
-                    
-                    Button(action: {
-                        do {
-                            try saveRoutineIntoDB()
-                        } catch let error as ValidationException {
-                            showToast = true
-                            toastMessage = error.message
-                        } catch {
-                            showToast = true
-                            toastMessage = "Unexpected error occured: \(error)"
-                        }
-                        
-                    }) {
-                        Text("Save")
-                            .foregroundColor(Color.TextColorButton)
-                            .font(.system(size: 18))
-                            .foregroundColor(Color.white)
-                            .padding()
-                            .frame(maxWidth: 125, maxHeight: 45)
-                            .background(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.accentColor)
-                                    .shadow(radius: 3)
-                            )
-                    }
-                    .padding(.horizontal, 30)
-                    .padding(.top, 50)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
         }
-        .alert(item: $alertType) { alertType in
+        .alert(item: $viewModel.alertType) { alertType in
             switch alertType {
             case .navigation:
                 return Alert(
@@ -116,10 +79,15 @@ struct RoutineView: View {
             
         }
         .navigationBarBackButtonHidden(true)
+        .navigationTitle((originalRoutineName != nil) ? "Edit Routine" : "Create Routine")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: {
-                    alertType = .navigation
+                    if viewModel.wasExerciseModified {
+                        viewModel.alertType = .navigation
+                    } else {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }) {
                     HStack {
                         Image (systemName: "chevron.left")
@@ -128,20 +96,48 @@ struct RoutineView: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    addExercise()
-                }) {
-                    Image(systemName: "plus")
+                HStack {
+                    Button(action: {
+                        viewModel.addExercise()
+                        viewModel.wasExerciseModified = true
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                    
+                    Button(action: {
+                        do {
+                            try viewModel.saveRoutineIntoDB(routinesViewModel: routinesViewModel, originalRoutineName: originalRoutineName)
+                            if viewModel.wasSuccesfullySaved {
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                        } catch let error as ValidationException {
+                            viewModel.showToast = true
+                            viewModel.toastMessage = error.message
+                        } catch {
+                            viewModel.showToast = true
+                            viewModel.toastMessage = "Unexpected error occured: \(error)"
+                        }
+                    }) {
+                        Text("Save")
+                    }
                 }
             }
         }
-        .toast(isShowing: $showToast, message: toastMessage)
+        .onAppear {
+            viewModel.setPlanName(planName: routinesViewModel.planName)
+            viewModel.loadRoutine(originalRoutineName: originalRoutineName, planId: routinesViewModel.planId)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                viewModel.wasRoutineLoaded = true
+            }
+            if viewModel.routineDraft.isEmpty {
+                viewModel.addExercise()
+            }
+        }
+        .toast(isShowing: $viewModel.showToast, message: viewModel.toastMessage)
     }
     
-    private func addExercise() {
-        let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
-        routineDraft.append(newExercise)
-    }
+    
+    
     
     private func showDescriptionDialog(title: String, message: String) -> Alert {
         return Alert(
@@ -152,106 +148,7 @@ struct RoutineView: View {
         )
     }
     
-    private func getRoutine() throws -> [Exercise] {
-        var routine = [Exercise]()
-        var routineNames = [String]()
-        
-        for exerciseDraft in routineDraft {
-            let exercise = try exerciseDraft.toExercise()
-            
-            if routineNames.contains(exercise.name) {
-                throw ValidationException(message: "You can't create routine with exercises with the same name.")
-            } else {
-                routineNames.append(exercise.name)
-                routine.append(exercise)
-            }
-        }
-        return routine
-    }
     
-    private func loadRoutine() {
-        guard let checkedOriginalRoutineName = originalRoutineName else {
-            return
-        }
-        routineName = checkedOriginalRoutineName
-        routineDraft = exercisesDatabaseHelper.getRoutine(routineName: checkedOriginalRoutineName, planId: String(planId))
-    }
-    
-    
-    private func saveRoutineIntoDB() throws {
-        // Check if routine draft is empty
-        if routineDraft.isEmpty {
-            throw ValidationException(message: "You must add at least one exercise to the routine.")
-        }
-        // Check if routine name is empty
-        if routineName.isEmpty {
-            throw ValidationException(message: "Routine name cannot be empty.")
-        }
-        // Try to get the routine and handle possible exceptions
-        do {
-            let routine = try getRoutine()
-            exercisesDatabaseHelper.addRoutine(routine: routine, routineName: routineName, planId: planId, originalRoutineName: originalRoutineName)
-            
-            successfullySaved = true
-            refreshRoutines = true
-            savedMessage = "Routine \(routineName) saved."
-            presentationMode.wrappedValue.dismiss()
-        } catch let error as ValidationException {
-            // Handle validation errors
-            showToast = true
-            toastMessage = error.message
-        }
-    }
-    
-}
-
-enum AlertType: Identifiable {
-    case navigation
-    case description(DescriptionType)
-    
-    var id: Int {
-        switch self {
-        case .navigation:
-            return 0
-        case .description(let type):
-            return type.rawValue
-        }
-    }
-}
-
-enum DescriptionType: Int, Identifiable {
-    case pause = 1
-    case load = 2
-    case reps = 3
-    case series = 4
-    case intensity = 5
-    case pace = 6
-    
-    var id: Self {self}
-}
-
-private struct AddButton: View {
-    @Binding var routine: [ExerciseDraft]
-    let geometry: GeometryProxy
-    var buttonScale = 0.135
-    var buttonOffsetX = 0.4
-    var buttonOffsetY = 0.1
-    
-    private let newExercise = ExerciseDraft(name: "", pause: "", pauseUnit: TimeUnit.min, load: "", loadUnit: WeightUnit(rawValue: UserDefaultsUtils.shared.getWeight()) ?? .kg, series: "", reps: "", intensity: "", intensityIndex: IntensityIndex(rawValue: UserDefaultsUtils.shared.getIntensity()) ?? .RPE, pace: "", wasModified: false)
-    var body: some View {
-        Button(action: {
-            routine.append(newExercise)
-        }) {
-            Image(systemName: "plus.circle.fill")
-                .resizable()
-                .frame(width: geometry.size.width * buttonScale, height: geometry.size.width * buttonScale)
-        }
-        .position(x: geometry.size.width * buttonOffsetX, y: geometry.size.height * buttonOffsetY)
-        .frame(
-            width: geometry.size.width * buttonScale,
-            height: geometry.size.height * buttonScale
-        )
-    }
 }
 
 struct RoutineView_Previews: PreviewProvider {
@@ -260,7 +157,7 @@ struct RoutineView_Previews: PreviewProvider {
     @State static var savedMessage = ""
     static var previews: some View {
         GeometryReader { geometry in
-            RoutineView(routineName: "", originalRoutineName: nil, planName: "Plan", planId: 0, refreshRoutines: $refreshRoutines, successfullySaved: $successfullySaved, savedMessage: $savedMessage)
+            RoutineView(originalRoutineName: nil, routinesViewModel: RoutinesViewModel())
         }
     }
 }

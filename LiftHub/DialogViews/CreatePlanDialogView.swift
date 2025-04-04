@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct CreatePlanDialogView: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+    @ObservedObject var plansViewModel: PlansViewModel
+    @ObservedObject var planViewModel: PlanViewModel
     let dialogTitle: String
     let confirmButtonTitle: String
     let state: DialogState
     @State var planNameText: String
-    let position: Int?
-    @State var planName: String = ""
+    //let position: Int?
+    //@State var planName: String = ""
     @Environment(\.presentationMode) var presentationMode
     @State private var showToast = false
     @State private var toastMessage = ""
@@ -32,7 +32,7 @@ struct CreatePlanDialogView: View {
                 VStack {
                     // Title at the top, centered horizontally
                     Text(dialogTitle)
-                        .font(.title)
+                        .font(.system(size: 18))
                         .padding(.top)
                     
                     // TextField for entering plan name
@@ -55,7 +55,8 @@ struct CreatePlanDialogView: View {
                         Button(action: {
                             if state == DialogState.add {
                                 do {
-                                    try addPlan()
+                                    try plansViewModel.addPlan(planName: planNameText)
+                                    presentationMode.wrappedValue.dismiss()
                                 } catch let error as ValidationException {
                                     toastMessage = error.message
                                     showToast = true
@@ -65,7 +66,8 @@ struct CreatePlanDialogView: View {
                                 }
                             } else {
                                 do {
-                                    try editPlan()
+                                    try plansViewModel.editPlan(planName: planViewModel.planName, planNameText: planNameText, position: planViewModel.position)
+                                    presentationMode.wrappedValue.dismiss()
                                 } catch let error as ValidationException {
                                     toastMessage = error.message
                                     showToast = true
@@ -89,57 +91,16 @@ struct CreatePlanDialogView: View {
                 .shadow(radius: 10)
                 .padding(.horizontal)
                 .frame(maxWidth: .infinity) // Take the full width at the bottom
-                .onAppear() {
-                    if let position = position, position < trainingPlans.count {
-                        planName = trainingPlans[position].name
-                    }
-                }
             }
             .toast(isShowing: $showToast, message: toastMessage)
         }
-    }
-    
-    func addPlan() throws {
-        if planNameText.isEmpty {
-            throw ValidationException(message: "Plan's name cannot be empty")
-        }
-        
-        if trainingPlans.contains(where: { $0.name == planNameText }) {
-            throw ValidationException(message: "A plan with this name already exists")
-        }
-        
-        plansDatabaseHelper.addPlan(planName: planNameText)
-        trainingPlans.append(TrainingPlan(name: planNameText))
-        presentationMode.wrappedValue.dismiss()
-    }
-    
-    func editPlan() throws {
-        if planNameText.isEmpty {
-            throw ValidationException(message: "Plan's name cannot be empty")
-        }
-        if trainingPlans.contains(where: { $0.name == planNameText }) {
-            throw ValidationException(message: "A plan with this name already exists")
-        }
-        let planId = plansDatabaseHelper.getPlanId(planName: planName)
-        guard let checkedPlanId = planId else {
-            print("Plan ID is null.")
-            return
-        }
-        guard let checkedPosition = position else {
-            print("Position is null.")
-            return
-        }
-        plansDatabaseHelper.updatePlanName(planId: checkedPlanId, newName: planNameText)
-        trainingPlans[checkedPosition].name = planNameText
-        presentationMode.wrappedValue.dismiss()
     }
 }
 
 struct CreatePlanDialogView_Previews: PreviewProvider {
     @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
-    static var plansDatabaseHelper = PlansDataBaseHelper()
     @State static var planName: String?
     static var previews: some View {
-        CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper,dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", position: nil)
+        CreatePlanDialogView(plansViewModel: PlansViewModel(), planViewModel: PlanViewModel(), dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "")
     }
 }

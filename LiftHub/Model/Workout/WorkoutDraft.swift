@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct WorkoutDraft: Codable {
-    let workoutExerciseDraft: WorkoutExerciseDraft
-    let workoutSeriesDraftList: [WorkoutSeriesDraft]
+struct WorkoutDraft: Codable, Identifiable, Hashable {
+    var id = UUID()
+    var workoutExerciseDraft: WorkoutExerciseDraft
+    var workoutSeriesDraftList: [WorkoutSeriesDraft]
 }

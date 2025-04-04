@@ -9,23 +9,32 @@ import SwiftUI
 import Foundation
 
 struct PlansView: View {
-    @State private var trainingPlans: [TrainingPlan] = []
+    @StateObject var viewModel = PlansViewModel()
     @State private var showCreatePlanDialog = false
-
-    private let plansDatabaseHelper = PlansDataBaseHelper()
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                Backgroundimage(geometry: geometry, imageName: "plans_icon")
-                VStack {
-                    TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
-                        .onAppear() {
-                            loadPlans()
+            VStack {
+                if viewModel.trainingPlans.isEmpty {
+                    Button(action : {
+                        showCreatePlanDialog = true
+                    }) {
+                        VStack {
+                            Image(systemName: "plus")
+                                .resizable()
+                                .frame(width: 70, height: 70)
+                            Text("Create Training Plan")
                         }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                    }
+                    
+                    
+                } else {
+                    TrainingPlansListView(viewModel: viewModel)
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height)
+                    
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -37,44 +46,13 @@ struct PlansView: View {
             }
         }
         .sheet(isPresented: $showCreatePlanDialog) {
-            @State var name = ""
-            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", position: nil)
+            CreatePlanDialogView(plansViewModel: viewModel, planViewModel: PlanViewModel(), dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "")
+        }
+        .onAppear() {
+            viewModel.loadPlans()
         }
     }
     
-    func loadPlans() {
-        trainingPlans = plansDatabaseHelper.getPlans()
-    }
-}
-
-private struct AddButton: View {
-    let geometry: GeometryProxy
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
-    
-    @State private var showCreatePlanDialog = false
-    
-    var buttonScale = 0.14
-    var buttonOffsetX = 0.35
-    var buttonOffsetY = 0.02
-    var body: some View {
-        Button(action: {
-            showCreatePlanDialog = true
-        }) {
-            Image(systemName: "plus.circle.fill")
-                .resizable()
-                .frame(width: geometry.size.width * buttonScale, height: geometry.size.width * buttonScale)
-        }
-        .position(x: geometry.size.width * buttonOffsetX, y: geometry.size.height * buttonOffsetY)
-        .frame(
-            width: geometry.size.width * buttonScale,
-            height: geometry.size.height * buttonScale
-        )
-        .sheet(isPresented: $showCreatePlanDialog) {
-            @State var name = ""
-            CreatePlanDialogView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, dialogTitle: "Create training plan", confirmButtonTitle: "Add plan", state: DialogState.add, planNameText: "", position: nil)
-        }
-    }
 }
 
 struct PlansView_Previews: PreviewProvider {

@@ -126,9 +126,9 @@ struct HistoryOptionsDialog: View {
                 .frame(maxWidth: .infinity) // Take the full width at the bottom
             }
             .fullScreenCover(isPresented: $openEditHistory) {
-                EditHistoryDetailsView(workoutHistoryElement: historyItem, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
+//                EditHistoryDetailsView(workoutHistoryElement: historyItem, showWorkoutSavedToast: $showToast, savedWorkoutToastMessage: $toastMessage)
             }
-            .onChange(of: showToast) { exit in
+            .onChange(of: showToast) { _, exit in
                 if exit {
                     presentationMode.wrappedValue.dismiss()
                 }

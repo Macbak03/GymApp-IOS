@@ -9,95 +9,58 @@ import SwiftUI
 import Foundation
 
 struct RoutinesView: View {
-    @State private var routines: [TrainingPlanElement] = []
-    @State private var openRoutine = false
     let planName: String
-    let plansDatabaseHelper: PlansDataBaseHelper
-    private let routinesDatabaseHelper = RoutinesDataBaseHelper()
+    @StateObject var viewModel = RoutinesViewModel()
     @Environment(\.presentationMode) var presentationMode // Allows us to dismiss this view
-    
-    @State private var showToast = false
-    @State private var refreshRoutines = false
-    @State private var toastMessage = ""
-    
-    @State private var performDelete = false
-    
-    @State private var planId: Int64 = -1
     
     var body: some View {
         
         
         GeometryReader { geometry in
-            ZStack {
-                VStack {
-                    // HStack for Back Button at the top-left corner
-//                    HStack {
-//                        ZStack{
-//                            HStack{
-//                                Button(action: {
-//                                    // Dismiss the current view to go back
-//                                    presentationMode.wrappedValue.dismiss()
-//                                }) {
-//                                    Image(systemName: "arrow.left")
-//                                        .font(.system(size: 20, weight: .bold))
-//                                }
-//                                Spacer()
-//                            }
-//                            .padding(.leading, 30) // Add some padding to keep it away from the edge
-//                            
-//                            Text(planName)
-//                                .frame(maxWidth: 250, maxHeight: 100)
-//                                .font(.system(size: 32, weight: .medium))
-//                                .foregroundColor(Color.TextColorPrimary)
-//                                .multilineTextAlignment(.center)
-//                        }
-//                    }
-                    
-                    RoutinesListView(routines: $routines, planName: planName, planId: planId, showToast: $showToast, refreshRoutines: $refreshRoutines, toastMessage: $toastMessage, performDelete: $performDelete)
-                        .onChange(of: refreshRoutines) { refreshNeeded in
-                            if refreshNeeded {
-                                loadRoutines()
-                                refreshRoutines = false
+            VStack {
+                if viewModel.routines.isEmpty {
+                    NavigationLink(
+                        destination: RoutineView(originalRoutineName: nil, routinesViewModel: viewModel),
+                        label: {
+                            VStack {
+                                Image(systemName: "plus")
+                                    .resizable()
+                                    .frame(width: 70, height: 70)
+                                Text("Create Routine")
                             }
-                            
+                            .frame(width: geometry.size.width, height: geometry.size.height)
                         }
-                        .onAppear() {
-                            loadRoutines()
-                        }
+                    )
                     
-//                    Spacer()
-//                    
-//                    AddButton(openRoutine: $openRoutine ,geometry: geometry, planName: planName)
-//                    
-//                    Spacer()
-                }
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .fullScreenCover(isPresented: $openRoutine) {
-                    RoutineView(originalRoutineName: nil, planName: planName, planId: planId, refreshRoutines: $refreshRoutines, successfullySaved: $showToast, savedMessage: $toastMessage)
+                } else {
+                    RoutinesListView(viewModel: viewModel)
                 }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
             .navigationTitle(planName)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action : {
-                        openRoutine.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                    }
+                    NavigationLink(
+                        destination: RoutineView(originalRoutineName: nil, routinesViewModel: viewModel),
+                        label: {
+                            Image(systemName: "plus")
+                        }
+                    )
                 }
             }
-            .toast(isShowing: $showToast, message: toastMessage)
-            .onAppear() {
-                guard let checkedPlanId = plansDatabaseHelper.getPlanId(planName: planName) else {
-                    return
+            .toast(isShowing: $viewModel.showToast, message: viewModel.toastMessage)
+            .onChange(of: viewModel.refreshRoutines) { _, refreshNeeded in
+                if refreshNeeded {
+                    viewModel.loadRoutines()
+                    viewModel.refreshRoutines = false
                 }
-                planId = checkedPlanId
+                
+            }
+            .onAppear() {
+                viewModel.initPlanName(planName: planName)
+                viewModel.loadRoutines()
             }
         }
-    }
-    
-    private func loadRoutines() {
-        routines = routinesDatabaseHelper.getRoutinesInPlan(planId: planId)
     }
 }
 
@@ -128,6 +91,6 @@ private struct AddButton: View {
 struct RoutinesView_Previews: PreviewProvider {
     static var plansDatabaseHelper = PlansDataBaseHelper()
     static var previews: some View {
-        RoutinesView(planName: "Plan", plansDatabaseHelper: plansDatabaseHelper)
+        RoutinesView(planName: "", viewModel: RoutinesViewModel())
     }
 }

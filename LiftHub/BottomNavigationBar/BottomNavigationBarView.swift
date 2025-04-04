@@ -1,11 +1,11 @@
 import SwiftUI
 
 enum BottomBarSelectedTab: Int {
-    //case stats = 0
-    case workout = 0
+    case stats = 0
     case plans = 1
-    case history = 2
-    case settings = 3
+    case workout = 2
+    case history = 3
+    case settings = 4
 }
 
 struct BottomBar: View {
@@ -17,12 +17,12 @@ struct BottomBar: View {
         NavigationStack {
             GeometryReader { geometry in
                 TabView(selection: $selectedTab) {
-                    //            StatsView()
-                    //                .tag(BottomBarSelectedTab.stats)
-                    HomeView()
-                        .tag(BottomBarSelectedTab.workout)
+                    StatsView()
+                        .tag(BottomBarSelectedTab.stats)
                     PlansView()
                         .tag(BottomBarSelectedTab.plans)
+                    HomeView()
+                        .tag(BottomBarSelectedTab.workout)
                     HistoryView()
                         .tag(BottomBarSelectedTab.history)
                     SettingsView()
@@ -30,10 +30,10 @@ struct BottomBar: View {
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .overlay(
-                    HStack(spacing:50) { //35 for 5 elements, change position of workout and plans
-                        //                BottomBarButton(selectedTab: $selectedTab, tab: .stats, image: "stats_icon", text: "Stats")
-                        BottomBarButton(selectedTab: $selectedTab, tab: .workout, image: "workout_icon", text: "Workout")
+                    HStack(spacing: 35) { //35 for 5 elements, change position of workout and plans
+                        BottomBarButton(selectedTab: $selectedTab, tab: .stats, image: "stats_icon", text: "Stats")
                         BottomBarButton(selectedTab: $selectedTab, tab: .plans, image: "plans_icon", text: "Plans")
+                        BottomBarButton(selectedTab: $selectedTab, tab: .workout, image: "workout_icon", text: "Workout")
                         BottomBarButton(selectedTab: $selectedTab, tab: .history, image: "history_icon", text: "History")
                         BottomBarButton(selectedTab: $selectedTab, tab: .settings, image: "settings_icon", text: "Settings")
                     }

@@ -130,26 +130,79 @@ class WorkoutSeriesDataBaseHelper : Repository{
             print("Error updating series values: \(error)")
         }
     }
+    
+    func getLastWorkoutExercisePerformance(exerciseId: Int64?) -> [WorkoutSeriesDraft] {
+        var sets = [WorkoutSeriesDraft]()
+        guard let exerciseId = exerciseId else {
+            return sets
+        }
+        do {
+            let query = workoutSeriesTable
+                .filter(self.exerciseId == exerciseId)
+            
+            for row in try db!.prepare(query) {
+                let actualRepsDouble = try row.get(actualReps)
+                let loadValueDouble = try row.get(loadValue)
+                let intensityValueInt = try row.get(intensityValue)
+                
+                let actualReps = actualRepsDouble.description
+                let loadValue = loadValueDouble.description
+                let intensityValue = intensityValueInt.description
+                let loadUnit = getLoadUnit(exerciseId: exerciseId)
+                let intensityIndex = getIntensityIndex(exerciseId: exerciseId)
+                sets.append(WorkoutSeriesDraft(actualReps: actualReps, actualLoad: loadValue, loadUnit: loadUnit!, intensityIndex: intensityIndex!, actualIntensity: intensityValue))
+            }
+        } catch {
+            print("Error fetching last workout performance: \(error)")
+        }
+        return sets
+    }
 
     // MARK: - Get Chart Data
-//    func getChartData(exerciseId: Int64) -> (Float, Float) {
-//        var actualReps: Float = 0
-//        var loadValue: Float = 0
-//
-//        do {
-//            let query = workoutSeriesTable
-//                .select(self.actualReps, self.loadValue)
-//                .filter(self.exerciseId == exerciseId && self.loadValue == workoutSeriesTable.select(self.loadValue.max))
-//                .order(self.loadValue.desc)
-//
-//            if let row = try db?.pluck(query) {
-//                actualReps = Float(row[self.actualReps])
-//                loadValue = Float(row[self.loadValue])
-//            }
-//        } catch {
-//            print("Error fetching chart data: \(error)")
-//        }
-//
-//        return (actualReps, loadValue)
-//    }
+    func getChartData(exerciseId: Int64) -> (reps: Double, weight: Double) {
+        var actualReps: Double = 0
+        var loadValue: Double = 0
+
+        do {
+            // First, get the maximum value for loadValue for the given exerciseId
+            let maxLoadQuery = workoutSeriesTable
+                .select(self.loadValue.max)
+                .filter(self.exerciseId == exerciseId)
+            
+            // Execute the query to get the maximum load value
+            if let maxRow = try db?.pluck(maxLoadQuery),
+               let maxLoadValue = maxRow[self.loadValue.max] {
+                
+                // Now that we have the max load value, proceed with the main query
+                let query = workoutSeriesTable
+                    .select(self.actualReps, self.loadValue)
+                    .filter(self.exerciseId == exerciseId && self.loadValue == maxLoadValue)
+                    .order(self.loadValue.desc)
+                
+                if let row = try db?.pluck(query) {
+                    actualReps = row[self.actualReps]
+                    loadValue = row[self.loadValue]
+                }
+            } else {
+                print("No max load value found.")
+            }
+        } catch {
+            print("Error fetching chart data: \(error)")
+        }
+
+        return (actualReps, loadValue)
+    }
+    
+    func getExerciseSumWeight(exerciseId: Int64) -> Double {
+        do {
+            let sqlQuery = "SELECT SUM(\(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)) FROM \(WorkoutSeriesDataBaseHelper.TABLE_NAME) WHERE exerciseId = ?"
+
+            if let sum = try db?.scalar(sqlQuery, exerciseId) as? Double {
+                return sum
+            }
+        } catch {
+            print("Error fetching weight sum: \(error)")
+        }
+        return 0.0
+    }
 }

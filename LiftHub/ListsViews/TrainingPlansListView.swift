@@ -8,19 +8,18 @@
 import SwiftUI
 
 struct TrainingPlansListView: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+    @ObservedObject var viewModel: PlansViewModel
     var body: some View {
         List {
-            ForEach(trainingPlans.indices, id: \.self) {
+            ForEach(viewModel.trainingPlans.indices, id: \.self) {
                 index in
                 NavigationLink(
-                    destination: RoutinesView(planName: trainingPlans[index].name, plansDatabaseHelper: plansDatabaseHelper),
+                    destination: RoutinesView(planName: viewModel.trainingPlans[index].name),
                     label: {
-                        TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: index)
+                        TrainingPlansElementView(viewModel: viewModel, position: index)
                     }
-                    )
-//                TrainingPlansElementView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: index)
+                )
+                
             }
             .padding(.top, 5)
         }
@@ -28,59 +27,99 @@ struct TrainingPlansListView: View {
 }
 
 struct TrainingPlansElementView: View {
-    @Binding var trainingPlans: [TrainingPlan]
-    let plansDatabaseHelper: PlansDataBaseHelper
+    @ObservedObject var viewModel: PlansViewModel
+    @StateObject var planViewModel =  PlanViewModel()
     let position: Int
     @Environment(\.colorScheme) var colorScheme
     @State private var showOptionsDialog = false
-    @State private var planName: String = ""
     @State private var openRoutines = false
+    @State private var showAlertDialog = false
+    @State private var showEditPlanDialog = false
     var body: some View {
         
         HStack {
-            Text(planName)
+            Text(planViewModel.planName ?? "")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(Color.TextColorPrimary)
-                .onAppear {
-                    // Set the initial value of planName
-                    if position < trainingPlans.count {
-                        planName = trainingPlans[position].name
-                    }
-                }
                 .allowsHitTesting(false)
             
             Spacer()
-            
-            Button(action: {
-            }) {
-                Image(systemName: "ellipsis")
-                    .resizable()
-                    .frame(width: 15, height: 3)
-                    .padding()
-                    .rotationEffect(.degrees(90))
+            Menu {
+                Button(action: {
+                    showEditPlanDialog = true
+                }) {
+                    HStack {
+                        Text("Edit plan's name")
+                            .foregroundColor(Color.accentColor)
+                        Image(systemName: "square.and.pencil")
+                            .padding()
+                            .foregroundColor(Color.accentColor)
+                    }
+                }
+                
+                
+                Button(role: .destructive, action: {
+                    showAlertDialog = true
+                }) {
+                    HStack {
+                        Text("Delete")
+                            .foregroundColor(Color.red)
+                        Image(systemName: "trash")
+                            .padding()
+                            .foregroundColor(Color.red)
+                    }
+                    .foregroundStyle(Color.red)
+                }
+                
+            } label: {
+                Button(action: {
+                }) {
+                    Image(systemName: "ellipsis")
+                        .resizable()
+                        .frame(width: 15, height: 3)
+                        .padding()
+                        .rotationEffect(.degrees(90))
+                }
+                .frame(width: 30, height: 20)
+                .background(Color.clear) // You can modify this to fit the background style
             }
-            .frame(width: 30, height: 20)
-            .background(Color.clear) // You can modify this to fit the background style
+
         }
-        .sheet(isPresented: $showOptionsDialog, onDismiss: {
-            if position < trainingPlans.count {
-                planName = trainingPlans[position].name
+            
+        .sheet(isPresented: $showEditPlanDialog, onDismiss: {
+            if position < viewModel.trainingPlans.count {
+                planViewModel.planName = viewModel.trainingPlans[position].name
             }
         }) {
-            PlanOptionsDialog(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper, position: position)
+            CreatePlanDialogView(plansViewModel: viewModel, planViewModel: planViewModel, dialogTitle: "Edit plan's name", confirmButtonTitle: "Ok", state: DialogState.edit, planNameText: planViewModel.planName ?? "")
         }
-        .onTapGesture {
-            showOptionsDialog = true
+        .alert(isPresented: $showAlertDialog) {
+            Alert(
+                title: Text("Warning"),
+                message: Text("Are you sure you want to delete \(String(describing: planViewModel.planName))?"),
+                primaryButton: .destructive(Text("OK")) {
+                    do {
+                        try viewModel.deletePlan(planName: planViewModel.planName, position: planViewModel.position)
+                    } catch let exception as ValidationException {
+                        print(exception.message)
+                    } catch {
+                        print("Unexpected error occured when deleting plan: \(error)")
+                    }
+                },
+                secondaryButton: .cancel()
+            )
+        }
+        .onAppear(){
+            if position < viewModel.trainingPlans.count {
+                planViewModel.initViewModel(planName: viewModel.trainingPlans[position].name, position: position)
+            }
         }
         
     }
 }
 
 struct TrainingPlansListView_Previews: PreviewProvider {
-    @State static var trainingPlans: [TrainingPlan] = [TrainingPlan(name: "plan1"), TrainingPlan(name: "plan2")]
-    static var plansDatabaseHelper = PlansDataBaseHelper()
-    
     static var previews: some View {
-        TrainingPlansListView(trainingPlans: $trainingPlans, plansDatabaseHelper: plansDatabaseHelper)
+        TrainingPlansListView(viewModel: PlansViewModel())
     }
 }

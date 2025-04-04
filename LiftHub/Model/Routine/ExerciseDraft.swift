@@ -7,19 +7,19 @@
 
 import Foundation
 
-struct ExerciseDraft {
-    var id = UUID()
-    var name: String
-    var pause: String
-    var pauseUnit: TimeUnit
-    var load: String
-    var loadUnit: WeightUnit
-    var series: String
-    var reps: String
-    var intensity: String
-    var intensityIndex: IntensityIndex
-    var pace: String
-    var wasModified: Bool
+class ExerciseDraft: ObservableObject, Identifiable {
+    @Published var id = UUID()
+    @Published var name: String
+    @Published var pause: String
+    @Published var pauseUnit: TimeUnit
+    @Published var load: String
+    @Published var loadUnit: WeightUnit
+    @Published var series: String
+    @Published var reps: String
+    @Published var intensity: String
+    @Published var intensityIndex: IntensityIndex
+    @Published var pace: String
+    @Published var wasModified: Bool
     
     init(name: String, pause: String, pauseUnit: TimeUnit, load: String, loadUnit: WeightUnit, series: String, reps: String, intensity: String, intensityIndex: IntensityIndex, pace: String, wasModified: Bool) {
         self.name = name
@@ -53,6 +53,10 @@ struct ExerciseDraft {
 
         guard let intSeries = Int(series) else {
             throw ValidationException(message: "Series must be a number")
+        }
+        
+        if intSeries > 50 {
+            throw ValidationException(message: "Sorry, can't let you create this many series because the app will crash")
         }
 
         // Convert intensity and pace
