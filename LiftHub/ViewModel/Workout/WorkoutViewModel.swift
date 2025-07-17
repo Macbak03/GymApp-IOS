@@ -115,12 +115,22 @@ class WorkoutViewModel: ObservableObject {
                 try jsonData.write(to: fileURL)
                 UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: false)
                 UserDefaultsUtils.shared.setUnfinishedRoutineName(routineName: routineName)
+                UserDefaultsUtils.shared.setUnsavedWorkoutPlanName(planName: planName)
                 UserDefaultsUtils.shared.setDate(date: date)
                 print("Workout data saved at: \(fileURL)")
             }
         } catch {
             print("Error saving workout: \(error)")
         }
+    }
+    
+    func clearWorkoutData(workoutStateViewModel: WorkoutStateViewModel) {
+        UserDefaultsUtils.shared.removeDate()
+        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
+        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
+        UserDefaultsUtils.shared.removeUnfinishedRoutineName()
+        UserDefaultsUtils.shared.removeUnsavedWorkoutPlanName()
+        workoutStateViewModel.isWorkoutFinished = true
     }
     
     func saveWorkoutToHistory(workoutStateViewModel: WorkoutStateViewModel, homeStateViewModel: HomeStateViewModel) {
