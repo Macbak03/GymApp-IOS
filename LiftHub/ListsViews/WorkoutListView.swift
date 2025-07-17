@@ -42,7 +42,7 @@ private struct WorkoutListExerciseView: View {
     @State private var isSaveClicked = false
     
     @State private var defaultSetComparison = WorkoutHints(repsHint: "reps", weightHint: UserDefaultsUtils.shared.getWeightUnit(),  intensityHint: UserDefaultsUtils.shared.getIntensity(), noteHint: "note")
-    
+    @State private var workoutModified = false
     var body: some View {
         HStack {
             Image(systemName: "chevron.down")
@@ -133,9 +133,27 @@ private struct WorkoutListExerciseView: View {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
                 if index < viewModel.lastWorkoutComparison.count {
-                    WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints, setComparison: $viewModel.lastWorkoutComparison[index], stateViewModel: workoutStateViewModel, viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index), isSaveClicked: $isSaveClicked, selectedComparisonMethod: $viewModel.selectedComparingMethod)
+                    WorkoutListSeriesView(
+                        series: $exercise.workoutSeriesDraftList[index],
+                        workoutHint: $workoutHints,
+                        setComparison: $viewModel.lastWorkoutComparison[index],
+                        stateViewModel: workoutStateViewModel,
+                        viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index),
+                        isSaveClicked: $isSaveClicked,
+                        selectedComparisonMethod: $viewModel.selectedComparingMethod,
+                        workoutModified: $workoutModified
+                    )
                 } else {
-                    WorkoutListSeriesView(series: $exercise.workoutSeriesDraftList[index], workoutHint: $workoutHints, setComparison: $defaultSetComparison, stateViewModel: workoutStateViewModel, viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index), isSaveClicked: $isSaveClicked, selectedComparisonMethod: $viewModel.selectedComparingMethod)
+                    WorkoutListSeriesView(
+                        series: $exercise.workoutSeriesDraftList[index],
+                        workoutHint: $workoutHints,
+                        setComparison: $defaultSetComparison,
+                        stateViewModel: workoutStateViewModel,
+                        viewModel: WorkoutSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index),
+                        isSaveClicked: $isSaveClicked,
+                        selectedComparisonMethod: $viewModel.selectedComparingMethod,
+                        workoutModified: $workoutModified
+                    )
                 }
             }
             // Note Input
@@ -148,11 +166,113 @@ private struct WorkoutListExerciseView: View {
                         .stroke(Color.textFieldOutline, lineWidth: 0.5)
                 )
                 .padding(.horizontal, 15)
+            
+            HStack {
+                HStack(spacing: 3) {
+                    Text("Volume:")
+                        .font(.system(size: textSize))
+                        .bold()
+                    Text(viewModel.volumeValue.description)
+                        .font(.system(size: textSize))
+                        .onChange(of: workoutModified) { _, modified in
+                            if modified {
+                                viewModel.volumeValue = calculateVolume()
+                                viewModel.volumeDifference = calculateVolumeDifference()
+                                workoutModified = false
+                            }
+                        }
+                    Text(exercise.workoutSeriesDraftList.first?.loadUnit.descritpion ?? "-")
+                        .font(.system(size: textSize))
+                    if viewModel.volumeValue > viewModel.lastTrainingVolumeValue ?? 0 {
+                        Text("(")
+                            .font(.system(size: textSize))
+                        Image(systemName: "arrow.up")
+                            .foregroundStyle(.green)
+                            .font(.system(size: textSize))
+                            .scaleEffect(CGSize(width: 0.8, height: 0.8))
+                        Text(viewModel.volumeDifference.description)
+                            .font(.system(size: textSize))
+                            .foregroundStyle(.green)
+                        Text(exercise.workoutSeriesDraftList.first?.loadUnit.descritpion ?? "-")
+                            .font(.system(size: textSize))
+                            .foregroundStyle(.green)
+                        Text(")")
+                            .font(.system(size: textSize))
+                    } else if viewModel.volumeValue < viewModel.lastTrainingVolumeValue ?? 0.0 {
+                        Text("(")
+                            .font(.system(size: textSize))
+                        Image(systemName: "arrow.down")
+                            .foregroundStyle(.red)
+                            .font(.system(size: textSize))
+                            .scaleEffect(CGSize(width: 0.8, height: 0.8))
+                        Text(viewModel.volumeDifference.description)
+                            .font(.system(size: textSize))
+                            .foregroundStyle(.red)
+                        Text(exercise.workoutSeriesDraftList.first?.loadUnit.descritpion ?? "-")
+                            .font(.system(size: textSize))
+                            .foregroundStyle(.red)
+                        Text(")")
+                            .font(.system(size: textSize))
+                    } else {
+                        Text("(")
+                            .font(.system(size: textSize))
+                        Image(systemName: "plusminus")
+                            .font(.system(size: textSize))
+                            .scaleEffect(CGSize(width: 0.8, height: 0.8))
+                        Text("0")
+                            .font(.system(size: textSize))
+                        Text(exercise.workoutSeriesDraftList.first?.loadUnit.descritpion ?? "-")
+                            .font(.system(size: textSize))
+                        Text(")")
+                            .font(.system(size: textSize))
+                    }
+                    
+                        
+                }
+                .onAppear {
+                    viewModel.volumeValue = calculateVolume()
+                    viewModel.lastTrainingVolumeValue = calculateLastTrainingVolume()
+                    viewModel.volumeDifference = calculateVolumeDifference()
+                }
+            }
+            .foregroundStyle(Color.TextColorSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .allowsTightening(true)
+            
             Divider()
                 .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
                 .background(Color(.systemGray6)) // Set color for the line
         }
         
+    }
+    
+    private func calculateVolume() -> Double {
+        var volumeValue = 0.0
+        exercise.workoutSeriesDraftList.forEach { series in
+            volumeValue += (Double(series.actualLoad) ?? 0.0) * (Double(series.actualReps) ?? 0.0)
+        }
+        
+        return volumeValue
+    }
+    
+    private func calculateLastTrainingVolume() -> Double? {
+        var lastTrainingVolumeValue: Double = 0.0
+        viewModel.lastWorkoutComparison.forEach { comparison in
+            lastTrainingVolumeValue += (Double(comparison.weightHint) ?? 0.0) * (Double(comparison.repsHint) ?? 0.0)
+        }
+        
+        return lastTrainingVolumeValue
+    }
+    
+    private func calculateVolumeDifference() -> Double {
+        guard let lastVolume = viewModel.lastTrainingVolumeValue else {
+            return viewModel.volumeValue
+        }
+        
+        return abs(viewModel.volumeValue - lastVolume)
     }
 }
 
@@ -166,7 +286,8 @@ private struct WorkoutListSeriesView: View {
     @Binding var isSaveClicked: Bool
     
     @Binding var selectedComparisonMethod: SelectedComparingMethod
-
+    
+    @Binding var workoutModified: Bool
     
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
@@ -213,6 +334,9 @@ private struct WorkoutListSeriesView: View {
                         viewModel.validateReps(focused: focused, series: series, stateViewModel: stateViewModel)
                         showRepsToolbar = focused
                     }
+                    .onChange(of: series.actualReps) {
+                        workoutModified = true
+                    }
                     .toolbar {
                         if showRepsToolbar {
                             ToolbarItemGroup(placement: .keyboard) {
@@ -244,6 +368,9 @@ private struct WorkoutListSeriesView: View {
                         showLoadToolbar = focused
                         compareWeight = !focused
                     }
+                    .onChange(of: series.actualLoad) {
+                        workoutModified = true
+                    }
                     .toolbar {
                         if showLoadToolbar {
                             ToolbarItemGroup(placement: .keyboard) {
@@ -262,8 +389,9 @@ private struct WorkoutListSeriesView: View {
                         HStack(spacing: 1) {
                             Image(systemName: "arrow.up")
                                 .foregroundColor(Color.green)
-                                .scaleEffect(CGSize(width: 0.8, height: 1))
-                            Text(formatDouble(compareResult.value))
+                                .font(.system(size: textSize))
+                                .scaleEffect(CGSize(width: 0.8, height: 0.8))
+                            Text(compareResult.value.toStringWithFormat)
                                 .font(.system(size: textSize))
                         }
                         .frame(width: 50)
@@ -272,9 +400,9 @@ private struct WorkoutListSeriesView: View {
                         HStack(spacing: 1) {
                             Image(systemName: "arrow.down")
                                 .foregroundColor(Color.red)
-                                .scaleEffect(CGSize(width: 0.8, height: 1))
-                            Text(formatDouble(compareResult.value))
                                 .font(.system(size: textSize))
+                                .scaleEffect(CGSize(width: 0.8, height: 0.8))
+                            Text(compareResult.value.toStringWithFormat).font(.system(size: textSize))
                         }
                         .frame(width: 50)
                     }
@@ -378,13 +506,6 @@ private struct WorkoutListSeriesView: View {
         return (value: 0, comparison: "")
     }
     
-    func formatDouble(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
-    }
 }
 
 struct WorkoutListView_previews: PreviewProvider {

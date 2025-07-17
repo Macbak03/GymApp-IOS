@@ -16,23 +16,23 @@ class WorkoutHistoryDataBaseHelper: Repository {
     
     // Define table and columns
     private let workoutHistoryTable = Table(TABLE_NAME)
-    private let exerciseId = Expression<Int64>(EXERCISE_ID_COLUMN)
-    private let date = Expression<String>("date")
-    private let planName = Expression<String>("planName")
-    private let routineName = Expression<String>("routineName")
-    private let exerciseOrder = Expression<Int64>("exerciseOrder")
-    private let exerciseName = Expression<String>("exerciseName")
-    private let pauseRangeFrom = Expression<Int>("pauseRangeFrom")
-    private let pauseRangeTo = Expression<Int>("pauseRangeTo")
-    private let loadUnit = Expression<String>(LOAD_UNIT_COLUMN)
-    private let repsRangeFrom = Expression<Int>("repsRangeFrom")
-    private let repsRangeTo = Expression<Int>("repsRangeTo")
-    private let series = Expression<Int>("series")
-    private let intensityRangeFrom = Expression<Int>("intensityRangeFrom")
-    private let intensityRangeTo = Expression<Int>("intensityRangeTo")
-    private let intensityIndex = Expression<String>(INTENSITY_INDEX_COLUMN)
-    private let pace = Expression<String>("pace")
-    private let notes = Expression<String>("notes")
+    private let exerciseId = SQLite.Expression<Int64>(EXERCISE_ID_COLUMN)
+    private let date = SQLite.Expression<String>("date")
+    private let planName = SQLite.Expression<String>("planName")
+    private let routineName = SQLite.Expression<String>("routineName")
+    private let exerciseOrder = SQLite.Expression<Int64>("exerciseOrder")
+    private let exerciseName = SQLite.Expression<String>("exerciseName")
+    private let pauseRangeFrom = SQLite.Expression<Int>("pauseRangeFrom")
+    private let pauseRangeTo = SQLite.Expression<Int>("pauseRangeTo")
+    private let loadUnit = SQLite.Expression<String>(LOAD_UNIT_COLUMN)
+    private let repsRangeFrom = SQLite.Expression<Int>("repsRangeFrom")
+    private let repsRangeTo = SQLite.Expression<Int>("repsRangeTo")
+    private let series = SQLite.Expression<Int>("series")
+    private let intensityRangeFrom = SQLite.Expression<Int>("intensityRangeFrom")
+    private let intensityRangeTo = SQLite.Expression<Int>("intensityRangeTo")
+    private let intensityIndex = SQLite.Expression<String>(INTENSITY_INDEX_COLUMN)
+    private let pace = SQLite.Expression<String>("pace")
+    private let notes = SQLite.Expression<String>("notes")
     
     // Create the table if it doesn't exist
     override func createTableIfNotExists() {
@@ -129,11 +129,11 @@ class WorkoutHistoryDataBaseHelper: Repository {
     func addSeriesToHistory(series: WorkoutSeries, exerciseId: Int64) {
         do {
             let seriesTable = Table(WorkoutSeriesDataBaseHelper.TABLE_NAME)
-            let exerciseIdColumn = Expression<Int64>(WorkoutSeriesDataBaseHelper.EXERCISE_ID_COLUMN)
-            let seriesOrder = Expression<Int64>(WorkoutSeriesDataBaseHelper.SERIES_ORDER_COLUMN)
-            let actualReps = Expression<Double>(WorkoutSeriesDataBaseHelper.ACTUAL_REPS_COLUMN)
-            let loadValue = Expression<Double>(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)
-            let intensityValue = Expression<Int>(WorkoutSeriesDataBaseHelper.INTENSITY_VALUE)
+            let exerciseIdColumn = SQLite.Expression<Int64>(WorkoutSeriesDataBaseHelper.EXERCISE_ID_COLUMN)
+            let seriesOrder = SQLite.Expression<Int64>(WorkoutSeriesDataBaseHelper.SERIES_ORDER_COLUMN)
+            let actualReps = SQLite.Expression<Double>(WorkoutSeriesDataBaseHelper.ACTUAL_REPS_COLUMN)
+            let loadValue = SQLite.Expression<Double>(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)
+            let intensityValue = SQLite.Expression<Int>(WorkoutSeriesDataBaseHelper.INTENSITY_VALUE)
             
             
             try db?.run(seriesTable.insert(

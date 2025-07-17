@@ -22,6 +22,8 @@ class EditHistoryDetailsElementViewModel: ObservableObject {
     
     @Published var noteHint = "Note"
     
+    @Published var volumeValue: Double = 0.0
+    
     init(planName: String, position: Int) {
         self.planName = planName
         self.position = position

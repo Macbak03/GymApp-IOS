@@ -125,7 +125,6 @@ struct HomeView: View {
                                 weightUnit: viewModel.weightUnit))
                 }
             }
-            //.toast(isShowing: $stateViewModel.showToast, message: stateViewModel.toastMessage)
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(false)
@@ -192,10 +191,7 @@ private struct lastWorkoutView: View {
                         position: 0,
                         showToast: viewModel.showToast,
                         toastMessage: viewModel.toastMessage))
-                    .onDisappear() {
-//                        homeStateViewModel.showToast = viewModel.showToast
-//                        homeStateViewModel.toastMessage = viewModel.toastMessage
-                    },
+                    .onDisappear() {},
                     label: {
                         HStack {
                             Text("Edit")

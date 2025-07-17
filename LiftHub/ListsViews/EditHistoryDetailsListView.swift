@@ -27,8 +27,7 @@ private struct EditHistoryDetailsListExerciseView: View {
     @StateObject var viewModel: EditHistoryDetailsElementViewModel
     
     @State private var isDetailsVisible = false
-    @State private var displayNote = false
-    
+    @State private var workoutModified = false
     
     private let textSize: CGFloat = 15
     private let outllineFrameHeight: CGFloat = 30
@@ -121,7 +120,12 @@ private struct EditHistoryDetailsListExerciseView: View {
         if isDetailsVisible {
             ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
                 index in
-                HistoryDetailsListSeriesView(series: $exercise.workoutSeriesDraftList[index], editHistoryDetailsViewModel: editHistoryDetailsViewModel, viewModel: EditHistoryDetailsSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index))
+                HistoryDetailsListSeriesView(
+                    series: $exercise.workoutSeriesDraftList[index],
+                    editHistoryDetailsViewModel: editHistoryDetailsViewModel,
+                    viewModel: EditHistoryDetailsSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index),
+                    workoutModified: $workoutModified
+                )
             }
             // Note Input
             TextField(viewModel.noteHint, text: $exercise.workoutExerciseDraft.note)
@@ -133,11 +137,45 @@ private struct EditHistoryDetailsListExerciseView: View {
                         .stroke(Color.textFieldOutline, lineWidth: 0.5)
                 )
                 .padding(.horizontal, 15)
+            
+            HStack {
+                Text("Volume:")
+                    .font(.system(size: textSize))
+                    .bold()
+                Text(viewModel.volumeValue.description)
+                    .font(.system(size: textSize))
+                    .onAppear {
+                        viewModel.volumeValue = calculateVolume()
+                    }
+                    .onChange(of: workoutModified) { _, modified in
+                        if modified {
+                            viewModel.volumeValue = calculateVolume()
+                            workoutModified = false
+                        }
+                    }
+                Text(exercise.workoutSeriesDraftList.first?.loadUnit.descritpion ?? "-")
+                    .font(.system(size: textSize))
+            }
+            .foregroundStyle(Color.TextColorSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .allowsTightening(true)
             Divider()
                 .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
                 .background(Color(.systemGray6)) // Set color for the line
         }
         
+    }
+    
+    private func calculateVolume() -> Double {
+        var volumeValue = 0.0
+        exercise.workoutSeriesDraftList.forEach { series in
+            volumeValue += (Double(series.actualLoad) ?? 0.0) * (Double(series.actualReps) ?? 0.0)
+        }
+        
+        return volumeValue
     }
 }
 
@@ -145,6 +183,7 @@ private struct HistoryDetailsListSeriesView: View {
     @Binding var series: WorkoutSeriesDraft
     @ObservedObject var editHistoryDetailsViewModel: EditHistoryDetailsViewModel
     @StateObject var viewModel: EditHistoryDetailsSeriesViewModel
+    @Binding var workoutModified: Bool
     
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
@@ -181,6 +220,9 @@ private struct HistoryDetailsListSeriesView: View {
                             .stroke((viewModel.showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                     )
                     .focused($isRepsFocused)
+                    .onChange(of: series.actualReps) { _, _ in
+                        workoutModified = true
+                    }
                     .onChange(of: isRepsFocused) { _, focused in
                         viewModel.validateReps(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
                         showRepsToolbar = focused
@@ -211,6 +253,9 @@ private struct HistoryDetailsListSeriesView: View {
                             .stroke((viewModel.showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                     )
                     .focused($isLoadFocused)
+                    .onChange(of: series.actualLoad) { _, _ in
+                        workoutModified = true
+                    }
                     .onChange(of: isLoadFocused) { _, focused in
                         viewModel.validateLoad(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
                         showLoadToolbar = focused

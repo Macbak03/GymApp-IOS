@@ -18,16 +18,16 @@ class WorkoutSeriesDataBaseHelper : Repository{
 
     // Define table and columns
     private let workoutSeriesTable = Table(TABLE_NAME)
-    private let exerciseId = Expression<Int64>(EXERCISE_ID_COLUMN)
-    private let seriesOrder = Expression<Int64>(SERIES_ORDER_COLUMN)
-    private let actualReps = Expression<Double>(ACTUAL_REPS_COLUMN)
-    private let loadValue = Expression<Double>(LOAD_VALUE_COLUMN)
-    private let intensityValue = Expression<Int>(INTENSITY_VALUE)
+    private let exerciseId = SQLite.Expression<Int64>(EXERCISE_ID_COLUMN)
+    private let seriesOrder = SQLite.Expression<Int64>(SERIES_ORDER_COLUMN)
+    private let actualReps = SQLite.Expression<Double>(ACTUAL_REPS_COLUMN)
+    private let loadValue = SQLite.Expression<Double>(LOAD_VALUE_COLUMN)
+    private let intensityValue = SQLite.Expression<Int>(INTENSITY_VALUE)
     
     private let workoutHistoryTable = Table(WorkoutHistoryDataBaseHelper.TABLE_NAME)
-    private let workoutHistoryExericseId = Expression<Int64>(WorkoutHistoryDataBaseHelper.EXERCISE_ID_COLUMN)
-    private let workoutHistoryLoadUnit = Expression<String>(WorkoutHistoryDataBaseHelper.LOAD_UNIT_COLUMN)
-    private let workoutHistoryIntensityIndex = Expression<String>(WorkoutHistoryDataBaseHelper.INTENSITY_INDEX_COLUMN)
+    private let workoutHistoryExericseId = SQLite.Expression<Int64>(WorkoutHistoryDataBaseHelper.EXERCISE_ID_COLUMN)
+    private let workoutHistoryLoadUnit = SQLite.Expression<String>(WorkoutHistoryDataBaseHelper.LOAD_UNIT_COLUMN)
+    private let workoutHistoryIntensityIndex = SQLite.Expression<String>(WorkoutHistoryDataBaseHelper.INTENSITY_INDEX_COLUMN)
 
     // Create the table if it doesn't exist
     override func createTableIfNotExists() {

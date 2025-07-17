@@ -106,6 +106,14 @@ class NoPlanWorkoutViewModel: ObservableObject {
         return nil
     }
     
+    func clearWorkoutData(workoutStateViewModel: WorkoutStateViewModel) {
+        UserDefaultsUtils.shared.removeDate()
+        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
+        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
+        UserDefaultsUtils.shared.removeUnsavedWorkoutPlanName()
+        workoutStateViewModel.isWorkoutFinished = true
+    }
+    
     func saveWorkoutToFile() {
         let workoutList = workoutDraft.map {
             WorkoutDraft(workoutExerciseDraft: $0.workoutExerciseDraft, workoutSeriesDraftList: $0.workoutSeriesDraftList)
@@ -118,9 +126,10 @@ class NoPlanWorkoutViewModel: ObservableObject {
             if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let fileURL = documentDirectory.appendingPathComponent("workout.json")
                 try jsonData.write(to: fileURL)
-                UserDefaults.standard.setValue(false, forKey: Constants.IS_WORKOUT_SAVED_KEY)
-                UserDefaults.standard.setValue(routineName, forKey: Constants.UNFINISHED_WORKOUT_ROUTINE_NAME)
-                UserDefaults.standard.setValue(date, forKey: Constants.DATE)
+                UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: false)
+                UserDefaultsUtils.shared.setUnfinishedRoutineName(routineName: routineName)
+                UserDefaultsUtils.shared.setDate(date: date)
+                UserDefaultsUtils.shared.setUnsavedWorkoutPlanName(planName: planName)
                 print("Workout data saved at: \(fileURL)")
             }
         } catch {
@@ -180,8 +189,8 @@ class NoPlanWorkoutViewModel: ObservableObject {
             }
         }
         workoutHistoryDatabaseHelper.addExercises(workout: workout, date: date, planName: planName, routineName: routineName)
-        UserDefaults.standard.setValue(nil, forKey: Constants.DATE)
-        UserDefaults.standard.setValue(true, forKey: Constants.IS_WORKOUT_SAVED_KEY)
+        UserDefaultsUtils.shared.removeDate()
+        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
         UserDefaultsUtils.shared.setHasWorkoutEnded(true)
         UserDefaultsUtils.shared.removeUnsavedWorkoutPlanName()
         workoutStateViewModel.isWorkoutFinished = true

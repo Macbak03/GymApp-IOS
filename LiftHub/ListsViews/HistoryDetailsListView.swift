@@ -38,10 +38,9 @@ private struct HistoryDetailsListExerciseView: View {
                 // First Horizontal Layout (Exercise Name)
                 HStack {
                     Text(viewModel.exercise.workoutExerciseDraft.name)
-                        .font(.system(size: 18, weight: .bold))  // Equivalent to bold and textSize 24sp
-                        .frame(height: 15)  // Equivalent to layout_height="30dp"
-                    //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
-                    Spacer()  // To take up the remaining space
+                        .font(.system(size: 18, weight: .bold))
+                        .frame(height: 15)
+                    Spacer()
                 }
                 .frame(maxWidth: .infinity)
                 
@@ -121,13 +120,13 @@ private struct HistoryDetailsListExerciseView: View {
                     .font(.system(size: textSize))
                     .padding(.leading, 15)
                     .padding(.trailing, 10)
-                    .padding(.bottom, 3)// Equivalent to layout_marginBottom
+                    .padding(.bottom, 3)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             Divider()
-                .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
-                .background(Color(.systemGray6)) // Set color for the line
+                .frame(maxWidth: .infinity, maxHeight: 2)
+                .background(Color(.systemGray6))
         }
         
     }
@@ -147,7 +146,7 @@ private struct HistoryDetailsListSeriesView: View {
                 Text("\(position + 1).")
                     .font(.system(size: textSize))
                     .padding(.leading, 4)
-                Spacer() // Pushes the text to the left
+                Spacer()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             

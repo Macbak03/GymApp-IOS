@@ -15,8 +15,8 @@ class PlansDataBaseHelper: Repository {
     
     // Define table and columns
     private let plansTable = Table(TABLE_NAME)
-    private let planId = Expression<Int64>(ID_COLUMN)
-    private let planName = Expression<String>(NAME_COLUMN)
+    private let planId = SQLite.Expression<Int64>(ID_COLUMN)
+    private let planName = SQLite.Expression<String>(NAME_COLUMN)
     
     func getPlans() -> [TrainingPlan] {
         var plans: [TrainingPlan] = []

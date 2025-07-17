@@ -16,12 +16,12 @@ class RoutinesDataBaseHelper: Repository {
     
     // Define table and columns
     private let routinesTable = Table(TABLE_NAME)
-    private let planId = Expression<Int64>(PLAN_ID_COLUMN)
-    private let routineId = Expression<Int64>(ROUTINE_ID_COLUMN)
-    private let routineName = Expression<String>(ROUTINE_NAME_COLUMN)
+    private let planId = SQLite.Expression<Int64>(PLAN_ID_COLUMN)
+    private let routineId = SQLite.Expression<Int64>(ROUTINE_ID_COLUMN)
+    private let routineName = SQLite.Expression<String>(ROUTINE_NAME_COLUMN)
     
     private let plansTable = Table(PlansDataBaseHelper.TABLE_NAME)
-    private let plansTableId = Expression<Int64>(PlansDataBaseHelper.ID_COLUMN)
+    private let plansTableId = SQLite.Expression<Int64>(PlansDataBaseHelper.ID_COLUMN)
     
     
     // Create the table if it doesn't exist

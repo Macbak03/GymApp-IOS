@@ -44,10 +44,7 @@ struct WorkoutView: View {
                     title: Text("Warning"),
                     message: Text("Workout won't be saved. Do you want to cancel?"),
                     primaryButton: .destructive(Text("Yes")) {
-                        UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: true)
-                        UserDefaultsUtils.shared.setHasWorkoutEnded(true)
-                        //homeStateViewModel.isWorkoutEnded = true
-                        stateViewModel.isWorkoutFinished = true
+                        viewModel.clearWorkoutData(workoutStateViewModel: stateViewModel)
                         presentationMode.wrappedValue.dismiss()
                     },
                     secondaryButton: .cancel()
