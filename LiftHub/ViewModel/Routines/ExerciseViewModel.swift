@@ -9,6 +9,8 @@ import Foundation
 
 class ExerciseViewModel: ObservableObject {
     @Published var exerciseDraft: ExerciseDraft
+    @Published var intensityValue: String = ""
+    @Published var paceValue: String = ""
     @Published var showNameError = false
     @Published var showPauseError = false
     @Published var showLoadError = false
@@ -19,6 +21,8 @@ class ExerciseViewModel: ObservableObject {
     
     init(exerciseDraft: ExerciseDraft) {
         self.exerciseDraft = exerciseDraft
+        self.intensityValue = exerciseDraft.intensity ?? ""
+        paceValue = exerciseDraft.pace ?? ""
     }
     
     func initExercise(exerciseDraft: ExerciseDraft) {
@@ -79,7 +83,7 @@ class ExerciseViewModel: ObservableObject {
     func validateReps(focused: Bool, viewModel: RoutineDetailsViewModel) {
         if !focused {
             do {
-                try _ = RepsFactory.fromString(exerciseDraft.reps)
+                try _ = RepsFactory.fromString(exerciseDraft.reps, exerciseType: exerciseDraft.exerciseType)
             } catch let error as ValidationException {
                 showRepsError = true
                 viewModel.setToast(message: error.message)

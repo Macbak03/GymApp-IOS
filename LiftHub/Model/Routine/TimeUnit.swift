@@ -11,7 +11,7 @@ enum TimeUnit : String, CaseIterable, Codable {
     case min = "min"
     case s = "s"
     
-    var descritpion: String {
+    var description: String {
         switch self {
         case .min: return "min"
         case .s: return "s"

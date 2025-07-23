@@ -32,9 +32,10 @@ struct RangeReps: Reps {
 }
 struct RepsFactory {
     // Helper function to create Reps from String
-    static func fromString(_ reps: String?) throws -> Reps {
+    static func fromString(_ reps: String?, exerciseType: ExerciseType = .weighted) throws -> Reps {
+        let type = exerciseType == .timed ? "Time" : "Reps"
         guard let reps = reps, !reps.isEmpty else {
-            throw ValidationException(message: "Reps cannot be empty")
+            throw ValidationException(message: "\(type) cannot be empty")
         }
         
         // Regular expression to match exact or range values
@@ -42,7 +43,7 @@ struct RepsFactory {
         let range = NSRange(location: 0, length: reps.utf16.count)
         
         guard let match = regex.firstMatch(in: reps, options: [], range: range) else {
-            throw ValidationException(message: "Reps must be a number (e.g., 5) or range (e.g., 3-5) and cannot be negative")
+            throw ValidationException(message: "\(type) must be a number (e.g., 5) or range (e.g., 3-5) and cannot be negative")
         }
         
         let matchExactValueRange = match.range(at: 1)
@@ -72,7 +73,7 @@ struct RepsFactory {
             let exactValue = (reps as NSString).substring(with: matchExactValueRange)
             
             guard let intValue = Int(exactValue) else {
-                throw ValidationException(message: "Reps cannot be decimal number")
+                throw ValidationException(message: "\(type) cannot be decimal number")
             }
             
             if intValue > 500 {
@@ -83,6 +84,6 @@ struct RepsFactory {
         }
         
         // If nothing matched, throw an error
-        throw ValidationException(message: "Reps must be a valid number or range")
+        throw ValidationException(message: "\(type) must be a valid number or range")
     }
 }

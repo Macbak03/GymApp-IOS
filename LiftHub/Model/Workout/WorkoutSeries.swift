@@ -11,5 +11,5 @@ struct WorkoutSeries {
     var actualReps: Double
     var seriesCount: Int
     var load: Weight
-    var actualIntensity: Intensity
+    var actualIntensity: Intensity?
 }

@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5F4177122E2BD54F0097B093 /* ExerciseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4177112E2BD5480097B093 /* ExerciseType.swift */; };
 		5F5958CC2CFF982900B61098 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 5F5958CB2CFF982900B61098 /* SQLite */; };
 		5F5958CE2CFF983400B61098 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 5F5958CD2CFF983400B61098 /* SwiftUIIntrospect */; };
 		5F5958D12D07889E00B61098 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5958D02D07889E00B61098 /* CalendarView.swift */; };
 		5F5958D32D078AB500B61098 /* WorkoutHistoryElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5958D22D078AB500B61098 /* WorkoutHistoryElements.swift */; };
 		5F5958D52D07A9D300B61098 /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5958D42D07A9D300B61098 /* DateExtension.swift */; };
 		5F5958D72D07B7E500B61098 /* HistoryDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5958D62D07B7E500B61098 /* HistoryDialog.swift */; };
+		5F6467C62E294C9A006E17E4 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6467C52E294C97006E17E4 /* String.swift */; };
 		5F6DDE8A2E2805210057D648 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6DDE892E28051D0057D648 /* Double.swift */; };
 		5F88E9742CBF100B002C345C /* CustomKeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F88E9732CBF100B002C345C /* CustomKeyboardToolbar.swift */; };
 		5FAAF9292CF14CA7002D9412 /* WorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAAF9282CF14CA7002D9412 /* WorkoutViewModel.swift */; };
@@ -133,10 +135,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5F4177112E2BD5480097B093 /* ExerciseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseType.swift; sourceTree = "<group>"; };
 		5F5958D02D07889E00B61098 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		5F5958D22D078AB500B61098 /* WorkoutHistoryElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryElements.swift; sourceTree = "<group>"; };
 		5F5958D42D07A9D300B61098 /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		5F5958D62D07B7E500B61098 /* HistoryDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDialog.swift; sourceTree = "<group>"; };
+		5F6467C52E294C97006E17E4 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		5F6DDE892E28051D0057D648 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		5F88E9732CBF100B002C345C /* CustomKeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKeyboardToolbar.swift; sourceTree = "<group>"; };
 		5FAAF9282CF14CA7002D9412 /* WorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewModel.swift; sourceTree = "<group>"; };
@@ -467,6 +471,7 @@
 		5FE53E582C8CB2A300FB6400 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				5F6467C52E294C97006E17E4 /* String.swift */,
 				5F6DDE892E28051D0057D648 /* Double.swift */,
 				5FE53E592C8CB2B700FB6400 /* Color.swift */,
 			);
@@ -548,6 +553,7 @@
 		5FE53E832C8F9C5B00FB6400 /* Routine */ = {
 			isa = PBXGroup;
 			children = (
+				5F4177112E2BD5480097B093 /* ExerciseType.swift */,
 				5FE53E842C8F9C7400FB6400 /* ExerciseDraft.swift */,
 				5FE53E862C908C5300FB6400 /* ExercisePace.swift */,
 				5FE53E8B2C90913700FB6400 /* IntensityIndex.swift */,
@@ -786,6 +792,7 @@
 				5FE53E852C8F9C7400FB6400 /* ExerciseDraft.swift in Sources */,
 				5FE53E822C8F9C1000FB6400 /* RoutineListView.swift in Sources */,
 				5FE53EE32C9C8CDA00FB6400 /* NoPlanWorkoutListView.swift in Sources */,
+				5F4177122E2BD54F0097B093 /* ExerciseType.swift in Sources */,
 				5FAAF93D2CF221AA002D9412 /* NoPlanWorkoutExerciseViewModel.swift in Sources */,
 				5FE53EDC2C9B53C400FB6400 /* StatsView.swift in Sources */,
 				5FE53E512C8C9E1E00FB6400 /* BottomNavigationBarView.swift in Sources */,
@@ -804,6 +811,7 @@
 				5FE53E662C8CF21100FB6400 /* TrainingPlan.swift in Sources */,
 				5FE53EBF2C95D2C300FB6400 /* WorkoutHints.swift in Sources */,
 				5FCCD2162CEFFDFE00385BCB /* HistoryDetailsViewModel.swift in Sources */,
+				5F6467C62E294C9A006E17E4 /* String.swift in Sources */,
 				5FE53ED02C98BB0100FB6400 /* WorkoutHistoryElement.swift in Sources */,
 				5FAAF92B2CF14DAA002D9412 /* WorkoutStateViewModel.swift in Sources */,
 				5FE53ED22C98DF0600FB6400 /* HistoryDetailsView.swift in Sources */,
@@ -1024,7 +1032,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"LiftHub/Preview Content\"";
 				DEVELOPMENT_TEAM = ZQN8QV4ZN8;
 				ENABLE_PREVIEWS = YES;
@@ -1054,7 +1062,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"LiftHub/Preview Content\"";
 				DEVELOPMENT_TEAM = ZQN8QV4ZN8;
 				ENABLE_PREVIEWS = YES;

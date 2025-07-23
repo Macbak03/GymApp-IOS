@@ -88,7 +88,7 @@ private struct HistoryDetailsListExerciseView: View {
                         HStack(spacing: VSpacing) {
                             Text("Pace:")
                                 .font(.system(size: textSize))
-                            Text(viewModel.exercise.workoutExerciseDraft.pace)
+                            Text(viewModel.exercise.workoutExerciseDraft.pace ?? "-")
                                 .font(.system(size: textSize))
                                 //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -176,21 +176,23 @@ private struct HistoryDetailsListSeriesView: View {
             .padding(.horizontal, 85)
             
             // Third HStack for Intensity Value on the right
-            HStack {
-                Divider()
-                    .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
-                    .background(Color(.systemGray6)) // Set color for the line
-                    .padding(.trailing, 5)
-                
-                Text("\(series.intensityIndex.rawValue):")
-                    .font(.system(size: textSize))
-
-                Text(series.actualIntensity)
-                    .frame(width: 25, height: 25)
-                    .multilineTextAlignment(.leading)
-                    .padding(.trailing, 5)
+            if series.actualIntensity != nil {
+                HStack {
+                    Divider()
+                        .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
+                        .background(Color(.systemGray6)) // Set color for the line
+                        .padding(.trailing, 5)
+                    
+                    Text("\(series.intensityIndex.rawValue):")
+                        .font(.system(size: textSize))
+                    
+                    Text(series.actualIntensity!)
+                        .frame(width: 25, height: 25)
+                        .multilineTextAlignment(.leading)
+                        .padding(.trailing, 5)
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing) // Align the HStack to the right
             }
-            .frame(maxWidth: .infinity, alignment: .trailing) // Align the HStack to the right
         }
         .padding(.top, 2)  // Equivalent to layout_marginTop="5dp"
         .padding(.horizontal, 10)

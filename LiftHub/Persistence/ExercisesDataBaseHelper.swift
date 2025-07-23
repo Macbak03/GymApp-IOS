@@ -9,8 +9,9 @@ import Foundation
 import SQLite
 
 class ExercisesDataBaseHelper: Repository {
+    static let TABLE_NAME = "exercises"
     // Define table and columns
-    private let exercisesTable = Table("exercises")
+    private let exercisesTable = Table(TABLE_NAME)
     private let planId = SQLite.Expression<Int64>("PlanID")
     private let routineId = SQLite.Expression<Int64>("RoutineID")
     private let routineName = SQLite.Expression<String>("RoutineName")
@@ -23,10 +24,11 @@ class ExercisesDataBaseHelper: Repository {
     private let repsRangeFrom = SQLite.Expression<Int>("RepsRangeFrom")
     private let repsRangeTo = SQLite.Expression<Int>("RepsRangeTo")
     private let series = SQLite.Expression<Int>("Series")
-    private let intensityRangeFrom = SQLite.Expression<Int>("RPERangeFrom")
-    private let intensityRangeTo = SQLite.Expression<Int>("RPERangeTo")
+    private let intensityRangeFrom = SQLite.Expression<Int?>("RPERangeFrom")
+    private let intensityRangeTo = SQLite.Expression<Int?>("RPERangeTo")
     private let intensityIndex = SQLite.Expression<String>("IntensityIndex")
-    private let pace = SQLite.Expression<String>("Pace")
+    private let pace = SQLite.Expression<String?>("Pace")
+    private let exerciseType = SQLite.Expression<String>("ExerciseType")
     
     private let routinesTable = Table(RoutinesDataBaseHelper.TABLE_NAME)
     private let routinesTableRoutineId = SQLite.Expression<Int64>(RoutinesDataBaseHelper.ROUTINE_ID_COLUMN)
@@ -34,6 +36,14 @@ class ExercisesDataBaseHelper: Repository {
     private let routinesTableRoutineName = SQLite.Expression<String>(RoutinesDataBaseHelper.ROUTINE_NAME_COLUMN)
     private let plansTable = Table(PlansDataBaseHelper.TABLE_NAME)
     private let plansTableId = SQLite.Expression<Int64>(PlansDataBaseHelper.ID_COLUMN)
+    
+    override init() {
+        super.init()
+        if !UserDefaultsUtils.shared.wasExerciseDatabaseMigrationPerformed() {
+            migrateTable()
+            addExerciseTypeColumn()
+        }
+    }
 
     // Create the table if it doesn't exist
     override func createTableIfNotExists() {
@@ -55,13 +65,47 @@ class ExercisesDataBaseHelper: Repository {
                 table.column(intensityRangeTo)
                 table.column(intensityIndex)
                 table.column(pace)
-
+                table.column(exerciseType)
                 // Foreign key constraints
                 table.foreignKey(routineId, references: routinesTable, routineId, update: .cascade, delete: .cascade)
                 table.foreignKey(planId, references: plansTable, plansTableId, update: .cascade, delete: .cascade)
             })
         } catch {
             print("Error creating table: \(error)")
+        }
+    }
+    
+    private func migrateTable() {
+        let tableName = ExercisesDataBaseHelper.TABLE_NAME
+        let helperTableName = "\(tableName)_old"
+        do {
+            try db?.transaction {
+                try db?.run("ALTER TABLE \(tableName) RENAME TO \(helperTableName)")
+                createTableIfNotExists()
+                let columns = [
+                    "PlanID", "RoutineID", "RoutineName", "ExerciseOrder", "ExerciseName",
+                    "PauseRangeFrom", "PauseRangeTo", "LoadValue", "LoadUnit",
+                    "RepsRangeFrom", "RepsRangeTo", "Series",
+                    "RPERangeFrom", "RPERangeTo", "IntensityIndex", "Pace"
+                ].joined(separator: ", ")
+                try db?.run("""
+                        INSERT INTO \(tableName) (\(columns))
+                        SELECT \(columns) FROM \(helperTableName)
+                    """)
+                try db?.run("DROP TABLE \(helperTableName)")
+                UserDefaultsUtils.shared.setExerciseDatabaseMigrationPerformed(true)
+                print("Exercises database migration completed")
+            }
+        } catch {
+            print("Exercises migration failed: \(error)")
+        }
+    }
+    
+    private func addExerciseTypeColumn() {
+        do {
+            try db?.run(exercisesTable.addColumn(exerciseType, defaultValue: ExerciseType.weighted.description))
+        } catch {
+            print("Adding exercise type column failed: \(error)")
         }
     }
 
@@ -91,8 +135,8 @@ class ExercisesDataBaseHelper: Repository {
                 toReps = rangeReps.to
             }
 
-            var fromIntensity: Int = 0
-            var toIntensity: Int = 0
+            var fromIntensity: Int? = nil
+            var toIntensity: Int? = nil
             var intensityIndexValue: String = ""
             
             // Handle the intensity types (ExactIntensity, RangeIntensity)
@@ -104,8 +148,11 @@ class ExercisesDataBaseHelper: Repository {
                 fromIntensity = rangeIntensity.from
                 toIntensity = rangeIntensity.to
                 intensityIndexValue = rangeIntensity.index.rawValue
+            } else {
+                intensityIndexValue = (exercise.intensity as! ExactIntensity).index.rawValue
             }
-
+            
+            
             // Insert exercise data into the table
             try db?.run(exercisesTable.insert(
                 self.planId <- planId,
@@ -123,7 +170,8 @@ class ExercisesDataBaseHelper: Repository {
                 self.intensityRangeFrom <- fromIntensity,
                 self.intensityRangeTo <- toIntensity,
                 self.intensityIndex <- intensityIndexValue,
-                self.pace <- exercise.pace.description
+                self.pace <- exercise.pace?.description,
+                self.exerciseType <- exercise.exerciseType.description
             ))
         } catch {
             print("Error adding exercise: \(error)")
@@ -253,8 +301,10 @@ class ExercisesDataBaseHelper: Repository {
                 let intensityIndex = try exerciseRow.get(self.intensityIndex)
                 let intensityRangeFrom = try exerciseRow.get(self.intensityRangeFrom)
                 let intensityRangeTo = try exerciseRow.get(self.intensityRangeTo)
-                let intensity: String
-                if intensityRangeFrom == intensityRangeTo {
+                let intensity: String?
+                if intensityRangeTo == nil || intensityRangeTo == nil {
+                    intensity = nil
+                } else if intensityRangeFrom == intensityRangeTo {
                     intensity = ExactIntensity(value: intensityRangeFrom, index: IntensityIndex(rawValue: intensityIndex)!).description
                 } else {
                     intensity = RangeIntensity(from: intensityRangeFrom, to: intensityRangeTo, index: IntensityIndex(rawValue: intensityIndex)!).description
@@ -262,9 +312,13 @@ class ExercisesDataBaseHelper: Repository {
 
                 // Pace
                 let pace = try exerciseRow.get(self.pace)
+                
+                // Type
+                let exerciseType = ExerciseType(rawValue: try exerciseRow.get(self.exerciseType)) ?? .weighted
 
                 // Create the ExerciseDraft object and add it to the list
                 let exercise = ExerciseDraft(
+                    exerciseTpe: exerciseType,
                     name: exerciseName,
                     pause: pause,
                     pauseUnit: pauseUnit,

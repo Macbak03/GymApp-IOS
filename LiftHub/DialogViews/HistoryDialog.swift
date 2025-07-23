@@ -18,7 +18,7 @@ struct HistoryDialog: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let dateSelected {
+                if dateSelected != nil {
                     List {
                         ForEach(foundTrainings.indices, id: \.self) { index in
                             TrainingDayListView(viewModel: HistoryElementViewModel(historyElement: foundTrainings[index], position: index))

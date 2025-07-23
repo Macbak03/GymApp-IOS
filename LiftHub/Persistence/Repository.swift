@@ -27,7 +27,8 @@ class Repository {
             db = try Connection(dbPath)
             try onConfigure()
             try createTableIfNotExists()
-            //print(dbPath)
+            print(dbPath)
+
         } catch {
             print("Error initializing database: \(error)")
         }

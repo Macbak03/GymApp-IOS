@@ -14,30 +14,43 @@ protocol Intensity {
 
 // ExactIntensity struct
 struct ExactIntensity: Intensity {
-    let value: Int
+    let value: Int?
     let index: IntensityIndex
     
     var description: String {
-        return "\(value)"
+        if value == nil {
+            return "-"
+        } else {
+            return "\(value!)"
+        }
     }
 }
 
 // RangeIntensity struct
 struct RangeIntensity: Intensity {
-    let from: Int
-    let to: Int
+    let from: Int?
+    let to: Int?
     let index: IntensityIndex
     
     var description: String {
-        return "\(from)-\(to)"
+        if from == nil || to == nil {
+            return "-"
+        } else {
+            return "\(from!)-\(to!)"
+        }
     }
 }
 
 struct IntensityFactory {
     // Helper function for Intensity creation
-    static func fromString(_ intensity: String?, index: IntensityIndex) throws -> Intensity {
+    static func fromString(_ intensity: String?, index: IntensityIndex) throws -> Intensity? {
         guard let intensity = intensity else {
-            throw ValidationException(message: "\(index.rawValue) cannot be empty")
+            //throw ValidationException(message: "\(index.rawValue) cannot be empty")
+            return ExactIntensity(value: nil, index: index)
+        }
+        
+        if intensity.isEmpty {
+            return ExactIntensity(value: nil, index: index)
         }
         
         // Regex to match single values or ranges
@@ -68,9 +81,14 @@ struct IntensityFactory {
         }
     }
     
-    static func fromStringForWorkout(_ intensity: String?, index: IntensityIndex) throws -> Intensity {
+    static func fromStringForWorkout(_ intensity: String?, index: IntensityIndex) throws -> Intensity? {
         guard let intensity = intensity else {
-            throw ValidationException(message: "\(index.rawValue) cannot be empty")
+            //throw ValidationException(message: "\(index.rawValue) cannot be empty")
+            return ExactIntensity(value: nil, index: index)
+        }
+        
+        if intensity.isEmpty {
+            return ExactIntensity(value: nil, index: index)
         }
         
         let regex = try! NSRegularExpression(pattern: "^([0-9]|10)$")

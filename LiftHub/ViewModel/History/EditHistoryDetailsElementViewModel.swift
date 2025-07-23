@@ -17,8 +17,8 @@ class EditHistoryDetailsElementViewModel: ObservableObject {
     @Published var restValue = "val"
     @Published var restUnit = "val"
     @Published var seriesValue = "val"
-    @Published var intensityValue = "val"
-    @Published var paceValue = "val"
+    @Published var intensityValue: String? = "val"
+    @Published var paceValue: String? = "val"
     
     @Published var noteHint = "Note"
     

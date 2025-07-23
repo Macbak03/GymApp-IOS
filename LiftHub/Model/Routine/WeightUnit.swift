@@ -11,7 +11,7 @@ enum WeightUnit: String, CaseIterable, Codable {
     case kg = "kg"
     case lbs = "lbs"
     
-    var descritpion: String {
+    var description: String {
         switch self {
         case .kg: return "kg"
         case .lbs: return "lbs"

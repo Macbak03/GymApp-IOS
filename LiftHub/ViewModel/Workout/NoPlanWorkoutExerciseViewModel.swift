@@ -9,6 +9,7 @@ import Foundation
 
 class NoPlanWorkoutExerciseViewModel: ObservableObject {
     @Published var showNameError = false
+    @Published var volumeValue = 0.0
     let exerciseCount: Int
     
     init(exerciseCount: Int) {

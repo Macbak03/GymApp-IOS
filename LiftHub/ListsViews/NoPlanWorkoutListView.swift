@@ -15,11 +15,12 @@ struct NoPlanWorkoutListView: View {
     @ObservedObject var stateViewModel: WorkoutStateViewModel
     
     @State private var exerciseRemoved: (removed: Bool, id: UUID?) = (removed: false, id: nil)
+    @State private var isLastExercise: (last: Bool, id: UUID?) = (last: false, id: nil)
     var body: some View {
         List {
             ForEach(viewModel.workoutDraft) {
                 exercise in
-                WorkoutListExerciseView(exercise: binding(for: exercise), viewModel: NoPlanWorkoutExerciseViewModel(exerciseCount: viewModel.workoutDraft.count), stateViewModel: stateViewModel, noPlanWorkoutViewModel: viewModel, exerciseRemoved: $exerciseRemoved)
+                WorkoutListExerciseView(exercise: binding(for: exercise), viewModel: NoPlanWorkoutExerciseViewModel(exerciseCount: viewModel.workoutDraft.count), stateViewModel: stateViewModel, noPlanWorkoutViewModel: viewModel, exerciseRemoved: $exerciseRemoved, isLastExercise: $isLastExercise)
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         if viewModel.workoutDraft.count > 1 {
                             Button(role: .destructive) {
@@ -27,15 +28,39 @@ struct NoPlanWorkoutListView: View {
                                 exerciseRemoved.id = exercise.id
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     viewModel.removeExercise(id: exercise.id)
+                                    updateLastExercise()
                                 }
                             } label: {
                                 Text("Delete")
                             }
                         }
                     }
+                    .onAppear() {
+                        updateLastExercise()
+                    }
             }
         }
         .listStyle(PlainListStyle())
+    }
+    
+    private func resetLastExercise() {
+        if isLastExercise.id != nil {
+            isLastExercise.id = nil
+            isLastExercise.last = false
+        }
+    }
+    
+    private func setLastExercise() {
+        let lastIndex = viewModel.workoutDraft.endIndex - 1
+        if viewModel.workoutDraft[lastIndex].id != isLastExercise.id {
+            isLastExercise.id = viewModel.workoutDraft[lastIndex].id
+            isLastExercise.last = true
+        }
+    }
+    
+    private func updateLastExercise() {
+        resetLastExercise()
+        setLastExercise()
     }
     
     private func binding(for exercise: WorkoutDraft) -> Binding<WorkoutDraft> {
@@ -59,8 +84,12 @@ private struct WorkoutListExerciseView: View {
     @FocusState private var isExerciseNameFocused: Bool
     
     @State var setAdded = false
+    @State private var workoutModified = false
     
     @Binding var exerciseRemoved: (removed: Bool, id: UUID?)
+    @Binding var isLastExercise: (last: Bool, id: UUID?)
+    
+    private let textSize: CGFloat = 15
     
     var body: some View {
         HStack {
@@ -80,6 +109,8 @@ private struct WorkoutListExerciseView: View {
                 .padding(.trailing, 20)
                 .lineLimit(1)
                 .truncationMode(.tail)
+                .minimumScaleFactor(0.5)
+                .allowsTightening(true)
             
                 .overlay(Rectangle()
                     .frame(height: 1)
@@ -93,17 +124,43 @@ private struct WorkoutListExerciseView: View {
                 .onChange(of: isExerciseNameFocused) { _, focused in
                     viewModel.validateExerciseName(focused: focused, exercise: exercise.workoutExerciseDraft, stateViewModel: stateViewModel)
                 }
-            Button(action: {
-                isDetailsVisible = true
-                addSet()
-            }) {
-                Image(systemName: "plus")
-                    .resizable()
-                    .frame(width: 18, height: 18)
-                    .padding(.trailing, 5)
-                    .foregroundStyle(Color.accentColor)
+            
+            Menu {
+                Picker(selection: $exercise.workoutExerciseDraft.exerciseType) {
+                    ForEach(ExerciseType.allCases, id: \.self) { type in
+                        Text(type.description).tag(type)
+                    }
+                } label: {}
+            } label: {
+                HStack {
+                    switch exercise.workoutExerciseDraft.exerciseType {
+                    case .weighted:
+                        Image(systemName: "dumbbell")
+                            .font(.system(size: textSize))
+                            .foregroundStyle(Color.Accent)
+                    case .timed:
+                        Image(systemName: "clock")
+                            .font(.system(size: textSize))
+                            .foregroundStyle(Color.Accent)
+                    }
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: textSize))
+                        .foregroundStyle(Color.Accent)
+                }
             }
-            .frame(width: 30, height: 30)
+            .frame(width: 40, alignment: .trailing)
+            
+            if isLastExercise.last && exercise.id == isLastExercise.id {
+                Button(action: {
+                    noPlanWorkoutViewModel.addExercise()
+                }) {
+                    Image(systemName: "plus")
+                        .resizable()
+                        .frame(width: 18, height: 18)
+                        .foregroundStyle(Color.accentColor)
+                }
+                .frame(width: 18, height: 25)
+            }
             
         }
         .frame(maxWidth: .infinity)
@@ -117,10 +174,16 @@ private struct WorkoutListExerciseView: View {
         }
         
         if isDetailsVisible {
-            List {
-                ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
-                    index in
-                    WorkoutListSeriesView(set: $exercise.workoutSeriesDraftList[index], stateViewModel: stateViewModel, viewModel: NoPlanWorkoutSetViewModel(seriesCount: index + 1))
+            VStack {
+                List {
+                    ForEach(exercise.workoutSeriesDraftList.indices, id: \.self) {
+                        index in
+                        WorkoutListSeriesView(
+                            set: $exercise.workoutSeriesDraftList[index],
+                            stateViewModel: stateViewModel,
+                            viewModel: NoPlanWorkoutSetViewModel(seriesCount: index + 1, exercsieType: exercise.workoutExerciseDraft.exerciseType),
+                            workoutModified: $workoutModified
+                        )
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             if exercise.workoutSeriesDraftList.count > 1 {
                                 Button(role: .destructive) {
@@ -130,29 +193,83 @@ private struct WorkoutListExerciseView: View {
                                 }
                             }
                         }
-                }
-            }
-            .frame(height: calculateListHeight(for: exercise.workoutSeriesDraftList.count))
-            .listStyle(PlainListStyle())
-            .introspect(.list, on: .iOS(.v17, .v18), customize: { list in
-                if setAdded {
-                    DispatchQueue.main.async {
-                        let lastIndex = IndexPath(item: self.exercise.workoutSeriesDraftList.count - 1, section: 0)
-                        if self.exercise.workoutSeriesDraftList.count > 0 {
-                            list.scrollToItem(at: lastIndex, at: .bottom, animated: true)
-                            setAdded = false
-                        }
                     }
                 }
-            }) //it's responsible for scrolling the list to the bottom
-            TextField("Note", text: $exercise.workoutExerciseDraft.note)
-                .font(.system(size: 16))
-                .frame(height: 25)
-                .padding(.horizontal, 15)
-                .padding(.top, 2)
+                .frame(height: calculateListHeight(for: exercise.workoutSeriesDraftList.count))
+                .listStyle(PlainListStyle())
+                .introspect(.list, on: .iOS(.v17, .v18), customize: { list in
+                    if setAdded {
+                        DispatchQueue.main.async {
+                            let lastIndex = IndexPath(item: self.exercise.workoutSeriesDraftList.count - 1, section: 0)
+                            if self.exercise.workoutSeriesDraftList.count > 0 {
+                                list.scrollToItem(at: lastIndex, at: .bottom, animated: true)
+                                setAdded = false
+                            }
+                        }
+                    }
+                }) //it's responsible for scrolling the list to the bottom
+                HStack {
+                    Button(action: {
+                        isDetailsVisible = true
+                        addSet()
+                    }) {
+                        Image(systemName: "plus")
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .padding(.trailing, 5)
+                            .foregroundStyle(Color.accentColor)
+                    }
+                    .frame(width: 30, height: 25)
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                TextField("Note", text: $exercise.workoutExerciseDraft.note)
+                    .font(.system(size: 16))
+                    .frame(height: 25)
+                    .padding(.horizontal, 20)
+            }
+            
+            
+            if exercise.workoutExerciseDraft.exerciseType != .timed {
+                VStack{
+                    HStack(spacing: 3) {
+                        Text("Volume:")
+                            .font(.system(size: textSize))
+                            .bold()
+                        Text(viewModel.volumeValue.description)
+                            .font(.system(size: textSize))
+                            .onAppear {
+                                viewModel.volumeValue = calculateVolume()
+                            }
+                            .onChange(of: workoutModified) { _, modified in
+                                if modified {
+                                    viewModel.volumeValue = calculateVolume()
+                                    workoutModified = false
+                                }
+                            }
+                        Text(exercise.workoutSeriesDraftList.first?.loadUnit.description ?? "-")
+                            .font(.system(size: textSize))
+                    }
+                    .foregroundStyle(Color.TextColorSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .allowsTightening(true)
+                }
+                
+            }
             
         }
-            
+        
+    }
+    
+    private func calculateVolume() -> Double {
+        var volumeValue = 0.0
+        exercise.workoutSeriesDraftList.forEach { series in
+            volumeValue += (Double(series.actualLoad) ?? 0.0) * (Double(series.actualReps) ?? 0.0)
+        }
+        
+        return volumeValue
     }
     
     private func calculateListHeight(for itemCount: Int) -> CGFloat {
@@ -192,6 +309,7 @@ private struct WorkoutListSeriesView: View {
     @Binding var set: WorkoutSeriesDraft
     @ObservedObject var stateViewModel: WorkoutStateViewModel
     @StateObject var viewModel: NoPlanWorkoutSetViewModel
+    @Binding var workoutModified: Bool
     
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
@@ -224,7 +342,7 @@ private struct WorkoutListSeriesView: View {
                     TextField(viewModel.repsHint, text: $set.actualReps)
                         .keyboardType(.decimalPad)
                         .font(.system(size: textSize))
-                        .frame(width: 40, height: outllineFrameHeight)
+                        .frame(minWidth: 40, minHeight: outllineFrameHeight)
                         .multilineTextAlignment(.trailing)
                         .padding(.horizontal, 10)
                         .overlay(
@@ -232,6 +350,9 @@ private struct WorkoutListSeriesView: View {
                                 .stroke((viewModel.showRepsError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                         )
                         .focused($isRepsFocused)
+                        .onChange(of: set.actualReps) { _, _ in
+                            workoutModified = true
+                        }
                         .onChange(of: isRepsFocused) { _, focused in
                             viewModel.validateReps(focused: focused, set: set, stateViewModel: stateViewModel)
                             showRepsToolbar = focused
@@ -244,7 +365,7 @@ private struct WorkoutListSeriesView: View {
                             }
                         }
                     
-                    Text("x")
+                    Text(viewModel.exerciseType == .timed ? "s" : "x")
                         .font(.system(size: textSize))
                         .frame(width: 10)
                         .multilineTextAlignment(.center)
@@ -253,7 +374,7 @@ private struct WorkoutListSeriesView: View {
                     TextField(viewModel.weightHint, text: $set.actualLoad)
                         .keyboardType(.decimalPad)
                         .font(.system(size: textSize))
-                        .frame(width: 55, height: outllineFrameHeight)
+                        .frame(minWidth: 55, minHeight: outllineFrameHeight)
                         .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
                         .padding(.horizontal, 10)
                         .overlay(
@@ -261,9 +382,26 @@ private struct WorkoutListSeriesView: View {
                                 .stroke((viewModel.showLoadError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
                         )
                         .focused($isLoadFocused)
+                        .onChange(of: set.actualLoad) { _, _ in
+                            workoutModified = true
+                        }
                         .onChange(of: isLoadFocused) { _, focused in
                             viewModel.validateLoad(focused: focused, set: set, stateViewModel: stateViewModel)
                             showLoadToolbar = focused
+                        }
+                        .onChange(of: viewModel.exerciseType) { _, type in
+                            if viewModel.repsHint == "Reps" && type == .timed {
+                                viewModel.repsHint = "Time"
+                            } else {
+                                viewModel.repsHint = "Reps"
+                            }
+                        }
+                        .onAppear() {
+                            if viewModel.repsHint == "Reps" && viewModel.exerciseType == .timed {
+                                viewModel.repsHint = "Time"
+                            } else {
+                                viewModel.repsHint = "Reps"
+                            }
                         }
                         .toolbar {
                             if showLoadToolbar {
@@ -277,36 +415,47 @@ private struct WorkoutListSeriesView: View {
                     Text(viewModel.weightUnitText)  // Assuming the weight unit is kilograms
                         .font(.system(size: textSize))
                     
-                    Divider()
-                        .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
-                        .background(Color(.systemGray6)) // Set color for the line
                     
-                    // Intensity Value
-                    Text("\(viewModel.intensityIndexText):")
-                        .font(.system(size: textSize))
-                    // Intensity Input
-                    TextField(viewModel.intensityHint, text: $set.actualIntensity)
-                        .keyboardType(.decimalPad)
-                        .font(.system(size: textSize))
-                        .frame(width: 35, height: outllineFrameHeight)
-                        .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
-                        .padding(.horizontal, 10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                                .stroke((viewModel.showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
-                        )
-                        .focused($isIntensityFocused)
-                        .onChange(of: isIntensityFocused) { _, focused in
-                            viewModel.validateIntensity(focused: focused, set: set, stateViewModel: stateViewModel)
-                            showIntensityToolbar = focused
-                        }
-                        .toolbar {
-                            if showIntensityToolbar {
-                                ToolbarItemGroup(placement: .keyboard) {
-                                    CustomKeyboardToolbar(textFieldValue: $set.actualIntensity)
+                    if viewModel.exerciseType != .timed {
+                        Divider()
+                            .frame(width: 2, height: 25)  // Vertical line, adjust height as needed
+                            .background(Color(.systemGray6)) // Set color for the line
+                        
+                        // Intensity Value
+                        Text("\(viewModel.intensityIndexText):")
+                            .font(.system(size: textSize))
+                        // Intensity Input
+                        TextField(viewModel.intensityHint, text: $viewModel.intensityValue)
+                            .keyboardType(.decimalPad)
+                            .font(.system(size: textSize))
+                            .frame(minWidth: 35, minHeight: outllineFrameHeight)
+                            .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                            .padding(.horizontal, 10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                                    .stroke((viewModel.showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                            )
+                            .focused($isIntensityFocused)
+                            .onChange(of: viewModel.intensityValue) { _, intensity in
+                                set.actualIntensity = intensity
+                            }
+                            .onChange(of: isIntensityFocused) { _, focused in
+                                viewModel.validateIntensity(focused: focused, set: set, stateViewModel: stateViewModel)
+                                showIntensityToolbar = focused
+                            }
+                            .onChange(of: viewModel.exerciseType) { _, type in
+                                if type == .timed {
+                                    viewModel.intensityValue = ""
                                 }
                             }
-                        }
+                            .toolbar {
+                                if showIntensityToolbar {
+                                    ToolbarItemGroup(placement: .keyboard) {
+                                        CustomKeyboardToolbar(textFieldValue: $viewModel.intensityValue)
+                                    }
+                                }
+                            }
+                    }
                 }
             }
             

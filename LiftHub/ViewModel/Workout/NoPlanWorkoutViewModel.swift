@@ -20,7 +20,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
     private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
     private var isWorkoutRepeated = false
     
-    init(planName: String, date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
+    init(planName: String, routineName: String = "", date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
         self.planName = planName
         self.date = date
         self.intensityIndex = intensityIndex
@@ -28,9 +28,10 @@ class NoPlanWorkoutViewModel: ObservableObject {
     }
     
     
-    init(workoutDraft: [WorkoutDraft], planName: String, date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
+    init(workoutDraft: [WorkoutDraft], planName: String, routineName: String = "", date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
         self.workoutDraft = workoutDraft
         self.planName = planName
+        self.routineName = routineName
         self.date = date
         self.intensityIndex = intensityIndex
         self.weightUnit = weightUnit
@@ -153,6 +154,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
         for (index, pair) in workoutDraft.enumerated() {
             let loadUnit = pair.workoutSeriesDraftList[0].loadUnit
             let exerciseDraft = ExerciseDraft(
+                exerciseTpe: pair.workoutExerciseDraft.exerciseType,
                 name: pair.workoutExerciseDraft.name,
                 pause: pair.workoutExerciseDraft.pause,
                 pauseUnit: pair.workoutExerciseDraft.pauseUnit,

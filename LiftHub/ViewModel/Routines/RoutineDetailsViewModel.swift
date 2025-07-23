@@ -26,6 +26,11 @@ class RoutineDetailsViewModel: ObservableObject {
     
     var planName: String = ""
     
+    init(routineDraft: [ExerciseDraft] = [], routineName: String = "") {
+        self.routineDraft = routineDraft
+        self.routineName = routineName
+    }
+    
     func setPlanName(planName: String){
         self.planName = planName
     }
@@ -78,6 +83,7 @@ class RoutineDetailsViewModel: ObservableObject {
         // Try to get the routine and handle possible exceptions
         do {
             let routine = try getRoutine()
+            
             exercisesDatabaseHelper.addRoutine(routine: routine, routineName: routineName, planId: routinesViewModel.planId, originalRoutineName: originalRoutineName)
             
             routinesViewModel.showToast = true

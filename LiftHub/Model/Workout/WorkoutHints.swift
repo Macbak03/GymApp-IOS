@@ -10,10 +10,10 @@ import Foundation
 struct WorkoutHints {
     var repsHint: String
     var weightHint: String
-    var intensityHint: String
+    var intensityHint: String?
     var noteHint: String
     
-    init(repsHint: String, weightHint: String, intensityHint: String, noteHint: String) {
+    init(repsHint: String, weightHint: String, intensityHint: String?, noteHint: String) {
         self.repsHint = repsHint
         self.weightHint = weightHint
         self.intensityHint = intensityHint

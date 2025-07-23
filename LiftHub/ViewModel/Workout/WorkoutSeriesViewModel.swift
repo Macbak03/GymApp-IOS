@@ -13,7 +13,8 @@ class WorkoutSeriesViewModel: ObservableObject {
     
     @Published var repsHint: String = "Reps"
     @Published var weightHint: String = "Weight"
-    @Published var intensityHint: String = "RPE"
+    @Published var intensityHint: String? = "RPE"
+    @Published var intensityValue: String = ""
     
     @Published var intensityIndexText: String = "RPE"
     @Published var weightUnitText: String = "kg"
@@ -30,6 +31,7 @@ class WorkoutSeriesViewModel: ObservableObject {
     func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints, setCompariosn: WorkoutHints, selectedComparingMethod: SelectedComparingMethod){
         self.weightUnitText = series.loadUnit.rawValue
         self.intensityIndexText = series.intensityIndex.rawValue
+        self.intensityValue = series.actualIntensity ?? ""
         
         if selectedComparingMethod == .trainingPlan {
             self.repsHint = hint.repsHint
@@ -103,7 +105,7 @@ class WorkoutSeriesViewModel: ObservableObject {
     }
     
     private func handleEmptyIntensityException(series: WorkoutSeriesDraft) throws {
-        guard let _ = Int(intensityHint) else {
+        guard let _ = Int(intensityHint!) else {
             throw ValidationException(message: "\(series.intensityIndex) can't be in ranged or floating point number value")
         }
     }
@@ -111,7 +113,10 @@ class WorkoutSeriesViewModel: ObservableObject {
     func validateIntensity(focused: Bool, series: WorkoutSeriesDraft, stateViewModel: WorkoutStateViewModel) {
         if !focused {
             do {
-                if series.actualIntensity.isEmpty {
+                guard let intensity = series.actualIntensity else {
+                    return
+                }
+                if intensity.isEmpty && intensityHint != nil {
                     try handleEmptyIntensityException(series: series)
                 } else {
                     try _ = IntensityFactory.fromStringForWorkout(series.actualIntensity, index: series.intensityIndex)

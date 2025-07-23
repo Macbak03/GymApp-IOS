@@ -56,15 +56,20 @@ struct EditHistoryDetailsView: View {
                 }
             }
             .fullScreenCover(isPresented: $viewModel.repeatWorkout) {
-                NoPlanWorkoutView(
-                    viewModel:
-                        NoPlanWorkoutViewModel(
-                            workoutDraft: viewModel.workoutDraft,
-                            planName: viewModel.planName,
-                            date: CustomDate.getCurrentDate(),
-                            intensityIndex: viewModel.intensityIndex,
-                            weightUnit: viewModel.weightUnit)
-                )
+                if viewModel.planName == Constants.NO_PLAN_NAME {
+                    NoPlanWorkoutView(
+                        viewModel:
+                            NoPlanWorkoutViewModel(
+                                workoutDraft: viewModel.workoutDraft,
+                                planName: viewModel.planName,
+                                routineName: viewModel.routineName,
+                                date: CustomDate.getCurrentDate(),
+                                intensityIndex: viewModel.intensityIndex,
+                                weightUnit: viewModel.weightUnit)
+                    )
+                } else {
+                    WorkoutView(viewModel: WorkoutViewModel(planName: viewModel.planName, routineName: viewModel.routineName, date: CustomDate.getCurrentDate()), homeStateViewModel: HomeStateViewModel())
+                }
             }
         }
     }

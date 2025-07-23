@@ -18,25 +18,30 @@ class EditHistoryDetailsSeriesViewModel: ObservableObject {
     @Published var intensityIndexText: String = "RPE"
     @Published var weightUnitText: String = "kg"
     
+    @Published var intensityValue: String = ""
+    @Published var exerciseType: ExerciseType
+    
     @Published var showLoadError = false
     @Published var showRepsError = false
     @Published var showIntensityError = false
     
-    init(seriesCount: Int, position: Int) {
+    init(seriesCount: Int, position: Int, exerciseType: ExerciseType) {
         self.seriesCount = seriesCount
         self.position = position
+        self.exerciseType = exerciseType
     }
     
     func initValues(series: WorkoutSeriesDraft){
         self.weightUnitText = series.loadUnit.rawValue
         self.intensityIndexText = series.intensityIndex.rawValue
         self.intensityHint = series.intensityIndex.rawValue
+        self.intensityValue = series.actualIntensity ?? ""
     }
     
     func validateReps(focused: Bool, parentViewModel: EditHistoryDetailsViewModel, series: WorkoutSeriesDraft) {
         if !focused {
             do {
-                try _ = RepsFactory.fromString(series.actualReps)
+                try _ = RepsFactory.fromString(series.actualReps, exerciseType: exerciseType)
             } catch let error as ValidationException {
                 showRepsError = true
                 parentViewModel.setToast(errorMessage: error.message)

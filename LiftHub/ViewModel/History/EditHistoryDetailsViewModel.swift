@@ -13,6 +13,7 @@ class EditHistoryDetailsViewModel: ObservableObject {
     @Published var toastMessage = ""
     
     @Published var planName = ""
+    @Published var routineName = ""
     
     @Published var historySuccessfullyEdited = false
     
@@ -26,8 +27,9 @@ class EditHistoryDetailsViewModel: ObservableObject {
     
     func loadRoutine(historyElementViewModel: HistoryElementViewModel) {
         planName = historyElementViewModel.historyElement.planName
+        routineName =  historyElementViewModel.historyElement.routineName
         let rawDate = historyElementViewModel.historyElement.rawDate
-        let workoutExercises = workoutHistoryDatabaseHelper.getWorkoutExercises(date: historyElementViewModel.historyElement.rawDate, routineName: historyElementViewModel.historyElement.routineName, planName: historyElementViewModel.historyElement.planName)
+        let workoutExercises = workoutHistoryDatabaseHelper.getWorkoutExercises(date: historyElementViewModel.historyElement.rawDate, routineName: routineName, planName: planName)
         for workoutExercise in workoutExercises {
             guard let exerciseId = workoutHistoryDatabaseHelper.getExerciseID(date: rawDate, exerciseName: workoutExercise.name) else {
                 print("exercise id in EditHistoryDetails was null")
@@ -45,7 +47,7 @@ class EditHistoryDetailsViewModel: ObservableObject {
             do {
                 let workoutSeries = try getWorkoutSeries(groupPosition: groupPosition)
                 for (index, set) in workoutSeries.enumerated() {
-                    workoutSeriesDatabaseHelper.updateSeriesValues(exerciseId: exerciseIds[groupPosition], setOrder: Int64(index + 1), actualReps: set.actualReps, loadValue: set.load.weight, intensityValue: Int(set.actualIntensity.description)!)
+                    workoutSeriesDatabaseHelper.updateSeriesValues(exerciseId: exerciseIds[groupPosition], setOrder: Int64(index + 1), actualReps: set.actualReps, loadValue: set.load.weight, intensityValue: Int(set.actualIntensity?.description ?? ""))
                 }
                 workoutHistoryDatabaseHelper.updateNotes(date: rawDate, exerciseId: exerciseIds[groupPosition], newNote: workoutDraft[groupPosition].workoutExerciseDraft.note)
             } catch let error as ValidationException {

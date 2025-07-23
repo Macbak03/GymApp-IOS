@@ -33,15 +33,21 @@ class WorkoutViewModel: ObservableObject {
         }
         let savedRoutine = exercisesDatabaseHelper.getRoutine(routineName: routineName, planId: String(planId))
         for (index, savedExercise) in savedRoutine.enumerated() {
-            let exercise = WorkoutExerciseDraft(name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, loadUnit: savedExercise.loadUnit,intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
-            let seriesList: [WorkoutSeriesDraft] = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
+            let exercise = WorkoutExerciseDraft(exerciseType: savedExercise.exerciseType, name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, loadUnit: savedExercise.loadUnit, intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
+            let seriesList: [WorkoutSeriesDraft]
+            if savedExercise.intensity == nil {
+                seriesList = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: nil), count: Int(savedExercise.series)!)
+            } else {
+                seriesList = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
+            }
+
             workoutDraft.append(WorkoutDraft(workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
             let savedNotes = workoutHistoryDatabaseHelper.getLastTrainingNotes(planName: planName, routineName: routineName)
             if !savedNotes.isEmpty {
                 if index < savedNotes.count {
                     let note = savedNotes[index]
                     if !note.isEmpty {
-                        let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint:           savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
+                        let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
                         self.workoutHints.append(workoutHint)
                     } else {
                         let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
@@ -139,6 +145,7 @@ class WorkoutViewModel: ObservableObject {
         for (index, pair) in workoutDraft.enumerated() {
             let loadUnit = pair.workoutSeriesDraftList[0].loadUnit
             let exerciseDraft = ExerciseDraft(
+                exerciseTpe: pair.workoutExerciseDraft.exerciseType,
                 name: pair.workoutExerciseDraft.name,
                 pause: pair.workoutExerciseDraft.pause,
                 pauseUnit: pair.workoutExerciseDraft.pauseUnit,

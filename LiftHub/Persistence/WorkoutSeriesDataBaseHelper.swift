@@ -22,12 +22,13 @@ class WorkoutSeriesDataBaseHelper : Repository{
     private let seriesOrder = SQLite.Expression<Int64>(SERIES_ORDER_COLUMN)
     private let actualReps = SQLite.Expression<Double>(ACTUAL_REPS_COLUMN)
     private let loadValue = SQLite.Expression<Double>(LOAD_VALUE_COLUMN)
-    private let intensityValue = SQLite.Expression<Int>(INTENSITY_VALUE)
+    private let intensityValue = SQLite.Expression<Int?>(INTENSITY_VALUE)
     
     private let workoutHistoryTable = Table(WorkoutHistoryDataBaseHelper.TABLE_NAME)
     private let workoutHistoryExericseId = SQLite.Expression<Int64>(WorkoutHistoryDataBaseHelper.EXERCISE_ID_COLUMN)
     private let workoutHistoryLoadUnit = SQLite.Expression<String>(WorkoutHistoryDataBaseHelper.LOAD_UNIT_COLUMN)
     private let workoutHistoryIntensityIndex = SQLite.Expression<String>(WorkoutHistoryDataBaseHelper.INTENSITY_INDEX_COLUMN)
+    
 
     // Create the table if it doesn't exist
     override func createTableIfNotExists() {
@@ -46,6 +47,7 @@ class WorkoutSeriesDataBaseHelper : Repository{
             print("Error creating table: \(error)")
         }
     }
+    
 
     // MARK: - Get Series Cursor
     private func getSeriesCursor(exerciseId: Int64) -> AnySequence<Row>? {
@@ -105,7 +107,11 @@ class WorkoutSeriesDataBaseHelper : Repository{
                     let loadValue = try row.get(self.loadValue)
                     let intensityValue = try row.get(self.intensityValue)
                     if let loadUnit = getLoadUnit(exerciseId: exerciseId), let intensityIndex = getIntensityIndex(exerciseId: exerciseId) {
-                        workoutSeries.append(WorkoutSeriesDraft(actualReps: String(actualRepsValue), actualLoad: String(loadValue), loadUnit: loadUnit, intensityIndex: intensityIndex, actualIntensity: String(intensityValue)))
+                        if intensityValue == nil {
+                            workoutSeries.append(WorkoutSeriesDraft(actualReps: String(actualRepsValue), actualLoad: String(loadValue), loadUnit: loadUnit, intensityIndex: intensityIndex, actualIntensity: nil))
+                        } else {
+                            workoutSeries.append(WorkoutSeriesDraft(actualReps: String(actualRepsValue), actualLoad: String(loadValue), loadUnit: loadUnit, intensityIndex: intensityIndex, actualIntensity: String(intensityValue!)))
+                        }
                     }
                 } catch {
                     print ("Error getting series \(error)")
@@ -116,7 +122,7 @@ class WorkoutSeriesDataBaseHelper : Repository{
     }
 
     // MARK: - Update Series Values
-    func updateSeriesValues(exerciseId: Int64, setOrder: Int64, actualReps: Double, loadValue: Double, intensityValue: Int) {
+    func updateSeriesValues(exerciseId: Int64, setOrder: Int64, actualReps: Double, loadValue: Double, intensityValue: Int?) {
         do {
             let query = workoutSeriesTable
                 .filter(self.exerciseId == exerciseId && self.seriesOrder == setOrder)
@@ -147,7 +153,7 @@ class WorkoutSeriesDataBaseHelper : Repository{
                 
                 let actualReps = actualRepsDouble.description
                 let loadValue = loadValueDouble.description
-                let intensityValue = intensityValueInt.description
+                let intensityValue = intensityValueInt?.description
                 let loadUnit = getLoadUnit(exerciseId: exerciseId)
                 let intensityIndex = getIntensityIndex(exerciseId: exerciseId)
                 sets.append(WorkoutSeriesDraft(actualReps: actualReps, actualLoad: loadValue, loadUnit: loadUnit!, intensityIndex: intensityIndex!, actualIntensity: intensityValue))

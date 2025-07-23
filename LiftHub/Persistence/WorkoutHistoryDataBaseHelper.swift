@@ -28,11 +28,20 @@ class WorkoutHistoryDataBaseHelper: Repository {
     private let repsRangeFrom = SQLite.Expression<Int>("repsRangeFrom")
     private let repsRangeTo = SQLite.Expression<Int>("repsRangeTo")
     private let series = SQLite.Expression<Int>("series")
-    private let intensityRangeFrom = SQLite.Expression<Int>("intensityRangeFrom")
-    private let intensityRangeTo = SQLite.Expression<Int>("intensityRangeTo")
+    private let intensityRangeFrom = SQLite.Expression<Int?>("intensityRangeFrom")
+    private let intensityRangeTo = SQLite.Expression<Int?>("intensityRangeTo")
     private let intensityIndex = SQLite.Expression<String>(INTENSITY_INDEX_COLUMN)
-    private let pace = SQLite.Expression<String>("pace")
+    private let pace = SQLite.Expression<String?>("pace")
     private let notes = SQLite.Expression<String>("notes")
+    private let exerciseType = SQLite.Expression<String>("exerciseType")
+    
+    override init() {
+        super.init()
+        if !UserDefaultsUtils.shared.wasHistoryDatabaseMigrationPerformed() {
+            migrateTable()
+            addExerciseTypeColumn()
+        }
+    }
     
     // Create the table if it doesn't exist
     override func createTableIfNotExists() {
@@ -58,6 +67,70 @@ class WorkoutHistoryDataBaseHelper: Repository {
             })
         } catch {
             print("Error creating table: \(error)")
+        }
+    }
+    
+    private func migrateTable() {
+        let tableName = WorkoutHistoryDataBaseHelper.TABLE_NAME
+        let helperTableName = "\(tableName)_old"
+        let seriesTableName = WorkoutSeriesDataBaseHelper.TABLE_NAME
+        let seriesHelperTableName = "\(seriesTableName)_old"
+        do {
+            try db?.transaction {
+                try db?.run("ALTER TABLE \(tableName) RENAME TO \(helperTableName)")
+                createTableIfNotExists()
+                let columns = [
+                    "exerciseID", "date", "planName", "routineName", "exerciseOrder",
+                    "exerciseName", "pauseRangeFrom", "pauseRangeTo", "loadUnit",
+                    "repsRangeFrom", "repsRangeTo", "series",
+                    "intensityRangeFrom", "intensityRangeTo", "intensityIndex", "pace", "notes"
+                ].joined(separator: ", ")
+                try db?.run("""
+                        INSERT INTO \(tableName) (\(columns))
+                        SELECT \(columns) FROM \(helperTableName)
+                    """)
+                
+                try db?.run("ALTER TABLE \(seriesTableName) RENAME TO \(seriesHelperTableName)")
+                let workoutSeriesTable = Table(seriesTableName)
+                let exerciseId = SQLite.Expression<Int64>(WorkoutSeriesDataBaseHelper.EXERCISE_ID_COLUMN)
+                let seriesOrder = SQLite.Expression<Int64>(WorkoutSeriesDataBaseHelper.SERIES_ORDER_COLUMN)
+                let actualReps = SQLite.Expression<Double>(WorkoutSeriesDataBaseHelper.ACTUAL_REPS_COLUMN)
+                let loadValue = SQLite.Expression<Double>(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)
+                let intensityValue = SQLite.Expression<Int?>(WorkoutSeriesDataBaseHelper.INTENSITY_VALUE)
+                try db?.run(workoutSeriesTable.create(ifNotExists: true) { table in
+                    table.column(exerciseId)
+                    table.column(seriesOrder)
+                    table.column(actualReps)
+                    table.column(loadValue)
+                    table.column(intensityValue)
+                    
+                    // Foreign key constraint
+                    table.foreignKey(exerciseId, references: workoutHistoryTable, self.exerciseId, update: .cascade, delete: .cascade)
+                })
+                let seriesColumns = [
+                    WorkoutSeriesDataBaseHelper.EXERCISE_ID_COLUMN, WorkoutSeriesDataBaseHelper.SERIES_ORDER_COLUMN,
+                    WorkoutSeriesDataBaseHelper.ACTUAL_REPS_COLUMN, WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN,
+                    WorkoutSeriesDataBaseHelper.INTENSITY_VALUE,
+                ].joined(separator: ", ")
+                try db?.run("""
+                            INSERT INTO \(seriesTableName) (\(seriesColumns))
+                            SELECT \(seriesColumns) FROM \(seriesHelperTableName)
+                        """)
+                try db?.run("DROP TABLE \(seriesHelperTableName)")
+                try db?.run("DROP TABLE \(helperTableName)")
+                UserDefaultsUtils.shared.setHistoryDatabaseMigrationPerformed(true)
+                print("History database migration completed")
+            }
+        } catch {
+            print("History migration failed: \(error)")
+        }
+    }
+    
+    private func addExerciseTypeColumn() {
+        do {
+            try db?.run(workoutHistoryTable.addColumn(exerciseType, defaultValue: ExerciseType.weighted.description))
+        } catch {
+            print("Adding exercise type column failed: \(error)")
         }
     }
     
@@ -87,8 +160,8 @@ class WorkoutHistoryDataBaseHelper: Repository {
                 toReps = rangeReps.to
             }
             
-            var fromIntensity = 0
-            var toIntensity = 0
+            var fromIntensity: Int? = nil
+            var toIntensity: Int? = nil
             var intensityIndexValue = ""
             
             // Handle intensity (ExactIntensity, RangeIntensity)
@@ -118,8 +191,9 @@ class WorkoutHistoryDataBaseHelper: Repository {
                 self.intensityRangeFrom <- fromIntensity,
                 self.intensityRangeTo <- toIntensity,
                 self.intensityIndex <- intensityIndexValue,
-                self.pace <- workoutExercise.exercise.pace.description,
-                self.notes <- workoutExercise.note
+                self.pace <- workoutExercise.exercise.pace?.description,
+                self.notes <- workoutExercise.note,
+                self.exerciseType <- workoutExercise.exercise.exerciseType.description
             ))
         } catch {
             print("Error adding exercise to history: \(error)")
@@ -133,15 +207,14 @@ class WorkoutHistoryDataBaseHelper: Repository {
             let seriesOrder = SQLite.Expression<Int64>(WorkoutSeriesDataBaseHelper.SERIES_ORDER_COLUMN)
             let actualReps = SQLite.Expression<Double>(WorkoutSeriesDataBaseHelper.ACTUAL_REPS_COLUMN)
             let loadValue = SQLite.Expression<Double>(WorkoutSeriesDataBaseHelper.LOAD_VALUE_COLUMN)
-            let intensityValue = SQLite.Expression<Int>(WorkoutSeriesDataBaseHelper.INTENSITY_VALUE)
-            
+            let intensityValue = SQLite.Expression<Int?>(WorkoutSeriesDataBaseHelper.INTENSITY_VALUE)
             
             try db?.run(seriesTable.insert(
                 exerciseIdColumn <- exerciseId,
                 seriesOrder <- Int64(series.seriesCount),
                 actualReps <- series.actualReps,
                 loadValue <- series.load.weight,
-                intensityValue <- Int(series.actualIntensity.description)!
+                intensityValue <- Int(series.actualIntensity?.description ?? "")
             ))
         } catch {
             print("Error adding series to history: \(error)")
@@ -317,7 +390,10 @@ class WorkoutHistoryDataBaseHelper: Repository {
                 let pace = try row.get(self.pace)
                 let note = try row.get(self.notes)
                 
+                let exerciseType = ExerciseType(rawValue: try row.get(self.exerciseType)) ?? .weighted
+
                 let workoutExercise = WorkoutExerciseDraft(
+                    exerciseType: exerciseType,
                     name: exerciseName,
                     pause: pause,
                     pauseUnit: pauseUnit,

@@ -18,17 +18,21 @@ class NoPlanWorkoutSetViewModel: ObservableObject {
     @Published var showLoadError = false
     @Published var showRepsError = false
     @Published var showIntensityError = false
+    @Published var exerciseType: ExerciseType
+    
+    @Published var intensityValue: String = ""
     
     let seriesCount: Int
     
-    init(seriesCount: Int) {
+    init(seriesCount: Int, exercsieType: ExerciseType) {
         self.seriesCount = seriesCount
+        self.exerciseType = exercsieType
     }
     
     func validateReps(focused: Bool, set: WorkoutSeriesDraft,  stateViewModel: WorkoutStateViewModel) {
         if !focused {
             do {
-                try _ = RepsFactory.fromString(set.actualReps)
+                try _ = RepsFactory.fromString(set.actualReps, exerciseType: exerciseType)
             } catch let error as ValidationException {
                 showRepsError = true
                 stateViewModel.setToast(errorMessage: error.message)

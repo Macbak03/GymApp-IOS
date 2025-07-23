@@ -12,6 +12,10 @@ class UserDefaultsUtils {
     private let themeKey = "theme"
     private let intensityKey = "intensity"
     private let weightUnitKey = "weightUnit"
+    
+    private let exerciseDatabaseMigrationKey = "exerciseDatabaseMigration"
+    private let historyDatabaseMigrationKey = "historyDatabaseMigration"
+    private let seriesDatabaseMigrationKey = "seriesDatabaseMigration"
 
     func getTheme() -> String {
         return UserDefaults.standard.string(forKey: themeKey) ?? "Light"
@@ -105,4 +109,39 @@ class UserDefaultsUtils {
         UserDefaults.standard.bool(forKey: Constants.HAS_WORKOUT_ENDED)
     }
     
+    func setExerciseDatabaseMigrationPerformed(_ migrationPerformed: Bool) {
+        UserDefaults.standard.setValue(migrationPerformed, forKey: exerciseDatabaseMigrationKey)
+    }
+    
+    func wasExerciseDatabaseMigrationPerformed() -> Bool {
+        UserDefaults.standard.bool(forKey: exerciseDatabaseMigrationKey)
+    }
+    
+    func removeExerciseDatabaseMigrationPerformed() {
+        UserDefaults.standard.removeObject(forKey: exerciseDatabaseMigrationKey)
+    }
+    
+    func setHistoryDatabaseMigrationPerformed(_ migrationPerformed: Bool) {
+        UserDefaults.standard.setValue(migrationPerformed, forKey: historyDatabaseMigrationKey)
+    }
+    
+    func wasHistoryDatabaseMigrationPerformed() -> Bool {
+        UserDefaults.standard.bool(forKey: historyDatabaseMigrationKey)
+    }
+    
+    func removeHistoryDatabaseMigrationPerformed() {
+        UserDefaults.standard.removeObject(forKey: historyDatabaseMigrationKey)
+    }
+    
+    func setSeriesDatabaseMigrationPerformed(_ migrationPerformed: Bool) {
+        UserDefaults.standard.setValue(migrationPerformed, forKey: seriesDatabaseMigrationKey)
+    }
+    
+    func wasSeriesDatabaseMigrationPerformed() -> Bool {
+        UserDefaults.standard.bool(forKey: seriesDatabaseMigrationKey)
+    }
+    
+    func removeSeriesDatabaseMigrationPerformed() {
+        UserDefaults.standard.removeObject(forKey: seriesDatabaseMigrationKey)
+    }
 }

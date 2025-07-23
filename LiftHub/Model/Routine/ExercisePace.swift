@@ -51,9 +51,10 @@ struct ExercisePace {
         return "\(eccentricPhase.description)\(midLiftPause.description)\(concentricPhase.description)\(endLiftPause.description)"
     }
 
-    static func fromString(_ pace: String?, position: Int = 0) throws -> ExercisePace {
+    static func fromString(_ pace: String?, position: Int = 0) throws -> ExercisePace? {
         guard let pace = pace, !pace.isEmpty else {
-            throw ValidationException(message: "Pace cannot be empty", position: position)
+            //throw ValidationException(message: "Pace cannot be empty", position: position)
+            return nil
         }
 
         let regex = try! NSRegularExpression(pattern: "^[x\\d]{4}$")

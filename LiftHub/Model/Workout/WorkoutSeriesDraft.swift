@@ -13,9 +13,9 @@ struct WorkoutSeriesDraft: Codable, Identifiable, Hashable {
     var actualLoad: String
     var loadUnit: WeightUnit
     var intensityIndex: IntensityIndex
-    var actualIntensity: String
+    var actualIntensity: String?
     
-    init(id: UUID = UUID(), actualReps: String, actualLoad: String, loadUnit: WeightUnit, intensityIndex: IntensityIndex, actualIntensity: String) {
+    init(id: UUID = UUID(), actualReps: String, actualLoad: String, loadUnit: WeightUnit, intensityIndex: IntensityIndex, actualIntensity: String?) {
         self.id = id
         self.actualReps = actualReps
         self.actualLoad = actualLoad

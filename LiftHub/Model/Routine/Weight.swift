@@ -33,7 +33,7 @@ struct Weight: Equatable {
 
     // Function to create Weight from a string with unit
     static func fromStringWithUnit(_ weight: String?, unit: WeightUnit) throws -> Weight {
-        guard let weight = weight, !weight.isEmpty else {
+        guard let weight = weight?.dotFormatted, !weight.isEmpty else {
             throw ValidationException(message: "Load cannot be empty")
         }
 

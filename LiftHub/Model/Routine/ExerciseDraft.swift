@@ -9,6 +9,7 @@ import Foundation
 
 class ExerciseDraft: ObservableObject, Identifiable {
     @Published var id = UUID()
+    @Published var exerciseType: ExerciseType
     @Published var name: String
     @Published var pause: String
     @Published var pauseUnit: TimeUnit
@@ -16,12 +17,13 @@ class ExerciseDraft: ObservableObject, Identifiable {
     @Published var loadUnit: WeightUnit
     @Published var series: String
     @Published var reps: String
-    @Published var intensity: String
+    @Published var intensity: String?
     @Published var intensityIndex: IntensityIndex
-    @Published var pace: String
+    @Published var pace: String?
     @Published var wasModified: Bool
     
-    init(name: String, pause: String, pauseUnit: TimeUnit, load: String, loadUnit: WeightUnit, series: String, reps: String, intensity: String, intensityIndex: IntensityIndex, pace: String, wasModified: Bool) {
+    init(exerciseTpe: ExerciseType = .weighted, name: String, pause: String, pauseUnit: TimeUnit, load: String, loadUnit: WeightUnit, series: String, reps: String, intensity: String?, intensityIndex: IntensityIndex, pace: String?, wasModified: Bool) {
+        self.exerciseType = exerciseTpe
         self.name = name
         self.pause = pause
         self.pauseUnit = pauseUnit
@@ -44,7 +46,7 @@ class ExerciseDraft: ObservableObject, Identifiable {
         // Convert pause, weight, reps, intensity, and pace with appropriate error handling
         let pauseDuration = try PauseFactory.fromString(pause, unit: pauseUnit)
         let weight = try Weight.fromStringWithUnit(load, unit: loadUnit)
-        let reps = try RepsFactory.fromString(reps)
+        let reps = try RepsFactory.fromString(reps, exerciseType: exerciseType)
 
         // Validate series
         if series.isEmpty {
@@ -64,7 +66,7 @@ class ExerciseDraft: ObservableObject, Identifiable {
         let pace = try ExercisePace.fromString(pace)
 
         // Create and return an Exercise instance
-        return Exercise(name: name, pause: pauseDuration, load: weight, series: intSeries, reps: reps, intensity: intensity, pace: pace)
+        return Exercise(exerciseType: exerciseType, name: name, pause: pauseDuration, load: weight, series: intSeries, reps: reps, intensity: intensity, pace: pace)
     }
 
 }

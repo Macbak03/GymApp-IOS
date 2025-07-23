@@ -93,7 +93,7 @@ private struct EditHistoryDetailsListExerciseView: View {
                         HStack(spacing: VSpacing) {
                             Text("Pace:")
                                 .font(.system(size: textSize))
-                            Text(viewModel.paceValue)
+                            Text(viewModel.paceValue ?? "-")
                                 .font(.system(size: textSize))
                                 //.frame(maxWidth: maxWidth, maxHeight: maxHeight)
                         }
@@ -123,7 +123,7 @@ private struct EditHistoryDetailsListExerciseView: View {
                 HistoryDetailsListSeriesView(
                     series: $exercise.workoutSeriesDraftList[index],
                     editHistoryDetailsViewModel: editHistoryDetailsViewModel,
-                    viewModel: EditHistoryDetailsSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index),
+                    viewModel: EditHistoryDetailsSeriesViewModel(seriesCount: exercise.workoutSeriesDraftList.count, position: index, exerciseType: exercise.workoutExerciseDraft.exerciseType),
                     workoutModified: $workoutModified
                 )
             }
@@ -138,30 +138,32 @@ private struct EditHistoryDetailsListExerciseView: View {
                 )
                 .padding(.horizontal, 15)
             
-            HStack {
-                Text("Volume:")
-                    .font(.system(size: textSize))
-                    .bold()
-                Text(viewModel.volumeValue.description)
-                    .font(.system(size: textSize))
-                    .onAppear {
-                        viewModel.volumeValue = calculateVolume()
-                    }
-                    .onChange(of: workoutModified) { _, modified in
-                        if modified {
+            if exercise.workoutExerciseDraft.exerciseType != .timed {
+                HStack(spacing: 3) {
+                    Text("Volume:")
+                        .font(.system(size: textSize))
+                        .bold()
+                    Text(viewModel.volumeValue.description)
+                        .font(.system(size: textSize))
+                        .onAppear {
                             viewModel.volumeValue = calculateVolume()
-                            workoutModified = false
                         }
-                    }
-                Text(exercise.workoutSeriesDraftList.first?.loadUnit.descritpion ?? "-")
-                    .font(.system(size: textSize))
+                        .onChange(of: workoutModified) { _, modified in
+                            if modified {
+                                viewModel.volumeValue = calculateVolume()
+                                workoutModified = false
+                            }
+                        }
+                    Text(exercise.workoutSeriesDraftList.first?.loadUnit.description ?? "-")
+                        .font(.system(size: textSize))
+                }
+                .foregroundStyle(Color.TextColorSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .allowsTightening(true)
             }
-            .foregroundStyle(Color.TextColorSecondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 20)
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .allowsTightening(true)
             Divider()
                 .frame(maxWidth: .infinity, maxHeight: 2)  // Vertical line, adjust height as needed
                 .background(Color(.systemGray6)) // Set color for the line
@@ -184,7 +186,6 @@ private struct HistoryDetailsListSeriesView: View {
     @ObservedObject var editHistoryDetailsViewModel: EditHistoryDetailsViewModel
     @StateObject var viewModel: EditHistoryDetailsSeriesViewModel
     @Binding var workoutModified: Bool
-    
     @FocusState private var isLoadFocused: Bool
     @FocusState private var isRepsFocused: Bool
     @FocusState private var isIntensityFocused: Bool
@@ -198,6 +199,7 @@ private struct HistoryDetailsListSeriesView: View {
     
     private let textSize: CGFloat = 15
     private let outllineFrameHeight: CGFloat = 25
+    
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -234,9 +236,13 @@ private struct HistoryDetailsListSeriesView: View {
                             }
                         }
                     }
+                    .onAppear() {
+                        if viewModel.repsHint == "Reps" && viewModel.exerciseType == .timed {
+                            viewModel.repsHint = "Time"
+                        }
+                    }
                 
-                // Multiplication Sign
-                Text("x")
+                Text(viewModel.exerciseType == .timed ? "s" : "x")
                     .font(.system(size: textSize))
                     .frame(width: 10)
                     .multilineTextAlignment(.center)
@@ -277,32 +283,37 @@ private struct HistoryDetailsListSeriesView: View {
                     .background(Color(.systemGray6)) // Set color for the line
                 
                 // Intensity Value
-                Text("\(viewModel.intensityIndexText):")
-                    .font(.system(size: textSize))
-                // Intensity Input
-                TextField(viewModel.intensityHint, text: $series.actualIntensity)
-                    .keyboardType(.decimalPad)
-                    .font(.system(size: textSize))
-                    .frame(width: 40,height: 25)
-                    .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
-                    .padding(.horizontal, 10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: textFieldCornerRadius)
-                            .stroke((viewModel.showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
-                    )
-                    .focused($isIntensityFocused)
-                    .onChange(of: isIntensityFocused) { _, focused in
-                        viewModel.validateIntensity(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
-                        showIntensityToolbar = focused
-                    }
-                    .toolbar {
-                        if showIntensityToolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                CustomKeyboardToolbar(textFieldValue: $series.actualIntensity)
+                if series.actualIntensity != nil {
+                    Text("\(viewModel.intensityIndexText):")
+                        .font(.system(size: textSize))
+                    // Intensity Input
+                    TextField(viewModel.intensityHint, text: $viewModel.intensityValue)
+                        .keyboardType(.decimalPad)
+                        .font(.system(size: textSize))
+                        .frame(width: 40,height: 25)
+                        .multilineTextAlignment(.leading)// Equivalent to textAlignment="textEnd"
+                        .padding(.horizontal, 10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: textFieldCornerRadius)
+                                .stroke((viewModel.showIntensityError ? Color.red : Color.textFieldOutline), lineWidth: textFieldStrokeLineWidth)
+                        )
+                        .focused($isIntensityFocused)
+                        .onChange(of: viewModel.intensityValue) { _, intensity in
+                            series.actualIntensity = intensity
+                        }
+                        .onChange(of: isIntensityFocused) { _, focused in
+                            viewModel.validateIntensity(focused: focused, parentViewModel: editHistoryDetailsViewModel, series: series)
+                            showIntensityToolbar = focused
+                        }
+                        .toolbar {
+                            if showIntensityToolbar {
+                                ToolbarItemGroup(placement: .keyboard) {
+                                    CustomKeyboardToolbar(textFieldValue: $viewModel.intensityValue)
+                                }
                             }
                         }
-                    }
-                    .padding(.trailing, 5)
+                        .padding(.trailing, 5)
+            }
                 
             }
             .padding(.top, 5)  // Equivalent to layout_marginTop="5dp"

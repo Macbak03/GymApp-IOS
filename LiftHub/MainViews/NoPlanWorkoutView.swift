@@ -99,22 +99,22 @@ struct NoPlanWorkoutView: View {
                         Text("Back")
                     }
                 }
-                ToolbarItem(placement: .bottomBar) {
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            viewModel.addExercise()
-                        }) {
-                            Image(systemName: "plus")
-                                .resizable()
-                                .frame(width: 22, height: 22)
-                                .padding(.trailing, 5)
-                                .foregroundStyle(Color.accentColor)
-                        }
-                        .frame(width: 30, height: 30)
-                        .padding(.trailing)
-                    }
-                }
+//                ToolbarItem(placement: .bottomBar) {
+//                    HStack {
+//                        Spacer()
+//                        Button(action: {
+//                            viewModel.addExercise()
+//                        }) {
+//                            Image(systemName: "plus")
+//                                .resizable()
+//                                .frame(width: 22, height: 22)
+//                                .padding(.trailing, 5)
+//                                .foregroundStyle(Color.accentColor)
+//                        }
+//                        .frame(width: 30, height: 30)
+//                        .padding(.trailing)
+//                    }
+//                }
             }
             .onChange(of: stateViewModel.isWorkoutFinished) { oldValue, newValue in
                 if newValue == true {
