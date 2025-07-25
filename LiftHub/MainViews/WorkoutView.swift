@@ -20,7 +20,10 @@ struct WorkoutView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                WorkoutListView(workout: $viewModel.workoutDraft, workoutHints: $viewModel.workoutHints, workoutStateViewModel: stateViewModel, planName: viewModel.planName, routineName: viewModel.routineName)
+                WorkoutListView(
+                    viewModel: viewModel,
+                    workoutStateViewModel: stateViewModel
+                )
                 
             }
             .onAppear(){
@@ -99,15 +102,15 @@ struct WorkoutView: View {
     
 }
 
-struct WorkoutView_Previews: PreviewProvider {
-    @State static var closeWorkutSheet = true
-    @State static var isWorkoutEnded = true
-    @State static var unfinishedRoutineName: String? = nil
-    @State static var showToast = true
-    @State static var toastMessage: String = ""
-    @State static var rotineName = "Routine"
-    static var previews: some View {
-        WorkoutView(viewModel: WorkoutViewModel(planName: "", routineName: "", date: ""), homeStateViewModel: HomeStateViewModel())
-    }
-}
+//struct WorkoutView_Previews: PreviewProvider {
+//    @State static var closeWorkutSheet = true
+//    @State static var isWorkoutEnded = true
+//    @State static var unfinishedRoutineName: String? = nil
+//    @State static var showToast = true
+//    @State static var toastMessage: String = ""
+//    @State static var rotineName = "Routine"
+//    static var previews: some View {
+//        WorkoutView(viewModel: WorkoutViewModel(planName: "", routineName: "", date: ""), homeStateViewModel: HomeStateViewModel())
+//    }
+//}
 

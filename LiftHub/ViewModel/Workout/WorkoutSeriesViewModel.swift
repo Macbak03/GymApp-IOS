@@ -18,6 +18,7 @@ class WorkoutSeriesViewModel: ObservableObject {
     
     @Published var intensityIndexText: String = "RPE"
     @Published var weightUnitText: String = "kg"
+    //@Published var exerciseType: ExerciseType
     
     @Published var showLoadError = false
     @Published var showRepsError = false
@@ -26,6 +27,7 @@ class WorkoutSeriesViewModel: ObservableObject {
     init(seriesCount: Int, position: Int) {
         self.seriesCount = seriesCount
         self.position = position
+        //self.exerciseType = exerciseType
     }
     
     func initValues(series: WorkoutSeriesDraft, hint: WorkoutHints, setCompariosn: WorkoutHints, selectedComparingMethod: SelectedComparingMethod){

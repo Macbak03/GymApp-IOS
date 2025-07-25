@@ -228,7 +228,7 @@ class NoPlanWorkoutViewModel: ObservableObject {
     
     func removeExercise(id: UUID) {
         if let index = workoutDraft.firstIndex(where: { $0.id == id }) {
-                workoutDraft.remove(at: index)
+            workoutDraft.remove(at: index)
         }
         objectWillChange.send()
     }

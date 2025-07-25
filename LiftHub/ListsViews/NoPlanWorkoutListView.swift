@@ -20,7 +20,13 @@ struct NoPlanWorkoutListView: View {
         List {
             ForEach(viewModel.workoutDraft) {
                 exercise in
-                WorkoutListExerciseView(exercise: binding(for: exercise), viewModel: NoPlanWorkoutExerciseViewModel(exerciseCount: viewModel.workoutDraft.count), stateViewModel: stateViewModel, noPlanWorkoutViewModel: viewModel, exerciseRemoved: $exerciseRemoved, isLastExercise: $isLastExercise)
+                WorkoutListExerciseView(
+                    exercise: binding(for: exercise),
+                    viewModel: NoPlanWorkoutExerciseViewModel(exerciseCount: viewModel.workoutDraft.count),
+                    stateViewModel: stateViewModel,
+                    noPlanWorkoutViewModel: viewModel,
+                    exerciseRemoved: $exerciseRemoved,
+                    isLastExercise: $isLastExercise)
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         if viewModel.workoutDraft.count > 1 {
                             Button(role: .destructive) {
@@ -38,6 +44,7 @@ struct NoPlanWorkoutListView: View {
                     .onAppear() {
                         updateLastExercise()
                     }
+                    
             }
         }
         .listStyle(PlainListStyle())
@@ -83,7 +90,7 @@ private struct WorkoutListExerciseView: View {
     
     @FocusState private var isExerciseNameFocused: Bool
     
-    @State var setAdded = false
+    @State private var setAdded = false
     @State private var workoutModified = false
     
     @Binding var exerciseRemoved: (removed: Bool, id: UUID?)

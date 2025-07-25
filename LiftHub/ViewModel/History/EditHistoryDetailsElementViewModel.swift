@@ -32,10 +32,10 @@ class EditHistoryDetailsElementViewModel: ObservableObject {
     func initValues(workoutExerciseDraft: WorkoutExerciseDraft) {
         self.exerciseName = workoutExerciseDraft.name
         self.intensityIndexText = workoutExerciseDraft.intensityIndex.rawValue
-        self.restValue = workoutExerciseDraft.pause
-        self.restUnit = workoutExerciseDraft.pauseUnit.rawValue
+        self.restValue = workoutExerciseDraft.pause == "0" ? "-" : workoutExerciseDraft.pause
+        self.restUnit = workoutExerciseDraft.pause == "0" ? "" : workoutExerciseDraft.pauseUnit.rawValue
         self.seriesValue = workoutExerciseDraft.series
         self.intensityValue = workoutExerciseDraft.intensity
-        self.paceValue = workoutExerciseDraft.pace
+        self.paceValue = workoutExerciseDraft.pace == "0000" ? "-" : workoutExerciseDraft.pace
     }
 }

@@ -79,7 +79,12 @@ struct StartWorkoutSheetView: View {
                             List {
                                 ForEach(viewModel.routines.indices, id: \.self) {
                                     index in
-                                    SheetListElement(homeStateViewModel: homeStateViewModel, routine: viewModel.routines[index], planName: viewModel.selectedPlan, closeWorkoutSheetElement: $closeWorkoutSheetView)
+                                    SheetListElement(
+                                        viewModel: viewModel,
+                                        homeStateViewModel: homeStateViewModel,
+                                        routine: viewModel.routines[index],
+                                        planName: viewModel.selectedPlan,
+                                        closeWorkoutSheetElement: $closeWorkoutSheetView)
                                         .id(viewModel.selectedPlan)
                                         .transition(.move(edge: .bottom))
                                 }
@@ -142,6 +147,7 @@ struct StartWorkoutSheetView: View {
 
 private struct SheetListElement: View {
     @State private var startWorkout: Bool = false
+    @ObservedObject var viewModel: StartWorkoutSheetViewModel
     @ObservedObject var homeStateViewModel: HomeStateViewModel
     let routine: TrainingPlanElement
     let planName: String
@@ -177,7 +183,9 @@ private struct SheetListElement: View {
                     WorkoutViewModel(
                         planName: planName,
                         routineName: routine.name,
-                        date: date),
+                        date: date,
+                        intensityIndex: viewModel.intensityIndex,
+                        weightUnit: viewModel.weightUnit),
                 homeStateViewModel: homeStateViewModel
             )
         }

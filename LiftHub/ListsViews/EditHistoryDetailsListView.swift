@@ -43,10 +43,12 @@ private struct EditHistoryDetailsListExerciseView: View {
                 // First Horizontal Layout (Exercise Name)
                 HStack {
                     Text(viewModel.exerciseName)
-                        .font(.system(size: 18, weight: .bold))  // Equivalent to bold and textSize 24sp
-                        .frame(height: 15)  // Equivalent to layout_height="30dp"
-                    //.padding(.leading, 35)  // Equivalent to layout_marginStart="35dp"
-                    Spacer()  // To take up the remaining space
+                        .font(.system(size: 18, weight: .bold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .allowsTightening(true)
+                    Spacer()
                 }
                 .frame(maxWidth: .infinity)
                 

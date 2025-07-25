@@ -11,6 +11,7 @@ class WorkoutExerciseViewModel: ObservableObject {
     @Published var lastWorkoutComparison: [WorkoutHints] = []
     
     @Published var exerciseName = "Exercise"
+    @Published var showNameError = false
     
     @Published var intensityIndexText = "Intensity"
     @Published var restValue = "val"
@@ -50,6 +51,27 @@ class WorkoutExerciseViewModel: ObservableObject {
             for lastWorkoutSeries in lastWorkoutData {
                 lastWorkoutComparison.append(WorkoutHints(repsHint: lastWorkoutSeries.actualReps, weightHint: lastWorkoutSeries.actualLoad, intensityHint: lastWorkoutSeries.actualIntensity, noteHint: noteHint))
             }
+        }
+    }
+    
+    private func handleExerciseNameException(exercise: WorkoutExerciseDraft) throws {
+        if exercise.name.isEmpty {
+            throw ValidationException(message: "Exercise name cannot be empty")
+        }
+    }
+    
+    func validateExerciseName(focused: Bool, exercise: WorkoutExerciseDraft, stateViewModel: WorkoutStateViewModel) {
+        if !focused {
+            do {
+                try handleExerciseNameException(exercise: exercise)
+            } catch let error as ValidationException {
+                showNameError = true
+                stateViewModel.setToast(errorMessage: error.message)
+            } catch {
+                stateViewModel.setToast(errorMessage: "An unexpected error occured \(error)")
+            }
+        } else {
+            showNameError = false
         }
     }
 }

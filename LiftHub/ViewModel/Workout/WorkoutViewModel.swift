@@ -14,14 +14,43 @@ class WorkoutViewModel: ObservableObject {
     let planName: String
     let routineName: String
     let date: String
+    let intensityIndex: IntensityIndex
+    let weightUnit: WeightUnit
     
     private let workoutHistoryDatabaseHelper = WorkoutHistoryDataBaseHelper()
     private let workoutSeriesDatabaseHelper = WorkoutSeriesDataBaseHelper()
+    private var isWorkoutRepeated = false
     
-    init(planName: String, routineName: String, date: String) {
+    init(planName: String, routineName: String, date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
         self.planName = planName
         self.routineName = routineName
         self.date = date
+        self.intensityIndex = intensityIndex
+        self.weightUnit = weightUnit
+    }
+    
+    init(workoutDraft: [WorkoutDraft], planName: String, routineName: String = "", date: String, intensityIndex: IntensityIndex, weightUnit: WeightUnit) {
+        self.workoutDraft = workoutDraft
+        self.planName = planName
+        self.routineName = routineName
+        self.date = date
+        self.intensityIndex = intensityIndex
+        self.weightUnit = weightUnit
+        isWorkoutRepeated = true
+        for i in self.workoutDraft.indices {
+            for j in self.workoutDraft[i].workoutSeriesDraftList.indices {
+                self.workoutDraft[i].workoutSeriesDraftList[j].actualLoad = ""
+                self.workoutDraft[i].workoutSeriesDraftList[j].actualIntensity = ""
+                self.workoutDraft[i].workoutSeriesDraftList[j].actualReps = ""
+            }
+            self.workoutDraft[i].workoutExerciseDraft.note = ""
+        }
+        
+        if self.workoutDraft.count > workoutHints.count {
+            for _ in workoutHints.count...workoutDraft.count {
+                workoutHints.append(WorkoutHints(repsHint: "reps", weightHint: weightUnit.description, intensityHint: intensityIndex.descritpion, noteHint: "note"))
+            }
+        }
     }
     
     func loadRoutine(isWorkoutSaved: Bool) {
@@ -31,41 +60,56 @@ class WorkoutViewModel: ObservableObject {
             print("planId was null in workoutView")
             return
         }
+        if !isWorkoutSaved {
+            initRecoveredWorkoutData()
+            return
+        }
         let savedRoutine = exercisesDatabaseHelper.getRoutine(routineName: routineName, planId: String(planId))
+        var lastIndex: Int = 0
         for (index, savedExercise) in savedRoutine.enumerated() {
             let exercise = WorkoutExerciseDraft(exerciseType: savedExercise.exerciseType, name: savedExercise.name, pause: savedExercise.pause, pauseUnit: savedExercise.pauseUnit, series: savedExercise.series, reps: savedExercise.reps, loadUnit: savedExercise.loadUnit, intensity: savedExercise.intensity, intensityIndex: savedExercise.intensityIndex, pace: savedExercise.pace, note: "")
-            let seriesList: [WorkoutSeriesDraft]
-            if savedExercise.intensity == nil {
-                seriesList = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: nil), count: Int(savedExercise.series)!)
-            } else {
-                seriesList = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
+            if !isWorkoutRepeated {
+                let seriesList: [WorkoutSeriesDraft]
+                if savedExercise.intensity == nil {
+                    seriesList = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: nil), count: Int(savedExercise.series)!)
+                } else {
+                    seriesList = Array(repeating: WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: savedExercise.loadUnit, intensityIndex: savedExercise.intensityIndex, actualIntensity: ""), count: Int(savedExercise.series)!)
+                }
+                workoutDraft.append(WorkoutDraft(workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
             }
-
-            workoutDraft.append(WorkoutDraft(workoutExerciseDraft: exercise, workoutSeriesDraftList: seriesList))
             let savedNotes = workoutHistoryDatabaseHelper.getLastTrainingNotes(planName: planName, routineName: routineName)
             if !savedNotes.isEmpty {
                 if index < savedNotes.count {
                     let note = savedNotes[index]
                     if !note.isEmpty {
                         let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: note)
-                        self.workoutHints.append(workoutHint)
+                        if !isWorkoutRepeated {
+                            self.workoutHints.append(workoutHint)
+                        } else {
+                            self.workoutHints[index] = workoutHint
+                        }
                     } else {
-                        let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-                        self.workoutHints.append(workoutHint)
+                        addDefaultHint(savedExercise: savedExercise)
                     }
                 } else {
-                    let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-                    self.workoutHints.append(workoutHint)
+                    addDefaultHint(savedExercise: savedExercise)
                 }
             } else {
-                let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
-                self.workoutHints.append(workoutHint)
+                addDefaultHint(savedExercise: savedExercise)
             }
-                
+            lastIndex = index
         }
-        if !isWorkoutSaved {
-            initRecoveredWorkoutData()
+        
+        if lastIndex < workoutHints.count - 1 {
+            for i in lastIndex..<workoutHints.count {
+                workoutHints[i] = WorkoutHints(repsHint: "reps", weightHint: weightUnit.description, intensityHint: intensityIndex.descritpion, noteHint: "note")
+            }
         }
+    }
+    
+    private func addDefaultHint(savedExercise: ExerciseDraft) {
+        let workoutHint = WorkoutHints(repsHint: savedExercise.reps, weightHint: savedExercise.load, intensityHint: savedExercise.intensity, noteHint: "Note")
+        self.workoutHints.append(workoutHint)
     }
     
     private func initRecoveredWorkoutData() {
@@ -73,33 +117,37 @@ class WorkoutViewModel: ObservableObject {
             print("recovered workout was null in WorkoutView")
             return
         }
-        for (index, exercise) in recoveredWorkout.enumerated() {
-            if index < workoutDraft.endIndex {
-                workoutDraft[index].workoutExerciseDraft.note = exercise.workoutExerciseDraft.note
-            } else {
-                break
-            }
-            for (setIndex, set) in exercise.workoutSeriesDraftList.enumerated() {
-                if setIndex < workoutDraft[index].workoutSeriesDraftList.endIndex {
-                    workoutDraft[index].workoutSeriesDraftList[setIndex].actualReps = set.actualReps
-                    workoutDraft[index].workoutSeriesDraftList[setIndex].actualLoad = set.actualLoad
-                    workoutDraft[index].workoutSeriesDraftList[setIndex].actualIntensity = set.actualIntensity
-                } else {
-                    break
-                }
-            }
+        guard let recoveredHints = loadHintsFromFile() else {
+            print("recovered hints was null in WorkoutView")
+            return
         }
+        workoutDraft = recoveredWorkout
+        workoutHints = recoveredHints
     }
     
     private func loadWorkoutFromFile() -> [WorkoutDraft]? {
         if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let fileURL = documentDirectory.appendingPathComponent("workout.json")
-            
+            let workoutURL = documentDirectory.appendingPathComponent("workout.json")
             do {
-                let data = try Data(contentsOf: fileURL)
+                let workoutData = try Data(contentsOf: workoutURL)
                 let decoder = JSONDecoder()
-                let workoutList = try decoder.decode([WorkoutDraft].self, from: data)
+                let workoutList = try decoder.decode([WorkoutDraft].self, from: workoutData)
                 return workoutList.map { WorkoutDraft(workoutExerciseDraft: $0.workoutExerciseDraft, workoutSeriesDraftList:$0.workoutSeriesDraftList) }
+            } catch {
+                print("Error loading workout: \(error)")
+            }
+        }
+        return nil
+    }
+    
+    private func loadHintsFromFile() -> [WorkoutHints]? {
+        if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let hintsURL = documentDirectory.appendingPathComponent("hints.json")
+            do {
+                let hintsData = try Data(contentsOf: hintsURL)
+                let decoder = JSONDecoder()
+                let workoutHints = try decoder.decode([WorkoutHints].self, from: hintsData)
+                return workoutHints.map(\.self)
             } catch {
                 print("Error loading workout: \(error)")
             }
@@ -111,19 +159,23 @@ class WorkoutViewModel: ObservableObject {
         let workoutList = workoutDraft.map {
             WorkoutDraft(workoutExerciseDraft: $0.workoutExerciseDraft, workoutSeriesDraftList: $0.workoutSeriesDraftList)
         }
+        let workoutHints = workoutHints.map(\.self)
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         
         do {
-            let jsonData = try encoder.encode(workoutList)
+            let workoutData = try encoder.encode(workoutList)
+            let hintsData = try encoder.encode(workoutHints)
             if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-                let fileURL = documentDirectory.appendingPathComponent("workout.json")
-                try jsonData.write(to: fileURL)
+                let workoutURL = documentDirectory.appendingPathComponent("workout.json")
+                let hintsURL = documentDirectory.appendingPathComponent("hints.json")
+                try workoutData.write(to: workoutURL)
+                try hintsData.write(to: hintsURL)
                 UserDefaultsUtils.shared.setWorkoutSaved(workoutSaved: false)
                 UserDefaultsUtils.shared.setUnfinishedRoutineName(routineName: routineName)
                 UserDefaultsUtils.shared.setUnsavedWorkoutPlanName(planName: planName)
                 UserDefaultsUtils.shared.setDate(date: date)
-                print("Workout data saved at: \(fileURL)")
+                print("Workout data saved at: \(workoutURL)")
             }
         } catch {
             print("Error saving workout: \(error)")
@@ -187,5 +239,21 @@ class WorkoutViewModel: ObservableObject {
         UserDefaultsUtils.shared.setHasWorkoutEnded(true)
         UserDefaultsUtils.shared.removeUnsavedWorkoutPlanName()
         workoutStateViewModel.isWorkoutFinished = true
+    }
+    
+    func addExercise() {
+        let exerciseDraft = WorkoutExerciseDraft(name: "", pause: "0", pauseUnit: TimeUnit.min, series: "0", reps: "0", loadUnit: WeightUnit.kg, intensity: "0", intensityIndex: intensityIndex, pace: "0000", note: "", isAdded: true)
+        let exerciseSetDraft = WorkoutSeriesDraft(actualReps: "", actualLoad: "", loadUnit: weightUnit, intensityIndex: intensityIndex, actualIntensity: "")
+        workoutHints.append(WorkoutHints(repsHint: "Reps", weightHint: "Weight", intensityHint: intensityIndex.descritpion, noteHint: "Note"))
+        workoutDraft.append(WorkoutDraft(workoutExerciseDraft: exerciseDraft, workoutSeriesDraftList: [exerciseSetDraft]))
+        objectWillChange.send()
+    }
+    
+    func removeExercise(id: UUID) {
+        if let index = workoutDraft.firstIndex(where: { $0.id == id }) {
+            workoutHints.remove(at: index)
+            workoutDraft.remove(at: index)
+        }
+        objectWillChange.send()
     }
 }

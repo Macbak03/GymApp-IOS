@@ -112,7 +112,9 @@ struct HomeView: View {
                             WorkoutViewModel(
                                 planName: viewModel.unsavedWorkoutPlanName,
                                 routineName: UserDefaultsUtils.shared.getUnfinishedRoutineName(),
-                                date: UserDefaultsUtils.shared.getDate()),
+                                date: UserDefaultsUtils.shared.getDate(),
+                                intensityIndex: viewModel.intensityIndex,
+                                weightUnit: viewModel.weightUnit),
                         homeStateViewModel: stateViewModel
                     )
                 } else if stateViewModel.startNoPlanWorkout {
@@ -152,7 +154,9 @@ private struct lastWorkoutView: View {
                         .foregroundStyle(Color.TextColorPrimary)
                         .font(.system(size: 18))
                         .frame(maxWidth: .infinity)
-                        .multilineTextAlignment(.center)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .allowsTightening(true)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 1)
                     
@@ -169,8 +173,11 @@ private struct lastWorkoutView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.trailing, 10)
                     }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .allowsTightening(true)
                     .padding(.bottom, 5)
-                    .padding(.horizontal, 25)
+                    .padding(.horizontal, 20)
                 }
                 .cornerRadius(8)
                 .shadow(radius: 2)

@@ -20,8 +20,9 @@ struct WorkoutExerciseDraft: Codable, Identifiable, Hashable {
     var intensityIndex: IntensityIndex
     var pace: String?
     var note: String
+    var isAdded: Bool
 
-    init(exerciseType: ExerciseType = .weighted, name: String, pause: String, pauseUnit: TimeUnit, series: String, reps: String, loadUnit: WeightUnit, intensity: String?, intensityIndex: IntensityIndex, pace: String?, note: String) {
+    init(exerciseType: ExerciseType = .weighted, name: String, pause: String, pauseUnit: TimeUnit, series: String, reps: String, loadUnit: WeightUnit, intensity: String?, intensityIndex: IntensityIndex, pace: String?, note: String, isAdded: Bool = false) {
         self.exerciseType = exerciseType
         self.name = name
         self.pause = pause
@@ -33,5 +34,6 @@ struct WorkoutExerciseDraft: Codable, Identifiable, Hashable {
         self.intensityIndex = intensityIndex
         self.pace = pace
         self.note = note
+        self.isAdded = isAdded
     }
 }

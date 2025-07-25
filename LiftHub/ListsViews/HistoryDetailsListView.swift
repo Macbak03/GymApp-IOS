@@ -44,7 +44,7 @@ private struct HistoryDetailsListExerciseView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                if viewModel.planName != Constants.NO_PLAN_NAME {
+                if viewModel.planName != Constants.NO_PLAN_NAME && viewModel.exercise.workoutExerciseDraft.pause != "0" && viewModel.exercise.workoutExerciseDraft.pace != "0000" {
                     
                     // Second Horizontal Layout (Rest, Series, Intensity, Pace)
                     HStack(alignment: .center) {

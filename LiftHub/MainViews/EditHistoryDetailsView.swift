@@ -68,7 +68,15 @@ struct EditHistoryDetailsView: View {
                                 weightUnit: viewModel.weightUnit)
                     )
                 } else {
-                    WorkoutView(viewModel: WorkoutViewModel(planName: viewModel.planName, routineName: viewModel.routineName, date: CustomDate.getCurrentDate()), homeStateViewModel: HomeStateViewModel())
+                    WorkoutView(
+                        viewModel: WorkoutViewModel(
+                            workoutDraft: viewModel.workoutDraft,
+                            planName: viewModel.planName,
+                            routineName: viewModel.routineName,
+                            date: CustomDate.getCurrentDate(),
+                            intensityIndex: viewModel.intensityIndex,
+                            weightUnit: viewModel.weightUnit),
+                        homeStateViewModel: HomeStateViewModel())
                 }
             }
         }

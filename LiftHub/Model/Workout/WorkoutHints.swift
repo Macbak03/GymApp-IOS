@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct WorkoutHints {
+struct WorkoutHints: Codable, Identifiable, Hashable {
+    var id = UUID()
     var repsHint: String
     var weightHint: String
     var intensityHint: String?
